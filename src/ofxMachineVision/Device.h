@@ -19,14 +19,18 @@ namespace ofxMachineVision {
         
         enum FreeRunMode {
             FreeRunMode_OwnThread,
-            FreeRunMode_NeedsThread
+            FreeRunMode_NeedsThread,
+            FreeRunMode_PollEveryFrame
         };
         
         enum DeviceFeature {
             Feature_ROI,
             Feature_Binning,
             Feature_PixelClock,
-            Feature_Triggering
+            Feature_Triggering,
+            Feature_OneShot,
+            Feature_Exposure,
+            Feature_Gain
         };
         
         enum PixelMode {
@@ -52,6 +56,12 @@ namespace ofxMachineVision {
             TriggerSignal_WhilstLow
         };
         
+        enum DeviceState {
+            State_Closed,
+            State_Waiting,
+            State_Running
+        };
+        
         typedef std::set<DeviceFeature> DeviceFeatureSet;
         typedef std::set<PixelMode> PixelModeSet;
         typedef std::set<TriggerMode> TriggerModeSet;
@@ -64,8 +74,8 @@ namespace ofxMachineVision {
          */
         //@{
         void open(int deviceID = 0);
-        bool isOpen() const;
         void close();
+        bool getIsOpen() const { return this->deviceState != State_Closed; }
         string getDetailedInfo() const;
         //@}
 
@@ -97,7 +107,7 @@ namespace ofxMachineVision {
          the device only to trigger on a specific event (e.g. electrical signal on a GPIO).
          */
         //@{
-        void startTriggeredCapture(TriggerMode = Trigger_Device);
+        void startTriggeredCapture(TriggerMode triggerMode = Trigger_Device);
         void stopTriggeredCapture();
         bool isTriggeredCaptureRunning() const;
         const TriggerMode & getTriggerMode() const;
@@ -105,6 +115,8 @@ namespace ofxMachineVision {
         const TriggerModeSet & getDeviceTriggerModes() const { return this->deviceTriggerModes; }
         const TriggerSignalTypeSet & getDeviceTriggerSignalTypes() const { return this->deviceTriggerSignalTypes; }
         //@}
+        
+        void oneShotCapture(ofPixels &) const;
         
         /**
          @name Region of Interest
@@ -119,10 +131,10 @@ namespace ofxMachineVision {
          @name ofBaseDraws
          */
         //@{
-        void draw(float x, float y);
-        void draw(float x, float y, float w, float h) {
+        void draw(float x, float y) {
             this->draw(x, y, this->getWidth(), this->getHeight());
         }
+        void draw(float x, float y, float w, float h);
         /** \brief Get the width of the current capture mode */
         float getWidth() { return (int) this->roi.width; }
         /** \brief Get the height of the current capture mode */
@@ -168,7 +180,11 @@ namespace ofxMachineVision {
          \brief Your subclass must declare some parameters for operation when it calls Device's constructor.
          @param freeRunMode use freeRunMode_OwnThread or freeRunMode_NeedsThread
          */
-        Device(FreeRunMode freeRunMode);
+        Device(FreeRunMode freeRunMode) {
+            this->driverFreeRunMode = freeRunMode;
+            this->deviceState = State_Closed;
+            this->useTexture = true;
+        }
         
         /**
          @name Custom camera functions
@@ -183,22 +199,23 @@ namespace ofxMachineVision {
          * manufacturer
          * modelName
          */
-        virtual bool customOpen();
-        virtual void customClose();
-        virtual bool customStart();
-        virtual void customStop();
+        virtual bool customOpen(int deviceID) = 0;
+        virtual void customClose() = 0;
+        virtual bool customStart(TriggerMode) = 0;
+        virtual void customStop() = 0;
         virtual void customSetROI(const ofRectangle &) { }
-        virtual void customCaptureFrame() = 0;
-        virtual void customSetExposure(int ms);
+        virtual void customOneShotCapture(ofPixels &) { };
+        virtual void customSetExposure(int ms) { };
         //@}
         
         /** \cond PRIVATE */
         float fps;
         ofRectangle roi;
-        ofTexture texture;
         ofPixels pixels;
-        /** \endcond */
-    private:
+        void allocateTexture();
+        bool useTexture;
+        ofTexture texture;
+        
         FreeRunMode driverFreeRunMode;
         DeviceFeatureSet deviceFeatures;
         PixelModeSet devicePixelModes;
@@ -206,5 +223,8 @@ namespace ofxMachineVision {
         TriggerSignalTypeSet deviceTriggerSignalTypes;
         string manufacturer;
         string modelName;
+ 
+        DeviceState deviceState;
+        /** \endcond */
     };
 }
