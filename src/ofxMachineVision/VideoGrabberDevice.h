@@ -14,12 +14,13 @@ namespace ofxMachineVision {
      */
     class VideoGrabberDevice : public Device {
     public:
-        VideoGrabberDevice();
+        VideoGrabberDevice() : Device(Device::FreeRunMode_PollEveryFrame) { }
     protected:
-        bool customOpen(int deviceID);
+        Specification customOpen(int deviceID);
         void customClose();
         bool customStart(TriggerMode);
         void customStop();
+        bool customPollFrame();
         
         ofVideoGrabber video;
     };

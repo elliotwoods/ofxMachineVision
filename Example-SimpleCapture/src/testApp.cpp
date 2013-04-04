@@ -9,23 +9,32 @@ void testApp::setup(){
     //open a connection to the device
     camera->open();
     
+    //start the camera capturing using default trigger
+    camera->startFreeRunCapture();
+    
     //print device information
-    cout << camera->getDetailedInfo();
+    cout << camera->getSpecification().toString();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-
+    
+    //update the texture in the Device class
+    camera->update();
+    
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-
+    
+    //draw the texture in the Device class
+    camera->draw(0, 0);
+    
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-	
+	camera->everyframe = ! camera->everyframe;
 }
 
 //--------------------------------------------------------------

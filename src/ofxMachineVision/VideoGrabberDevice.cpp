@@ -7,17 +7,16 @@
 
 namespace ofxMachineVision {
     //---------
-    VideoGrabberDevice::VideoGrabberDevice() : Device(Device::FreeRunMode_PollEveryFrame) {
-    }
-    
-    //---------
-    bool VideoGrabberDevice::customOpen(int deviceID) {
+    Device::Specification VideoGrabberDevice::customOpen(int deviceID) {
         this->video.setDeviceID(deviceID);
-        this->devicePixelModes.insert(Pixel_RGB8);
-        this->deviceTriggerModes.insert(Trigger_Device);
-        this->manufacturer = "openFrameworks";
-        this->modelName = "ofVideoGrabber";
-        return true;
+        this->video.setUseTexture(false);
+        
+        Specification specification(640, 480, "openFrameworks", "ofVideoGrabber");
+        specification.addPixelMode(Pixel_RGB8);
+        specification.addFeature(Feature_FreeRun);
+        specification.addTriggerMode(Trigger_Device);
+        
+        return specification;
     }
     
     //---------
@@ -28,12 +27,22 @@ namespace ofxMachineVision {
     //---------
     bool VideoGrabberDevice::customStart(TriggerMode triggerMode) {
         //we can't request native sensor size using video grabber
-        this->video.initGrabber(640, 480, false);
+        this->video.initGrabber(this->getSensorWidth(), this->getSensorHeight(), false);
         return this->video.isInitialized();
     }
     
     //---------
     void VideoGrabberDevice::customStop() {
         this->video.close();
+    }
+    
+    //---------
+    bool VideoGrabberDevice::customPollFrame() {
+        this->video.update();
+        bool newFrame = this->video.isFrameNew();
+        if (newFrame) {
+            this->pixels.setFromExternalPixels(this->video.getPixels(), this->getSensorWidth(), this->getSensorHeight(), 3);
+        }
+        return newFrame;
     }
 }
