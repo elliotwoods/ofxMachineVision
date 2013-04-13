@@ -28,6 +28,9 @@ namespace ofxMachineVision {
 
 			virtual bool startCapture() = 0;
 			virtual void stopCapture() = 0;
+			/**
+			Note : Make sure to lock the Frame for writing whilst you write to it.
+			*/
 			virtual void getFrame(Frame &) = 0;
 		};
 	}

@@ -5,6 +5,7 @@
 #include "Poco/Any.h"
 	
 #include "ofThread.h"
+#include "ofEvents.h"
 
 #include "ofxMachineVision/Constants.h"
 #include "ofxMachineVision/Device/Blocking.h"
@@ -58,7 +59,7 @@ namespace ofxMachineVision {
 				};
 
 				Blocking(Device::Blocking *, Grabber::Base *);
-				~Blocking() { this->close(); }
+				~Blocking() { this->close(); cout << __func__ << " closing"; }
             
 				/**
 				\brief Open device and block until complete.
@@ -77,12 +78,15 @@ namespace ofxMachineVision {
 
 				void addAction(const Action &, bool blockUntilComplete = false);
 				void blockUntilActionQueueEmpty();
+
+				ofEvent<Frame> evtNewFrame;
 			protected:
 				void threadedFunction();
 				queue<Action> actionQueue;
 				ofMutex actionQueueLock;
 				Device::Blocking * device;
 				Grabber::Base * grabber;
+				Frame frame;
 			};
 		}
 	}

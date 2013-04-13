@@ -48,18 +48,18 @@ namespace ofxMachineVision {
 			//----------
 			void Blocking::setBinning(int binningX, int binningY) {
 				Binning binning = {binningX, binningY};
-				this->addAction(Action(Action::Type_SetBinning, binning));
+				this->addAction(Action(Action::Type_SetBinning, binning), true);
 			}
 
 			//----------
 			void Blocking::setROI(const ofRectangle& roi) {
-				this->addAction(Action(Action::Type_SetROI, roi));
+				this->addAction(Action(Action::Type_SetROI, roi), true);
 			}
-
+			
 			//----------
 			void Blocking::setTriggerMode(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
 				TriggerSettings triggerSettings(triggerMode, triggerSignalType);
-				this->addAction(Action(Action::Type_SetTriggerSettings, triggerSettings));
+				this->addAction(Action(Action::Type_SetTriggerSettings, triggerSettings), true);
 			}
 
 			//----------
@@ -131,6 +131,8 @@ namespace ofxMachineVision {
 		
 					if (this->grabber->getIsDeviceRunning()) {
 						//pull a frame from the device
+						this->device->getFrame(this->frame);
+						ofNotifyEvent(this->evtNewFrame, this->frame, this); 
 					} else {
 						//the device is open but waiting for instructions
 						ofThread::sleep(1);

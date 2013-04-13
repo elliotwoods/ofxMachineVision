@@ -36,6 +36,7 @@ namespace ofxMachineVision {
 			}
 
 			virtual ~Base() {
+				this->deviceState = State_Deleting;
 				switch(this->deviceType) {
 				case Device::Type_Blocking:
 					if (this->getIsDeviceOpen()) {

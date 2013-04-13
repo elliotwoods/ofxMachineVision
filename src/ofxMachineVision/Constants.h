@@ -70,7 +70,8 @@ namespace ofxMachineVision {
     enum DeviceState {
         State_Closed,
         State_Waiting,
-        State_Running
+        State_Running,
+		State_Deleting
     };
 
 	/**
