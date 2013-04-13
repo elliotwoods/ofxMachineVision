@@ -10,7 +10,10 @@
 #include "ofThread.h"
 #include "ofEventUtils.h"
 
+#include "Poco/RWLock.h"
+
 #include <set>
+#include <queue>
 
 namespace ofxMachineVision {
     /**
@@ -21,7 +24,7 @@ namespace ofxMachineVision {
 
         enum FreeRunMode {
             FreeRunMode_OwnThread,
-            FreeRunMode_NeedsThread,
+            FreeRunMode_Blocking,
             FreeRunMode_PollEveryFrame
         };
         
@@ -33,7 +36,8 @@ namespace ofxMachineVision {
             Feature_FreeRun,
             Feature_OneShot,
             Feature_Exposure,
-            Feature_Gain
+            Feature_Gain,
+			Feature_DeviceID
         };
         
         enum PixelMode {
@@ -66,6 +70,29 @@ namespace ofxMachineVision {
             State_Running
         };
         
+		/**
+		\brief An instance of ofPixels with some other metadata and a thread lock
+		*/
+		class Frame {
+		public:
+			Frame(const Device * device, const ofPixels & pixels) {
+				this->device = device;
+			}
+
+			bool lockForReading() { return this->lock.tryReadLock(); }
+			bool lockForWriting() { return this->lock.tryWriteLock(); }
+			void unlock() { this->lock.unlock(); }
+
+			const ofPixels & getPixelsRef() const { return this->pixels; }
+			const unsigned char * getPixels() const { return this->getPixelsRef().getPixels(); }
+			const Device & getDevice() const { return * this->device; }
+
+		protected:
+			Poco::RWLock lock;
+			ofPixels pixels;
+			Device const * device;
+		};
+
         class Specification {
         public:    
             typedef std::set<Feature> FeatureSet;
@@ -74,10 +101,13 @@ namespace ofxMachineVision {
             typedef std::set<TriggerSignalType> TriggerSignalTypeSet;
 
             Specification();
+			Specification(int deviceID) { this->deviceID = deviceID;}
             Specification(const Specification &);
             Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName);
             
             bool getValid() const { return this->valid; }
+			int getDeviceID() const { return this->deviceID; }
+			
             const FeatureSet & getFeatures() const { return this->features; }
             const PixelModeSet & getPixelModes() const { return this->pixelModes; }
             const TriggerModeSet & getTriggerModes() const { return this->triggerModes; }
@@ -87,20 +117,21 @@ namespace ofxMachineVision {
             bool supports(const PixelMode &);
             bool supports(const TriggerMode &);
             bool supports(const TriggerSignalType &);
-            
+
             int getSensorWidth() const { return this->sensorWidth; }
             int getSensorHeight() const { return this->sensorHeight; }
-            
+
             const string & getManufacturer() const { return this->manufacturer; }
             const string & getModelName() const { return this->modelName; }
-            
+
             string toString() const;
 
+			void setDeviceID(int deviceID) { this->deviceID = deviceID; }
             void addFeature(const Feature &);
             void addPixelMode(const PixelMode &);
             void addTriggerMode(const TriggerMode &);
             void addTriggerSignalType(const TriggerSignalType &);
-            
+
         protected:
             bool valid;
             FeatureSet features;
@@ -113,11 +144,12 @@ namespace ofxMachineVision {
             
             string manufacturer;
             string modelName;
+			
+			int deviceID;
         };
-        
+
         class PollDeviceThread : public ofThread {
         public:
-            PollDeviceThread() { this->running = false; };
             ~PollDeviceThread() { stop(); }
             /**
              @param device The device to poll
@@ -131,10 +163,36 @@ namespace ofxMachineVision {
             void threadedFunction();
             Device * device;
             float updateLoopPeriod;
-            bool running;
-            
-            friend Device;
         };
+
+		class RunDeviceThread : public ofThread {
+		public:
+            enum Action {
+                Action_Open,
+                Action_Close,
+                Action_StartFreeRun,
+                Action_StopFreeRun
+            };
+            
+			~RunDeviceThread() { }
+            
+            void open() { this->addAction(Action_Open); this->blockUntilActionQueueEmpty(); }
+            void close() { this->addAction(Action_Close); this->blockUntilActionQueueEmpty();  }
+            void startFreeRun() { this->addAction(Action_StartFreeRun); this->blockUntilActionQueueEmpty(); }
+            void stopFreeRun() { this->addAction(Action_StopFreeRun); this->blockUntilActionQueueEmpty(); }
+            
+            void addAction(const Action &);
+            void setDevice(Device * device) { this->device = device; }
+			
+			void blockUntilActionQueueEmpty();
+		protected:
+			void threadedFunction();
+            
+            queue<Action> actionQueue;
+            ofMutex actionQueueLock;
+            
+            Device * device;
+		};
         
         virtual ~Device() { };
         
@@ -145,6 +203,7 @@ namespace ofxMachineVision {
         void open(int deviceID = 0);
         void close();
         bool getIsOpen() const { return this->deviceState != State_Closed; }
+		const DeviceState & getDeviceState() const { return this->deviceState; }
         //@}
 
         /**
@@ -153,6 +212,7 @@ namespace ofxMachineVision {
          */
         //@{
         const Specification & getSpecification() const { return this->specification; }
+		int getDeviceID() const { return this->getSpecification().getDeviceID(); }
         int getSensorWidth() const { return this->getSpecification().getSensorWidth(); }
         int getSensorHeight() const { return this->getSpecification().getSensorHeight(); }
         const string & getManufacturer() const { return this->getSpecification().getManufacturer(); };
@@ -171,7 +231,7 @@ namespace ofxMachineVision {
          @name Capture
          */
         //@{
-        void startFreeRunCapture(TriggerMode triggerMode = Trigger_Device);
+        void startFreeRunCapture(const TriggerMode & triggerMode = Trigger_Device, const TriggerSignalType & triggerSignalMode = TriggerSignal_RisingEdge);
         void stopFreeRunCapture();
         bool isFreeRunCaptureRunning() const;
         void oneShotCapture(ofPixels &, TriggerMode triggerMode = Trigger_Device) const;
@@ -254,20 +314,14 @@ namespace ofxMachineVision {
         static bool isColor(const PixelMode &);
         //@}
         
-        ofEvent<ofPixels> newFrame;
+        ofEvent<Frame> newFrame;
         
     protected:
         /**
          \brief Your subclass must declare some parameters for operation when it calls Device's constructor.
          @param freeRunMode use freeRunMode_OwnThread or freeRunMode_NeedsThread
          */
-        Device(FreeRunMode freeRunMode){
-            this->driverFreeRunMode = freeRunMode;
-            this->deviceState = State_Closed;
-            this->setUseTexture(true);
-            this->isFrameNew = false;
-            this->hasNewFrameWaiting = false;
-        }
+        Device(const FreeRunMode & freeRunMode);
         
         /**
          @name Custom camera functions
@@ -289,14 +343,14 @@ namespace ofxMachineVision {
         /** \brief Start the free run capture.
          This function should allocate Device::pixels
          */
-        virtual bool customStart(TriggerMode) = 0;
+        virtual bool customStart(const TriggerMode &, const TriggerSignalType &) = 0;
         virtual void customStop() = 0;
         /** \brief Poll for new frames.
          This function should only be overried for devices with
          `FreeRunMode_PollEveryFrame` driver types
          \return `true` if new frame found.
          */
-        virtual bool customPollFrame() { }
+        virtual bool customPollFrame() { return false; }
         virtual void customSetROI(const ofRectangle &) { }
         virtual void customOneShotCapture(ofPixels &) { };
         virtual void customSetExposure(int ms) { };
@@ -306,7 +360,8 @@ namespace ofxMachineVision {
          @name Threaded callbacks
          */
         //@{
-        void pollForNewFrame();
+		void callbackAction(const RunDeviceThread::Action &);
+		void callbackPollFrame();
         //@}
         
         /**
@@ -326,15 +381,19 @@ namespace ofxMachineVision {
         PixelMode pixelMode;
         
         void allocatePixels();
-        ofPixels pixels;
+        Frame frame;
         void allocateTexture();
         bool useTexture;
         ofTexture texture;
         
         PollDeviceThread pollThread;
-        
+        RunDeviceThread runDeviceThread;
+		
         bool isFrameNew;
         bool hasNewFrameWaiting;
         /** \endcond */
+        
+        friend PollDeviceThread;
+        friend RunDeviceThread;
     };
 }

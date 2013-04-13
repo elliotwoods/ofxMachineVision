@@ -25,7 +25,7 @@ namespace ofxMachineVision {
     }
     
     //---------
-    bool VideoGrabberDevice::customStart(TriggerMode triggerMode) {
+    bool VideoGrabberDevice::customStart(const TriggerMode &, const TriggerSignalType &) {
         //we can't request native sensor size using video grabber
         this->video.initGrabber(this->getSensorWidth(), this->getSensorHeight(), false);
         return this->video.isInitialized();

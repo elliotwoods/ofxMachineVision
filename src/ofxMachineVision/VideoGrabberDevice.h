@@ -18,7 +18,7 @@ namespace ofxMachineVision {
     protected:
         Specification customOpen(int deviceID);
         void customClose();
-        bool customStart(TriggerMode);
+        bool customStart(const TriggerMode &, const TriggerSignalType &);
         void customStop();
         bool customPollFrame();
         

@@ -5,6 +5,10 @@
 
 #include "Device.h"
 
+#ifndef __func__
+#define __func__ __FUNCTION__
+#endif
+
 #define LOG_ERROR ofLogError("ofxMachineVision::" + string(__func__))
 #define CHECK_OPEN if(!this->getIsOpen()) { LOG_ERROR << " Method cannot be called whilst device is not open"; return; }
 #define REQUIRES(feature) if(!this->specification.supports(feature)) { LOG_ERROR << " Device requires " << Device::toString(feature) << " to use this function."; return; }
@@ -17,7 +21,7 @@ namespace ofxMachineVision {
     sensorWidth(0), sensorHeight(0),
     manufacturer(""), modelName("") {
     }
-    
+
     //---------
     Device::Specification::Specification(const Specification & other) :
     valid(other.getValid()),
@@ -29,15 +33,15 @@ namespace ofxMachineVision {
     triggerSignalTypes(other.getTriggerSignalTypes())
     {
     }
-    
+
     //---------
     Device::Specification::Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName) :
     valid(true),
     sensorWidth(sensorWidth), sensorHeight(sensorHeight),
     manufacturer(manufacturer), modelName(modelName) {
     }
-    
-    //---------
+
+	//---------
     bool Device::Specification::supports(const Feature & feature) {
         return this->features.count(feature) > 0;
     }
@@ -46,22 +50,27 @@ namespace ofxMachineVision {
     bool Device::Specification::supports(const PixelMode & pixelMode) {
         return this->pixelModes.count(pixelMode) > 0;
     }
-    
+
     //---------
     bool Device::Specification::supports(const TriggerMode & triggerMode) {
         return this->triggerModes.count(triggerMode) > 0;
     }
-    
+
+    //---------
+    bool Device::Specification::supports(const TriggerSignalType & triggerSignalType) {
+        return this->triggerSignalTypes.count(triggerSignalType) > 0;
+    }
+
     //---------
     string Device::Specification::toString() const {
         stringstream ss;
         ss << "//--" << endl;
         ss << __func__ << endl;
         ss << endl;
-        ss << "Manufacturer:\t\t" << this->getManufacturer() << endl;
-        ss << "Model:\t\t\t\t" << this->getModelName() << endl;
+        ss << "[Manufacturer]\t\t" << this->getManufacturer() << endl;
+        ss << "[Model]\t\t\t" << this->getModelName() << endl;
         
-        ss << "Features:\t\t";
+        ss << "[Features]\t\t";
         const FeatureSet & features = this->getFeatures();
         for(FeatureSet::const_iterator it = features.begin(); it != features.end(); it++) {
             if (it != features.begin())
@@ -70,7 +79,7 @@ namespace ofxMachineVision {
         }
         ss << endl;
         
-        ss << "Pixel modes:\t\t";
+        ss << "[Pixel modes]\t\t";
         const PixelModeSet & pixelModes = this->getPixelModes();
         for(PixelModeSet::const_iterator it = pixelModes.begin(); it != pixelModes.end(); it++) {
             if (it != pixelModes.begin())
@@ -79,7 +88,7 @@ namespace ofxMachineVision {
         }
         ss << endl;
         
-        ss << "Trigger modes:\t\t";
+        ss << "[Trigger modes]\t\t";
         const TriggerModeSet & triggerModes = this->getTriggerModes();
         for(TriggerModeSet::const_iterator it = triggerModes.begin(); it != triggerModes.end(); it++) {
             if (it != triggerModes.begin())
@@ -88,7 +97,7 @@ namespace ofxMachineVision {
         }
         ss << endl;
         
-        ss << "Trigger signal types:\t";
+        ss << "[Trigger signal types]:\t";
         const TriggerSignalTypeSet triggerSignalTypes = this->getTriggerSignalTypes();
         for(TriggerSignalTypeSet::const_iterator it = triggerSignalTypes.begin(); it != triggerSignalTypes.end(); it++) {
             if (it != triggerSignalTypes.begin())
@@ -101,27 +110,27 @@ namespace ofxMachineVision {
         
         return ss.str();
     }
-    
+
     //---------
     void Device::Specification::addFeature(const Feature & feature) {
         this->features.insert(feature);
     }
-    
+
     //---------
     void Device::Specification::addPixelMode(const PixelMode & pixelMode) {
         this->pixelModes.insert(pixelMode);
     }
-    
+
     //---------
     void Device::Specification::addTriggerMode(const TriggerMode & triggerMode) {
         this->triggerModes.insert(triggerMode);
     }
-    
+
     //---------
     void Device::Specification::addTriggerSignalType(const TriggerSignalType & triggerSignalType) {
         this->triggerSignalTypes.insert(triggerSignalType);
     }
-    
+
 #pragma mark PollDeviceThread
     //---------
     void Device::PollDeviceThread::start(Device * device, float updateLoopPeriod) {
@@ -131,25 +140,59 @@ namespace ofxMachineVision {
         this->updateLoopPeriod = updateLoopPeriod;
         this->startThread(true, false);
     }
-    
+
     //---------
     void Device::PollDeviceThread::stop() {
         if (this->isThreadRunning()) {
             this->stopThread();
         }
     }
-    
+
     //---------
     void Device::PollDeviceThread::setUpdateLoopPeriod(float updateLoopPeriod) {
         this->updateLoopPeriod = updateLoopPeriod;
     }
-    
+
     //---------
     void Device::PollDeviceThread::threadedFunction() {
         while (this->isThreadRunning()) {
-            this->device->pollForNewFrame();
+            this->device->callbackPollFrame();
             this->sleep(this->updateLoopPeriod);
         }
+    }
+   
+#pragma mark RunDeviceThread
+    //----------
+    void Device::RunDeviceThread::addAction(const Action & action) {
+        this->actionQueueLock.lock();
+        this->actionQueue.push(action);
+        this->actionQueueLock.unlock();
+    }
+	
+	//----------
+	void Device::RunDeviceThread::blockUntilActionQueueEmpty() {
+		bool queueEmpty = false;
+		
+		while (!queueEmpty) {
+			this->actionQueueLock.lock();
+			queueEmpty = this->actionQueue.empty();
+			this->actionQueueLock.unlock();
+		}
+	}
+
+    //----------
+    void Device::RunDeviceThread::threadedFunction() {
+		//process any requested actions
+		actionQueueLock.lock();
+		while (!actionQueue.empty()) {
+			device->callbackAction(actionQueue.front());
+			actionQueue.pop();
+		}
+		actionQueueLock.unlock();
+		
+		if (device->getDeviceState() == State_Running) {
+			device->callbackPollFrame();
+		}
     }
     
 #pragma mark Device public members
@@ -160,7 +203,13 @@ namespace ofxMachineVision {
         this->isFrameNew = false;
         this->hasNewFrameWaiting = false;
         
-        this->specification = this->customOpen(deviceID);
+		if (this->driverFreeRunMode == FreeRunMode_Blocking) {
+			this->specification = Specification(deviceID);
+			this->runDeviceThread.open();
+		} else {
+			this->specification = this->customOpen(deviceID);
+		}
+        
         
         if (this->specification.getValid()) {
             this->deviceState = State_Waiting;
@@ -183,21 +232,22 @@ namespace ofxMachineVision {
     }
     
     //----------
-    void Device::startFreeRunCapture(TriggerMode triggerMode) {
+    void Device::startFreeRunCapture(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
         CHECK_OPEN
         REQUIRES(Feature_FreeRun);
         stopFreeRunCapture();
         
         REQUIRES(triggerMode);
+        REQUIRES(triggerSignalType);
         
         this->isFrameNew = false;
         this->hasNewFrameWaiting = false;
         
-        if (this->customStart(triggerMode)) {
+        if (this->customStart(triggerMode, triggerSignalType)) {
             
             switch (this->driverFreeRunMode) {
-                case FreeRunMode_NeedsThread:
-                    
+                case FreeRunMode_Blocking:
+                    pollThread.start(this);
                     break;
                 case FreeRunMode_OwnThread:
                     break;
@@ -242,12 +292,14 @@ namespace ofxMachineVision {
                 return;
             }
 
+			const ofPixels & pixels = this->frame.getPixelsRef();
+
             //if we haven't allocated yet or frame dimensions have changed
-            if (this->texture.getWidth() != this->pixels.getWidth() || this->texture.getHeight() != this->pixels.getHeight()) {
-                this->texture.allocate(this->pixels);
+            if (this->texture.getWidth() != pixels.getWidth() || this->texture.getHeight() != pixels.getHeight()) {
+                this->texture.allocate(pixels);
             }
             
-            this->texture.loadData(this->pixels);
+            this->texture.loadData(pixels);
         }
     }
     
@@ -267,8 +319,42 @@ namespace ofxMachineVision {
     }
     
 #pragma mark Device protected members
+	//----------
+	Device::Device(const FreeRunMode & freeRunMode) :
+		frame(this)
+	{
+		this->driverFreeRunMode = freeRunMode;
+		this->deviceState = State_Closed;
+		this->setUseTexture(true);
+		this->isFrameNew = false;
+		this->hasNewFrameWaiting = false;
+		
+		if (freeRunMode == FreeRunMode_Blocking) {
+			this->runDeviceThread.setDevice(this);
+			this->runDeviceThread.startThread();
+		}
+	}
+	
     //----------
-    void Device::pollForNewFrame() {
+    void Device::callbackAction(const RunDeviceThread::Action & action) {
+		switch (action) {
+			case RunDeviceThread::Action_Open:
+				this->specification = this->customOpen(this->getDeviceID());
+				break;
+			case RunDeviceThread::Action_Close:
+				this->customClose();
+				break;
+			case RunDeviceThread::Action_StartFreeRun:
+				break;
+			case RunDeviceThread::Action_StopFreeRun:
+				break;
+			default:
+				break;
+		}
+	}
+	
+	//----------
+    void Device::callbackPollFrame() {
         if (this->customPollFrame()) {
             this->onNewFrame();
         }
@@ -276,7 +362,7 @@ namespace ofxMachineVision {
     
     //----------
     void Device::onNewFrame() {
-        ofNotifyEvent(this->newFrame, this->pixels, this);
+        ofNotifyEvent(this->newFrame, this->frame, this);
         this->hasNewFrameWaiting = true;
     }
     
@@ -287,7 +373,7 @@ namespace ofxMachineVision {
     
     //----------
     void Device::allocateTexture() {
-        this->texture.allocate(this->pixels);
+        this->texture.allocate(this->frame.getPixelsRef());
     }
     
 #pragma mark toString helpers
