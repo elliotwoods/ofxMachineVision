@@ -59,7 +59,7 @@ namespace ofxMachineVision {
 				};
 
 				Blocking(Device::Blocking *, Grabber::Base *);
-				~Blocking() { this->close(); cout << __func__ << " closing"; }
+				~Blocking() { }
             
 				/**
 				\brief Open device and block until complete.

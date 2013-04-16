@@ -56,6 +56,9 @@ namespace ofxMachineVision {
 		ss << "[Manufacturer]\t\t" << this->getManufacturer() << endl;
 		ss << "[Model]\t\t\t" << this->getModelName() << endl;
         
+		ss << "[Sensor width]\t\t" << this->getSensorWidth() << endl;
+		ss << "[Sensor height]\t\t" << this->getSensorHeight() << endl;
+
 		ss << "[Features]\t\t";
 		const FeatureSet & features = this->getFeatures();
 		for(FeatureSet::const_iterator it = features.begin(); it != features.end(); it++) {
@@ -83,7 +86,7 @@ namespace ofxMachineVision {
 		}
 		ss << endl;
         
-		ss << "[Trigger signal types]:\t";
+		ss << "[Trigger signal types]\t";
 		const TriggerSignalTypeSet triggerSignalTypes = this->getTriggerSignalTypes();
 		for(TriggerSignalTypeSet::const_iterator it = triggerSignalTypes.begin(); it != triggerSignalTypes.end(); it++) {
 			if (it != triggerSignalTypes.begin())

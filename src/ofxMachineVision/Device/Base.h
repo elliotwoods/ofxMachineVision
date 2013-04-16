@@ -30,4 +30,6 @@ namespace ofxMachineVision {
 			//@}
 		};
 	}
+
+	typedef ofPtr<Device::Base> DevicePtr;
 }

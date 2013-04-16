@@ -16,3 +16,12 @@
 #include "ofxMachineVision/Device/Blocking.h"
 
 #include "ofxMachineVision/Grabber/Simple.h"
+
+namespace ofxMachineVision {
+	template<class DeviceClass>
+	class SimpleGrabber : public Grabber::Simple {
+	public:
+		SimpleGrabber() : Grabber::Simple(DevicePtr(new DeviceClass())) {
+		}
+	};
+}

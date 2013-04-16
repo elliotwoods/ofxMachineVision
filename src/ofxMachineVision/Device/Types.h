@@ -13,8 +13,8 @@ namespace ofxMachineVision {
 		/**
 		\brief Helper function to find DeviceType from a Device::Interface::Base *
 		*/
-		static Type getType(Device::Base * device) {
-			if (dynamic_cast<Device::Blocking *>(device) != NULL) {
+		static Type getType(ofPtr<Device::Base> device) {
+			if (dynamic_cast<Device::Blocking *>(device.get()) != NULL) {
 				return Type_Blocking;
 			} else {
 				return Type_NotImplemented;

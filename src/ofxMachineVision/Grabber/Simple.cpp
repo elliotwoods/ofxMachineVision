@@ -3,7 +3,7 @@
 namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
-		Simple::Simple(Device::Base * device) : Base(device) {
+		Simple::Simple(DevicePtr device) : Base(device) {
 			this->newFrameWaiting = false;
 			this->currentFrameNew = false;
 			this->useTexture = true;
@@ -37,7 +37,6 @@ namespace ofxMachineVision {
 					this->threadBlocking->close();
 					this->deviceState = State_Closed;
 					ofRemoveListener(this->threadBlocking->evtNewFrame, this, &Simple::callbackNewFrame);
-					cout << __func__ << " closing"; 
 					break;
 				}
 			}
@@ -158,7 +157,6 @@ namespace ofxMachineVision {
 			}
 		}
 
-		clock_t lastFrame = clock();
 
 		//----------
 		void Simple::callbackNewFrame(Frame & frame) {
@@ -172,11 +170,16 @@ namespace ofxMachineVision {
 			this->waitingPixelsLock.unlock();
 			frame.unlock();
 
-			float interval = clock() - lastFrame;
-			interval /= float(CLOCKS_PER_SEC);
-			cout << "Frame captured in " << interval << "s\t" << 1.0f / interval << "fps." << endl;
+			static clock_t lastFrame = frame.getTimestamp();
+			float interval = (frame.getTimestamp() - lastFrame) / 1e6;
+			lastFrame = frame.getTimestamp();
 
-			lastFrame = clock();
+			float newfps = (1.0f / interval);
+			if (this->fps == this->fps && abs(log(this->fps) - log(newfps)) < 10) {
+				this->fps = 0.9 * fps + 0.1f * newfps;
+			} else {
+				this->fps = newfps;
+			}
 
 			this->newFrameWaiting = true;
 		}

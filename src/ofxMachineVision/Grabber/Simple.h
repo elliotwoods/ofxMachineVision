@@ -14,7 +14,7 @@ namespace ofxMachineVision {
 		*/
 		class Simple : public Base {
 		public:
-			Simple(Device::Base * device);
+			Simple(DevicePtr device);
 
 			void open(int deviceID = 0);
 			void close();
@@ -63,8 +63,8 @@ namespace ofxMachineVision {
 			void setTriggerMode(const TriggerMode &, const TriggerSignalType &);
 			//@}
 
-			bool isFrameNew() { return this->currentFrameNew; }
-
+			bool isFrameNew() const { return this->currentFrameNew; }
+			float getFps() const { return this->fps; }
 		protected:
 			void callbackNewFrame(Frame &);
 
@@ -77,6 +77,8 @@ namespace ofxMachineVision {
 
 			bool newFrameWaiting;
 			bool currentFrameNew;
+
+			float fps;
 		};
 	}
 };

@@ -19,11 +19,11 @@ namespace ofxMachineVision {
 		*/
 		class Base {
 		public:
-			Base(Device::Base * device) {
+			Base(DevicePtr device) {
 				this->deviceType = getType(device);
 				switch(this->deviceType) {
 				case Device::Type_Blocking: {
-					Device::Blocking * blockingDevice = static_cast<Device::Blocking*>(device);
+					Device::Blocking * blockingDevice = static_cast<Device::Blocking*>(device.get());
 					this->threadBlocking = new Thread::Blocking(blockingDevice, this);
 					break;
 				}
@@ -84,6 +84,7 @@ namespace ofxMachineVision {
 
 			ofxMachineVision::Grabber::Thread::Blocking * threadBlocking;
 		private:
+			DevicePtr device;
 			Device::Type deviceType;
 
 			friend Thread::Blocking;

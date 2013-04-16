@@ -33,7 +33,7 @@ namespace ofxMachineVision {
 		\param index The index of the frame (can be reset in some camera API's on any parameter change).
 		*/
 		void setFrameIndex(int frameIndex) { this->frameIndex = frameIndex; }
-		long getFrameIndex() { this->frameIndex; }
+		long getFrameIndex() const { return this->frameIndex; }
 	protected:
 		Poco::RWLock * lock;
 		ofPixels pixels;
