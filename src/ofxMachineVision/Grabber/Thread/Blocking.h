@@ -79,7 +79,7 @@ namespace ofxMachineVision {
 				void addAction(const Action &, bool blockUntilComplete = false);
 				void blockUntilActionQueueEmpty();
 
-				ofEvent<Frame> evtNewFrame;
+				ofEvent<FrameEventArgs> evtNewFrame;
 			protected:
 				void threadedFunction();
 				queue<Action> actionQueue;

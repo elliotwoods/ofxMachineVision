@@ -31,7 +31,7 @@ namespace ofxMachineVision {
 					OFXMV_FATAL << "Device not implemented";
 					break;
 				}
-
+				this->baseDevice = device;
 				this->deviceState = State_Closed;
 			}
 
@@ -64,18 +64,20 @@ namespace ofxMachineVision {
 			Some of the members of Device::Specification are exposed.
 			*/
 			//@{
-			const Specification & getSpecification() const { return this->specification; }
-			int getDeviceID() const { return this->getSpecification().getDeviceID(); }
-			int getSensorWidth() const { return this->getSpecification().getSensorWidth(); }
-			int getSensorHeight() const { return this->getSpecification().getSensorHeight(); }
-			const string & getManufacturer() const { return this->getSpecification().getManufacturer(); };
-			const string & getModelName() const { return this->getSpecification().getModelName(); };
+			const Specification & getDeviceSpecification() const { return this->specification; }
+			int getDeviceID() const { return this->getDeviceSpecification().getDeviceID(); }
+			int getSensorWidth() const { return this->getDeviceSpecification().getSensorWidth(); }
+			int getSensorHeight() const { return this->getDeviceSpecification().getSensorHeight(); }
+			const string & getManufacturer() const { return this->getDeviceSpecification().getManufacturer(); };
+			const string & getModelName() const { return this->getDeviceSpecification().getModelName(); };
 			//@}
 
 			const Device::Type & getDeviceType() const { return this->deviceType; }
 			const DeviceState & getDeviceState() const { return this->deviceState; }
 			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }
 			bool getIsDeviceRunning() const { return this->getDeviceState() == State_Running; }
+
+			ofEvent<FrameEventArgs> newFrameReceived;
 		protected:
 			void setSpecification(const Specification & specification) { this->specification = specification; }
 
@@ -84,7 +86,7 @@ namespace ofxMachineVision {
 
 			ofxMachineVision::Grabber::Thread::Blocking * threadBlocking;
 		private:
-			DevicePtr device;
+			DevicePtr baseDevice;
 			Device::Type deviceType;
 
 			friend Thread::Blocking;

@@ -14,10 +14,16 @@
 */
 
 #include "ofxMachineVision/Device/Blocking.h"
-
 #include "ofxMachineVision/Grabber/Simple.h"
+#include "ofxMachineVision/Stream/Recorder.h"
 
 namespace ofxMachineVision {
+	/**
+	\brief A simple class for wrapping camera drivers
+	e.g. usage : ofxMachineVision::SimpleGrabber<ofxXimea::Device> grabber
+	this will give you an instance of ofxMachineVision::Grabber::Simple which
+	holds an instance of ofxXimea::Device
+	*/
 	template<class DeviceClass>
 	class SimpleGrabber : public Grabber::Simple {
 	public:

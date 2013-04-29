@@ -2,8 +2,15 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	ofSetVerticalSync(true);
+	
 	grabber.open();
+	grabber.setROI(ofRectangle(0,grabber.getSensorHeight() / 2,grabber.getSensorWidth(), 2));
 	grabber.startCapture();
+
+	cout << grabber.getDeviceSpecification().toString();
+
+	fbo.allocate(grabber.getSensorWidth(), 2048, GL_LUMINANCE);
 }
 
 //--------------------------------------------------------------
@@ -13,8 +20,25 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBaseDraws & drawer(grabber);
-	drawer.draw(ofGetCurrentViewport());
+	fbo.begin();
+	static int y = 0;
+	grabber.draw(0,y);
+	fbo.end();
+
+	y += grabber.getHeight();
+	if (y > fbo.getHeight()) {
+		y = 0;
+		ofPixels pixels;
+		fbo.readToPixels(pixels);
+		ofSaveImage(pixels, ofToString(ofGetFrameNum()) + ".png");
+	}
+
+	ofPushMatrix();
+	ofRotateZ(90);
+	fbo.draw(0, 0, ofGetHeight(), -ofGetWidth());
+	ofPopMatrix();
+
+	ofDrawBitmapStringHighlight(ofToString(grabber.getFps()), 20, 20);
 }
 
 //--------------------------------------------------------------

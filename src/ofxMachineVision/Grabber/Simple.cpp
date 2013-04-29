@@ -17,7 +17,7 @@ namespace ofxMachineVision {
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
 					this->threadBlocking->open(deviceID);
-					this->deviceState = this->getSpecification().getValid() ? State_Running : State_Closed;
+					this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 					ofAddListener(this->threadBlocking->evtNewFrame, this, &Simple::callbackNewFrame);
 					break;
 				default:
@@ -159,10 +159,12 @@ namespace ofxMachineVision {
 
 
 		//----------
-		void Simple::callbackNewFrame(Frame & frame) {
+		void Simple::callbackNewFrame(FrameEventArgs & frameEventArgs) {
 			if (this->getDeviceState() == State_Deleting) {
 				return;
 			}
+
+			Frame & frame(*frameEventArgs.frame);
 
 			frame.lockForReading();
 			this->waitingPixelsLock.lock();
@@ -182,6 +184,8 @@ namespace ofxMachineVision {
 			}
 
 			this->newFrameWaiting = true;
+
+			ofNotifyEvent(this->newFrameReceived, frameEventArgs, this);
 		}
 	}
 }

@@ -12,7 +12,7 @@ namespace ofxMachineVision {
 		\brief Grabber::Simple is designed to give the same personality as ofVideoGrabber.
 		Often you can get better performance by using Blocking or Callback Grabber instead
 		*/
-		class Simple : public Base {
+		class Simple : public Base, public ofBaseDraws, public ofBaseHasTexture, public ofBaseHasPixels, public ofBaseUpdates {
 		public:
 			Simple(DevicePtr device);
 
@@ -21,10 +21,15 @@ namespace ofxMachineVision {
 			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default);
 			void stopCapture();
 
+			/**
+			 \name ofBaseUpdates
+			 */
+			//@{
 			void update();
+			//@}
 			
 			/**
-			 @name ofBaseDraws
+			 \name ofBaseDraws
 			 */
 			//@{
 			void draw(float x, float y) {
@@ -38,7 +43,7 @@ namespace ofxMachineVision {
 			//@}
 
 		    /**
-			 @name ofBaseHasTexture
+			 \name ofBaseHasTexture
 			 */
 			//@{
 			ofTexture & getTextureReference() { return this->texture; }
@@ -46,7 +51,7 @@ namespace ofxMachineVision {
 			//@}
         
 			/**
-			 @name ofBaseHasPixels
+			 \name ofBaseHasPixels
 			 \brief These functions are virtual in case you want to allocate your own ofPixels
 			 */
 			//@{
@@ -66,7 +71,7 @@ namespace ofxMachineVision {
 			bool isFrameNew() const { return this->currentFrameNew; }
 			float getFps() const { return this->fps; }
 		protected:
-			void callbackNewFrame(Frame &);
+			void callbackNewFrame(FrameEventArgs &);
 
 			ofPixels pixels;
 			ofMutex waitingPixelsLock;

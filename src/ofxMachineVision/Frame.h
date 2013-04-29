@@ -10,15 +10,16 @@ namespace ofxMachineVision {
 	*/
 	class Frame {
 	public:
-		Frame() {
-			this->lock = new Poco::RWLock();
-			this->frameIndex = 0;
-			this->timestamp = 0;
-		}
-		~Frame() { delete this->lock; }
-		bool lockForReading() { return this->lock->tryReadLock(); }
-		bool lockForWriting() { return this->lock->tryWriteLock(); }
-		void unlock() { this->lock->unlock(); }
+		typedef long long Timestamp;
+
+		/** Use the empty flag if the capture of this frame failed **/
+		Frame(bool empty=false);
+		Frame(Frame &);
+		~Frame();
+
+		bool lockForReading();
+		bool lockForWriting();
+		void unlock();
 
 		ofPixels & getPixelsRef() { return this->pixels; }
 		unsigned char * getPixels() { return this->getPixelsRef().getPixels(); }
@@ -26,18 +27,30 @@ namespace ofxMachineVision {
 		/** Set the frame timestamp
 		\param timestamp Timestamp of frames in microseconds
 		*/
-		void setTimestamp(long timestamp) { this->timestamp = timestamp; }
-		long getTimestamp() const { return this->timestamp; }
+		void setTimestamp(Timestamp timestamp) { this->timestamp = timestamp; }
+		Timestamp getTimestamp() const { return this->timestamp; }
 
 		/** Set the frame index
 		\param index The index of the frame (can be reset in some camera API's on any parameter change).
 		*/
 		void setFrameIndex(int frameIndex) { this->frameIndex = frameIndex; }
 		long getFrameIndex() const { return this->frameIndex; }
+
+		bool isEmpty() const { return this->empty; }
+
+		bool operator<(const Frame&) const;
+
 	protected:
+		bool empty;
 		Poco::RWLock * lock;
 		ofPixels pixels;
-		long timestamp;
+		Timestamp timestamp;
 		long frameIndex;
+	};
+
+	class FrameEventArgs {
+	public:
+		FrameEventArgs(Frame &);
+		Frame * frame;
 	};
 }

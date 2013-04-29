@@ -89,53 +89,61 @@ namespace ofxMachineVision {
 				while (this->isThreadRunning()) {
 					//process any requested actions
 					this->actionQueueLock.lock();
-					while (!this->actionQueue.empty()) {
-						Action & action(this->actionQueue.front());
-						switch (action.getType()) {
-						case Action::Type_Open:
-							this->grabber->setSpecification(this->device->open(action.getArgument<int>()));
-							break;
-						case Action::Type_Close:
-							this->device->close();
-							while (!this->actionQueue.empty())
-								this->actionQueue.pop();
-							this->actionQueueLock.unlock();
-						case Action::Type_StartFreeRun:
-							this->device->startCapture();
-							break;
-						case Action::Type_StopFreeRun:
-							this->device->stopCapture();
-							break;
-						case Action::Type_SetBinning:
+					if (!this->actionQueue.empty()) {
+						while (!this->actionQueue.empty()) {
+							Action & action(this->actionQueue.front());
+							switch (action.getType()) {
+							case Action::Type_Open:
 							{
-								array<int, 2> binning = action.getArrayArgument<int, 2>();
-								this->device->setBinning(binning[0], binning[1]);
+								int deviceID = action.getArgument<int>();
+								const Specification specification = this->device->open(deviceID);
+								this->grabber->setSpecification(specification);
+								break;
 							}
-							break;
-						case Action::Type_SetROI:
-							{
-								ofRectangle roi = action.getArgument<ofRectangle>();
-								this->device->setROI(roi);
+							case Action::Type_Close:
+								this->device->close();
+								while (!this->actionQueue.empty())
+									this->actionQueue.pop();
+								this->actionQueueLock.unlock();
+							case Action::Type_StartFreeRun:
+								this->device->startCapture();
+								break;
+							case Action::Type_StopFreeRun:
+								this->device->stopCapture();
+								break;
+							case Action::Type_SetBinning:
+								{
+									array<int, 2> binning = action.getArrayArgument<int, 2>();
+									this->device->setBinning(binning[0], binning[1]);
+								}
+								break;
+							case Action::Type_SetROI:
+								{
+									ofRectangle roi = action.getArgument<ofRectangle>();
+									this->device->setROI(roi);
+								}
+								break;
+							case Action::Type_SetTriggerSettings:
+								{
+									TriggerSettings triggerSettings = action.getArgument<TriggerSettings>();
+									this->device->setTriggerMode(triggerSettings.first, triggerSettings.second);
+								}
+								break;
 							}
-							break;
-						case Action::Type_SetTriggerSettings:
-							{
-								TriggerSettings triggerSettings = action.getArgument<TriggerSettings>();
-								this->device->setTriggerMode(triggerSettings.first, triggerSettings.second);
-							}
-							break;
+							actionQueue.pop();
 						}
-						actionQueue.pop();
-					}
-					actionQueueLock.unlock();
-		
-					if (this->grabber->getIsDeviceRunning()) {
-						//pull a frame from the device
-						this->device->getFrame(this->frame);
-						ofNotifyEvent(this->evtNewFrame, this->frame, this); 
+						actionQueueLock.unlock();
 					} else {
-						//the device is open but waiting for instructions
-						ofThread::sleep(1);
+						actionQueueLock.unlock();
+						if (this->grabber->getIsDeviceRunning()) {
+							//pull a frame from the device
+							this->device->getFrame(this->frame);
+							FrameEventArgs eventArgs = FrameEventArgs(frame);
+							ofNotifyEvent(this->evtNewFrame, eventArgs, this); 
+						} else {
+							//the device is open but waiting for instructions
+							ofThread::sleep(1);
+						}
 					}
 				}
 
