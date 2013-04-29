@@ -2,24 +2,43 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-	grabber.open();
-	grabber.startCapture();
+    
+    //open a connection to the device
+    camera.open();
+    
+    //start the camera capturing using default trigger
+	camera.startCapture();
+    
+    //print device information
+    cout << camera.getDeviceSpecification().toString();
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-	grabber.update();
+    
+    //update the texture in the Device class
+    camera.update();
+    
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	ofBaseDraws & drawer(grabber);
-	drawer.draw(ofGetCurrentViewport());
+    
+    //draw the texture in the Device class
+    camera.draw(0, 0);
+    
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
+}
 
+//--------------------------------------------------------------
+void testApp::reset() {
+}
+
+//--------------------------------------------------------------
+void testApp::advance() {
 }
 
 //--------------------------------------------------------------

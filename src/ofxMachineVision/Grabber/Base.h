@@ -23,7 +23,7 @@ namespace ofxMachineVision {
 				this->deviceType = getType(device);
 				switch(this->deviceType) {
 				case Device::Type_Blocking: {
-					Device::Blocking * blockingDevice = static_cast<Device::Blocking*>(device.get());
+					ofPtr<Device::Blocking> blockingDevice = static_pointer_cast<Device::Blocking>(device);
 					this->threadBlocking = new Thread::Blocking(blockingDevice, this);
 					break;
 				}
@@ -39,9 +39,6 @@ namespace ofxMachineVision {
 				this->deviceState = State_Deleting;
 				switch(this->deviceType) {
 				case Device::Type_Blocking:
-					if (this->getIsDeviceOpen()) {
-						this->threadBlocking->close();
-					}
 					delete this->threadBlocking;
 					break;
 				}

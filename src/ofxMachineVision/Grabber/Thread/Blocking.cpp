@@ -18,9 +18,17 @@ namespace ofxMachineVision {
 
 #pragma mark Blocking
 			//----------
-			Blocking::Blocking(Device::Blocking * device, Grabber::Base * grabber) {
+			Blocking::Blocking(ofPtr<Device::Blocking> device, Grabber::Base * grabber) {
 				this->device = device;
 				this->grabber = grabber;
+				this->frame = ofPtr<Frame>(new Frame());
+			}
+
+			//----------
+			Blocking::~Blocking() {
+				this->close();
+				actionQueueLock.lock();
+				actionQueueLock.unlock();
 			}
 
 			//----------
@@ -137,9 +145,11 @@ namespace ofxMachineVision {
 						actionQueueLock.unlock();
 						if (this->grabber->getIsDeviceRunning()) {
 							//pull a frame from the device
-							this->device->getFrame(this->frame);
-							FrameEventArgs eventArgs = FrameEventArgs(frame);
-							ofNotifyEvent(this->evtNewFrame, eventArgs, this); 
+							this->device->getFrame(*this->frame);
+							if (!this->frame->isEmpty()) {
+								FrameEventArgs eventArgs = FrameEventArgs(frame);
+								ofNotifyEvent(this->evtNewFrame, eventArgs, this); 
+							}
 						} else {
 							//the device is open but waiting for instructions
 							ofThread::sleep(1);

@@ -12,8 +12,7 @@ namespace ofxMachineVision {
 	public:
 		typedef long long Timestamp;
 
-		/** Use the empty flag if the capture of this frame failed **/
-		Frame(bool empty=false);
+		Frame();
 		Frame(Frame &);
 		~Frame();
 
@@ -37,6 +36,7 @@ namespace ofxMachineVision {
 		long getFrameIndex() const { return this->frameIndex; }
 
 		bool isEmpty() const { return this->empty; }
+		void setEmpty(bool empty) { this->empty = empty; }
 
 		bool operator<(const Frame&) const;
 
@@ -50,7 +50,7 @@ namespace ofxMachineVision {
 
 	class FrameEventArgs {
 	public:
-		FrameEventArgs(Frame &);
-		Frame * frame;
+		FrameEventArgs(ofPtr<Frame> &);
+		ofPtr<Frame> frame;
 	};
 }

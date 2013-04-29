@@ -3,11 +3,11 @@
 namespace ofxMachineVision {
 #pragma mark Frame
 	//----------
-	Frame::Frame(bool empty) {
+	Frame::Frame() {
 		this->lock = new Poco::RWLock();
 		this->frameIndex = 0;
 		this->timestamp = 0;
-		this->empty = empty;
+		this->empty = false;
 	}
 
 	//----------
@@ -52,7 +52,7 @@ namespace ofxMachineVision {
 	}
 #pragma mark Frame
 	//----------
-	FrameEventArgs::FrameEventArgs (Frame & frame) {
-		this->frame = & frame;
+	FrameEventArgs::FrameEventArgs (ofPtr<Frame> & frame) {
+		this->frame = frame;
 	}
 }
