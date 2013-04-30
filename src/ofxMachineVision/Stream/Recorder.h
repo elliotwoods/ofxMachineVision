@@ -5,14 +5,15 @@
 #include "ofxMachineVision/Frame.h"
 #include "ofxMachineVision/Grabber/Base.h"
 
-#include <set>
+#include <map>
 
 namespace ofxMachineVision {
 	namespace Stream {
-		class Recorder : public std::set<Frame> {
+		class Recorder : public std::map<Frame::Timestamp, Frame> {
 		public:
 			enum State {
 				State_NoGrabber,
+				State_GrabberNotReady,
 				State_Ready,
 				State_Recording,
 				State_Saving,
@@ -30,7 +31,7 @@ namespace ofxMachineVision {
 
 			bool hasGrabber() const;
 			const State & getState() const;
-			bool isRecording() const;
+			bool getIsRecording() const;
 
 			Frame::Timestamp getFirstTimestamp() const;
 			Frame::Timestamp getLastTimestamp() const;

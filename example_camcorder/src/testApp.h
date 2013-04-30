@@ -3,6 +3,7 @@
 #include "ofxXimea.h"
 #include "ofMain.h"
 #include "ofxMachineVision.h"
+#include "ofxUI.h"
 
 using namespace ofxMachineVision;
 
@@ -12,6 +13,8 @@ class testApp : public ofBaseApp{
 	void setup();
 	void update();
 	void draw();
+
+	unsigned char getValue(Frame::Timestamp &, ofVec2f position);
 
 	void keyPressed  (int key);
 	void keyReleased(int key);
@@ -25,4 +28,24 @@ class testApp : public ofBaseApp{
 	
 	Stream::Recorder recorder;
 	ofxMachineVision::SimpleGrabber<ofxXimea::Device> grabber;
+
+	ofxUICanvas gui;
+	ofxUILabel * guiDeviceStateLabel;
+	ofxUILabel * guiRecordStateLabel;
+	ofxUILabel * guiRecordCountLabel;
+	ofxUILabel * guiFrameTimestamp;
+	ofxUILabel * guiFrameDuration;
+
+	bool bangOpen;
+	bool bangClear;
+	bool toggleRecord;
+
+	Frame::Timestamp timeStart;
+	Frame::Timestamp timeWindow;
+	
+	ofTexture selectionView;
+	Frame::Timestamp selectionTimestamp;
+	Frame::Timestamp selectionDuration;
+
+	vector<ofVec2f> pipets;
 };

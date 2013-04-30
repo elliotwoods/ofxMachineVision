@@ -185,7 +185,9 @@ namespace ofxMachineVision {
 
 			this->newFrameWaiting = true;
 
-			ofNotifyEvent(this->newFrameReceived, frameEventArgs, this);
+			if (!this->newFrameReceived.empty()) {
+				ofNotifyEvent(this->newFrameReceived, frameEventArgs, this);
+			}
 		}
 	}
 }

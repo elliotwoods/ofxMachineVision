@@ -143,6 +143,19 @@ namespace ofxMachineVision {
 				return "Whilst low";
 		}
 	}
+
+	static string toString(const DeviceState & deviceState) {
+		switch (deviceState) {
+		case State_Closed:
+			return "Closed";
+		case State_Deleting:
+			return "Deleting";
+		case State_Running:
+			return "Running";
+		case State_Waiting:
+			return "Waiting";
+		}
+	}
     
 	static bool isColor(const PixelMode & pixelMode) {
 		switch (pixelMode) {

@@ -12,7 +12,6 @@ namespace ofxMachineVision {
 
 	//----------
 	Frame::Frame(Frame & other) {
-		other.lockForReading();
 		if (other.isEmpty()) {
 			this->empty = true;
 			this->frameIndex = 0;
@@ -23,7 +22,7 @@ namespace ofxMachineVision {
 			this->timestamp = other.getTimestamp();
 			this->pixels = other.getPixelsRef();
 		}
-		other.unlock();
+		this->lock = new Poco::RWLock();
 	}
 
 	//----------
