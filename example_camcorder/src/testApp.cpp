@@ -3,17 +3,21 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	
-	ofSetVerticalSync(true);
     ofEnableSmoothing();
 	ofBackground(50);
 
 	grabber.open();
-	grabber.setROI(ofRectangle(0, 0, 2048, 256));
+	grabber.setROI(ofRectangle(0, 768, 2048, 160));
 	grabber.startCapture();
 	recorder.setGrabber(grabber);
 
 	this->toggleRecord = false;
 	this->bangClear = false;
+	this->bangClearBefore = false;
+	this->bangClearAfter = false;
+	this->bangSavePipets = false;
+	this->toggleSave = false;
+	this->toggleProgress = false;
 
 	gui.setHeight(400);
 	
@@ -32,7 +36,11 @@ void testApp::setup(){
 	this->guiRecordStateLabel = gui.addLabel("Recorder state", "...", OFX_UI_FONT_SMALL);
 	this->guiRecordCountLabel = gui.addLabel("Frame count", "Empty", OFX_UI_FONT_SMALL);
 	gui.addButton("Clear frames", &this->bangClear);
-	
+	gui.addButton("Clear before", &this->bangClearBefore);
+	gui.addButton("Clear after", &this->bangClearAfter);
+	gui.addButton("Save pipets", &this->bangSavePipets);
+	gui.addToggle("Progress", &this->toggleProgress);
+	gui.addToggle("Save", &this->toggleSave);
 	gui.addSpacer();
 
 	gui.addLabel("Frame details");
@@ -57,6 +65,74 @@ void testApp::update(){
 	if (this->bangClear) {
 		this->recorder.clear();
 	}
+
+	if (this->bangClearBefore) {
+		auto it = this->recorder.lower_bound(this->selectionTimestamp);
+		while (it != this->recorder.end()) {
+			this->recorder.erase(it);
+			it = this->recorder.lower_bound(this->selectionTimestamp);
+		}
+	}
+
+	if (this->bangClearAfter) {
+		auto it = this->recorder.upper_bound(this->selectionTimestamp);
+		while (it != this->recorder.end()) {
+			this->recorder.erase(it);
+			it = this->recorder.upper_bound(this->selectionTimestamp);
+		}
+	}
+	
+	if (this->bangSavePipets) {
+		ofFile file;
+		file.open("pipets.txt", ofFile::WriteOnly, false);
+		for (auto it : this->recorder) {
+			file << it.first << "\t";
+
+			for (auto pipet : this->pipets) {
+				file << (int) this->getValue(it.first, pipet) << "\t";
+			}
+
+			file << endl;
+		}
+		file.close();
+	}
+
+	if (!this->recorder.getIsRecording()) {
+		this->grabber.update();
+	}
+
+	if (this->toggleSave) {
+		auto & pixels = this->recorder[this->selectionTimestamp].getPixelsRef();
+		ofSaveImage(pixels, ofToString(this->selectionTimestamp) + ".png");
+	}
+
+	if (this->toggleProgress && ! this->recorder.empty()) {
+		auto nextFrame = this->recorder.upper_bound(this->selectionTimestamp);
+		if (nextFrame == this->recorder.end()) {
+			nextFrame = this->recorder.begin();
+		}
+		this->selectionTimestamp = nextFrame->first;
+		this->loadSelection();
+	} else {
+		this->toggleSave = false;
+	}
+}
+
+//--------------------------------------------------------------
+void testApp::loadSelection() {
+	auto & frame = this->recorder[this->selectionTimestamp];
+	this->selectionView.allocate(frame.getPixelsRef());
+	this->selectionView.loadData(frame.getPixelsRef());
+	
+	auto next = recorder.upper_bound(this->selectionTimestamp);
+	if (next == recorder.end()) {
+		this->selectionDuration = 0;
+	} else {
+		this->selectionDuration = next->first - this->selectionTimestamp;
+	}
+	
+	this->guiFrameTimestamp->setLabel("Timestamp : " + ofToString(selectionTimestamp) + "us");
+	this->guiFrameDuration->setLabel(ofToString(selectionDuration) + "us / " + ofToString(float(1e6) / float(selectionDuration)) + "fps");
 }
 
 //--------------------------------------------------------------
@@ -64,8 +140,12 @@ void testApp::draw(){
 
 	//-----
 	// draw image
-	if (this->selectionView.isAllocated()) {
-		this->selectionView.draw(ofGetCurrentViewport());
+	if (!this->recorder.getIsRecording()) {
+		if (this->selectionView.isAllocated()) {
+			this->selectionView.draw(ofGetCurrentViewport());
+		} else {
+			this->grabber.draw(0,0, ofGetWidth(), ofGetHeight());
+		}
 	}
 	//-----
 
@@ -176,6 +256,12 @@ void testApp::draw(){
 
 		//line
 		ofLine(drawLocation.x, drawLocation.y, drawLocation.x, drawLocation.y + 20);
+
+		//other lines
+		ofLine(drawLocation.x, drawLocation.y - 3, drawLocation.x, drawLocation.y - 10);
+		ofLine(drawLocation.x - 3, drawLocation.y, drawLocation.x - 10, drawLocation.y);
+		ofLine(drawLocation.x + 3, drawLocation.y, drawLocation.x + 10, drawLocation.y);
+
 	}
 	ofPopStyle();
 	//-----
@@ -183,7 +269,7 @@ void testApp::draw(){
 }
 
 //--------------------------------------------------------------
-unsigned char testApp::getValue(Frame::Timestamp & timestamp, ofVec2f position) { 
+unsigned char testApp::getValue(Frame::Timestamp timestamp, ofVec2f position) { 
 	const auto &pixels = this->recorder[timestamp].getPixelsRef();
 	position *= ofVec2f(pixels.getWidth(), pixels.getHeight());
 	return pixels[pixels.getPixelIndex(position.x, position.y)];
@@ -228,24 +314,12 @@ void testApp::mouseDragged(int x, int y, int button){
 	}
 
 	this->selectionTimestamp = frame->first;
-
-	auto next = recorder.upper_bound(frame->first);
-	if (next == recorder.end()) {
-		this->selectionDuration = 0;
-	} else {
-		this->selectionDuration = next->first - frame->first;
-	}
-
-	this->selectionView.allocate(frame->second.getPixelsRef());
-	this->selectionView.loadData(frame->second.getPixelsRef());
-
-	this->guiFrameTimestamp->setLabel("Timestamp : " + ofToString(selectionTimestamp) + "us");
-	this->guiFrameDuration->setLabel(ofToString(selectionDuration) + "us / " + ofToString(float(1e6) / float(selectionDuration)) + "fps");
+	this->loadSelection();
 }
 
 //--------------------------------------------------------------
 void testApp::mousePressed(int x, int y, int button){
-	mouseDragged(x, y, button);
+	//mouseDragged(x, y, button);
 }
 
 //--------------------------------------------------------------

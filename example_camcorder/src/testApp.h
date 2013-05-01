@@ -12,9 +12,11 @@ class testApp : public ofBaseApp{
   public:
 	void setup();
 	void update();
+	void loadSelection();
+
 	void draw();
 
-	unsigned char getValue(Frame::Timestamp &, ofVec2f position);
+	unsigned char getValue(Frame::Timestamp, ofVec2f position);
 
 	void keyPressed  (int key);
 	void keyReleased(int key);
@@ -38,7 +40,13 @@ class testApp : public ofBaseApp{
 
 	bool bangOpen;
 	bool bangClear;
+	bool bangClearBefore;
+	bool bangClearAfter;
+
+	bool bangSavePipets;
 	bool toggleRecord;
+	bool toggleSave;
+	bool toggleProgress;
 
 	Frame::Timestamp timeStart;
 	Frame::Timestamp timeWindow;
