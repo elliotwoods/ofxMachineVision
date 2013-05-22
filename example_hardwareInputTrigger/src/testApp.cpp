@@ -3,7 +3,10 @@
 //--------------------------------------------------------------
 void testApp::setup(){
 	grabber.open();
-	grabber.setExposure(1000);
+
+	grabber.setExposure(100);
+	grabber.setROI(ofRectangle(0,0,2048,1024));
+
 	grabber.startCapture(Trigger_GPIO0, TriggerSignal_RisingEdge);
 }
 
@@ -14,15 +17,17 @@ void testApp::update(){
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	grabber.draw(0, 0);
+	grabber.draw(ofGetCurrentViewport());
 
 	stringstream status;
 	status << "Last timestamp : \t" << grabber.getLastTimestamp() << endl;
 	status << "Last frame index : \t" << grabber.getLastFrameIndex() << endl;
+	status << "Framerate : \t\t" << grabber.getFps() << endl;
 	status << endl;
 	status << grabber.getDeviceSpecification();
 
-	ofDrawBitmapStringHighlight(status.str(), 10, 10);
+	ofEnableAlphaBlending();
+	ofDrawBitmapStringHighlight(status.str(), 10, 20, ofColor(100,0,0,100));
 }
 
 //--------------------------------------------------------------
