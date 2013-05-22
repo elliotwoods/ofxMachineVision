@@ -9,7 +9,7 @@
 
 namespace ofxMachineVision {
 	namespace Stream {
-		class Recorder : public std::map<Frame::Timestamp, Frame> {
+		class Recorder : public std::map<Microseconds, Frame> {
 		public:
 			enum State {
 				State_NoGrabber,
@@ -33,9 +33,9 @@ namespace ofxMachineVision {
 			const State & getState() const;
 			bool getIsRecording() const;
 
-			Frame::Timestamp getFirstTimestamp() const;
-			Frame::Timestamp getLastTimestamp() const;
-			Frame::Timestamp getDuration() const;
+			Microseconds getFirstTimestamp() const;
+			Microseconds getLastTimestamp() const;
+			Microseconds getDuration() const;
 
 			static string toString(const State &);
 

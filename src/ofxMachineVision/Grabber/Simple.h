@@ -63,13 +63,19 @@ namespace ofxMachineVision {
 			\name Capture properties
 			*/
 			//@{
+			void setExposure(Microseconds exposure);
 			void setBinning(int binningX = 1, int binningY = 1);
 			void setROI(const ofRectangle &);
 			void setTriggerMode(const TriggerMode &, const TriggerSignalType &);
+			void setGPOMode(const GPOMode &);
 			//@}
 
 			bool isFrameNew() const { return this->currentFrameNew; }
+			
 			float getFps() const { return this->fps; }
+			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
+			long getLastFrameIndex() const { return this->lastFrameIndex; }
+
 		protected:
 			void callbackNewFrame(FrameEventArgs &);
 
@@ -84,6 +90,8 @@ namespace ofxMachineVision {
 			bool currentFrameNew;
 
 			float fps;
+			Microseconds lastTimestamp;
+			long lastFrameIndex;
 		};
 	}
 };

@@ -21,9 +21,11 @@ namespace ofxMachineVision {
 			//@{
 			virtual Specification open(int deviceID = 0) = 0;
 			virtual void close() = 0;
+			virtual void setExposure(Microseconds exposure) { };
 			virtual void setBinning(int binningX = 1, int binningY = 1) { };
 			virtual void setROI(const ofRectangle &) { };
 			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) { };
+			virtual void setGPOMode(const GPOMode &) { };
 			//@}
 
 			virtual bool startCapture() = 0;

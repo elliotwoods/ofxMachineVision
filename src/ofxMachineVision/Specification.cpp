@@ -17,7 +17,8 @@ namespace ofxMachineVision {
 	features(other.getFeatures()),
 	pixelModes(other.getPixelModes()),
 	triggerModes(other.getTriggerModes()),
-	triggerSignalTypes(other.getTriggerSignalTypes())
+	triggerSignalTypes(other.getTriggerSignalTypes()),
+	gpoModes(other.getGPOModes())
 	{
 	}
 
@@ -42,10 +43,15 @@ namespace ofxMachineVision {
 	bool Specification::supports(const TriggerMode & triggerMode) {
 		return this->triggerModes.count(triggerMode) > 0;
 	}
-
+	
 	//---------
 	bool Specification::supports(const TriggerSignalType & triggerSignalType) {
 		return this->triggerSignalTypes.count(triggerSignalType) > 0;
+	}
+
+	//---------
+	bool Specification::supports(const GPOMode & gpoMode) {
+		return this->gpoModes.count(gpoMode) > 0;
 	}
 
 	//---------
@@ -87,7 +93,7 @@ namespace ofxMachineVision {
 		ss << endl;
         
 		ss << "[Trigger signal types]\t";
-		const TriggerSignalTypeSet triggerSignalTypes = this->getTriggerSignalTypes();
+		const TriggerSignalTypeSet & triggerSignalTypes = this->getTriggerSignalTypes();
 		for(TriggerSignalTypeSet::const_iterator it = triggerSignalTypes.begin(); it != triggerSignalTypes.end(); it++) {
 			if (it != triggerSignalTypes.begin())
 				ss << ", ";
@@ -95,6 +101,15 @@ namespace ofxMachineVision {
 		}
 		ss << endl;
         
+		ss << "[GPO modes]\t\t";
+		const GPOModeSet & gpoModes = this->getGPOModes();
+		for(GPOModeSet::const_iterator it = gpoModes.begin(); it != gpoModes.end(); it++) {
+			if (it != gpoModes.begin())
+				ss << ", ";
+			ss << ofxMachineVision::toString(*it);
+		}
+		ss << endl;
+
 		ss << "//--" << endl;
         
 		return ss.str();
@@ -114,9 +129,14 @@ namespace ofxMachineVision {
 	void Specification::addTriggerMode(const TriggerMode & triggerMode) {
 		this->triggerModes.insert(triggerMode);
 	}
-
+	
 	//---------
 	void Specification::addTriggerSignalType(const TriggerSignalType & triggerSignalType) {
 		this->triggerSignalTypes.insert(triggerSignalType);
+	}
+
+	//---------
+	void Specification::addGPOMode(const GPOMode & gpoMode) {
+		this->gpoModes.insert(gpoMode);
 	}
 }

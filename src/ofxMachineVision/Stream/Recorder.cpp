@@ -60,7 +60,7 @@ namespace ofxMachineVision {
 		}
 		
 		//---------
-		Frame::Timestamp Recorder::getFirstTimestamp() const {
+		Microseconds Recorder::getFirstTimestamp() const {
 			if (this->empty()) {
 				return 0;
 			}
@@ -68,7 +68,7 @@ namespace ofxMachineVision {
 		}
 
 		//---------
-		Frame::Timestamp Recorder::getLastTimestamp() const {
+		Microseconds Recorder::getLastTimestamp() const {
 			if (this->empty()) {
 				return 1;
 			}
@@ -78,7 +78,7 @@ namespace ofxMachineVision {
 		}
 		
 		//---------
-		Frame::Timestamp Recorder::getDuration() const {
+		Microseconds Recorder::getDuration() const {
 			return this->getLastTimestamp() - this->getFirstTimestamp();
 		}
 
@@ -103,7 +103,7 @@ namespace ofxMachineVision {
 		//---------
 		void Recorder::callbackNewFrame(FrameEventArgs & frameEventArgs) {
 			Frame & frame = * frameEventArgs.frame;
-			this->insert(std::pair<Frame::Timestamp, Frame>(frame.getTimestamp(), Frame(frame)));
+			this->insert(std::pair<Microseconds, Frame>(frame.getTimestamp(), Frame(frame)));
 		}
 	}
 }

@@ -13,6 +13,7 @@
  - Grabber::Blocking
 */
 
+#include "ofxMachineVision/Constants.h"
 #include "ofxMachineVision/Device/Blocking.h"
 #include "ofxMachineVision/Grabber/Simple.h"
 #include "ofxMachineVision/Stream/Recorder.h"

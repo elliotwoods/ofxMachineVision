@@ -13,6 +13,7 @@ using namespace std;
 
 namespace ofxMachineVision {
 	typedef array<int, 2> Binning;
+	typedef unsigned long long Microseconds;
     
 	/**
 	\brief Features which a device may support. These are known after the device is opened
@@ -22,6 +23,7 @@ namespace ofxMachineVision {
         Feature_Binning,
         Feature_PixelClock,
         Feature_Triggering,
+		Feature_GPO,
         Feature_FreeRun,
         Feature_OneShot,
         Feature_Exposure,
@@ -47,8 +49,8 @@ namespace ofxMachineVision {
     enum TriggerMode {
         Trigger_Device,
         Trigger_Software,
-        Trigger_GPIO1,
-        Trigger_GPIO2
+        Trigger_GPIO0,
+        Trigger_GPIO1
     };
         
 	/**
@@ -62,6 +64,18 @@ namespace ofxMachineVision {
         TriggerSignal_WhilstLow
     };
 
+	/**
+	\brief GPO mode of device.
+	*/
+    enum GPOMode {
+        GPOMode_On,
+        GPOMode_Off,
+        GPOMode_HighWhilstExposure,
+        GPOMode_HighWhilstFrameActive,
+        GPOMode_LowWhilstExposure,
+        GPOMode_LowWhilstFrameActive
+    };
+    
 	typedef std::pair<TriggerMode, TriggerSignalType> TriggerSettings;
 
 	/**
@@ -88,6 +102,8 @@ namespace ofxMachineVision {
 				return "Pixel clock";
 			case Feature_Triggering:
 				return "Triggering";
+			case Feature_GPO:
+				return "GPO";
 			case Feature_FreeRun:
 				return "Free run capture";
 			case Feature_OneShot:
@@ -120,10 +136,10 @@ namespace ofxMachineVision {
 		switch (triggerMode) {
 			case Trigger_Device:
 				return "Device";
+			case Trigger_GPIO0:
+				return "GPIO0";
 			case Trigger_GPIO1:
 				return "GPIO1";
-			case Trigger_GPIO2:
-				return "GPIO2";
 			case Trigger_Software:
 				return "Software";
 		}
@@ -141,6 +157,23 @@ namespace ofxMachineVision {
 				return "Whilst high";
 			case TriggerSignal_WhilstLow:
 				return "Whilst low";
+		}
+	}
+
+	static string toString(const GPOMode & gpoMode) {
+		switch (gpoMode) {
+		case GPOMode_On:
+			return "On";
+		case GPOMode_Off:
+			return "Off";
+		case GPOMode_HighWhilstExposure:
+			return "High whilst exposure";
+		case GPOMode_HighWhilstFrameActive:
+			return "High whilst frame active";
+		case GPOMode_LowWhilstExposure:
+			return "Low whilst exposure";
+		case GPOMode_LowWhilstFrameActive:
+			return "Low whilst frame active";
 		}
 	}
 

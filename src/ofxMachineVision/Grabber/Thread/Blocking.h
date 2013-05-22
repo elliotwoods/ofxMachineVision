@@ -29,9 +29,11 @@ namespace ofxMachineVision {
 						Type_Close,
 						Type_StartFreeRun,
 						Type_StopFreeRun,
+						Type_SetExposure,
 						Type_SetBinning,
 						Type_SetROI,
-						Type_SetTriggerSettings
+						Type_SetTriggerSettings,
+						Type_SetGPOMode
 					};
 
 					Action(const Type &);
@@ -72,9 +74,11 @@ namespace ofxMachineVision {
 				void close();
 				void startFreeRun();
 				void stopFreeRun();
+				void setExposure(Microseconds exposure);
 				void setBinning(int binningX = 1, int binningY = 1);
 				void setROI(const ofRectangle &);
 				void setTriggerMode(const TriggerMode &, const TriggerSignalType &);
+				void setGPOMode(const GPOMode &);
 
 				void addAction(const Action &, bool blockUntilComplete = false);
 				void blockUntilActionQueueEmpty();

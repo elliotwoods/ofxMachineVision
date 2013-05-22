@@ -4,14 +4,14 @@
 #include "ofPixels.h"
 #include "ofThread.h"
 
+#include "ofxMachineVision/Constants.h"
+
 namespace ofxMachineVision {
 	/**
 	\brief An instance of ofPixels with some other metadata and a thread lock
 	*/
 	class Frame {
 	public:
-		typedef long long Timestamp;
-
 		Frame();
 		Frame(Frame &);
 		~Frame();
@@ -26,8 +26,8 @@ namespace ofxMachineVision {
 		/** Set the frame timestamp
 		\param timestamp Timestamp of frames in microseconds
 		*/
-		void setTimestamp(Timestamp timestamp) { this->timestamp = timestamp; }
-		Timestamp getTimestamp() const { return this->timestamp; }
+		void setTimestamp(Microseconds timestamp) { this->timestamp = timestamp; }
+		Microseconds getTimestamp() const { return this->timestamp; }
 
 		/** Set the frame index
 		\param index The index of the frame (can be reset in some camera API's on any parameter change).
@@ -44,7 +44,7 @@ namespace ofxMachineVision {
 		bool empty;
 		Poco::RWLock * lock;
 		ofPixels pixels;
-		Timestamp timestamp;
+		Microseconds timestamp;
 		long frameIndex;
 	};
 

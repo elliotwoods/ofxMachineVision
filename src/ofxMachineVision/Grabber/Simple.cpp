@@ -4,9 +4,13 @@ namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
 		Simple::Simple(DevicePtr device) : Base(device) {
+			this->useTexture = true;
 			this->newFrameWaiting = false;
 			this->currentFrameNew = false;
-			this->useTexture = true;
+
+			this->fps = 0.0f;
+			this->lastTimestamp = 0;
+			this->lastFrameIndex = 0;
 		}
 
 		//----------
@@ -121,6 +125,19 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		void Simple::setExposure(Microseconds exposure) {
+			CHECK_OPEN
+			REQUIRES(Feature_Exposure)
+			
+			switch (this->getDeviceType())
+			{
+			case Device::Type_Blocking:
+				this->threadBlocking->setExposure(exposure);
+				break;
+			}
+		}
+
+		//----------
 		void Simple::setBinning(int binningX, int binningY) {
 			CHECK_OPEN
 			REQUIRES(Feature_Binning)
@@ -157,6 +174,17 @@ namespace ofxMachineVision {
 			}
 		}
 
+		//----------
+		void Simple::setGPOMode(const GPOMode & gpoMode) {
+			CHECK_OPEN
+			REQUIRES(Feature_GPO);
+			REQUIRES(gpoMode);
+
+			switch (this->getDeviceType()) {
+			case Device::Type_Blocking:
+				this->threadBlocking->setGPOMode(gpoMode);
+			}
+		}
 
 		//----------
 		void Simple::callbackNewFrame(FrameEventArgs & frameEventArgs) {
@@ -172,9 +200,7 @@ namespace ofxMachineVision {
 			this->waitingPixelsLock.unlock();
 			frame.unlock();
 
-			static clock_t lastFrame = frame.getTimestamp();
-			float interval = (frame.getTimestamp() - lastFrame) / 1e6;
-			lastFrame = frame.getTimestamp();
+			float interval = (frame.getTimestamp() - this->lastTimestamp) / 1e6;
 
 			float newfps = (1.0f / interval);
 			if (this->fps == this->fps && abs(log(this->fps) - log(newfps)) < 10) {
@@ -184,6 +210,8 @@ namespace ofxMachineVision {
 			}
 
 			this->newFrameWaiting = true;
+			this->lastTimestamp = frame.getTimestamp();
+			this->lastFrameIndex = frame.getFrameIndex();
 
 			if (!this->newFrameReceived.empty()) {
 				ofNotifyEvent(this->newFrameReceived, frameEventArgs, this);

@@ -54,20 +54,30 @@ namespace ofxMachineVision {
 			}
 
 			//----------
+			void Blocking::setExposure(Microseconds exposure) {
+				this->addAction(Action(Action::Type_SetExposure, exposure), false);
+			}
+
+			//----------
 			void Blocking::setBinning(int binningX, int binningY) {
 				Binning binning = {binningX, binningY};
-				this->addAction(Action(Action::Type_SetBinning, binning), true);
+				this->addAction(Action(Action::Type_SetBinning, binning), false);
 			}
 
 			//----------
 			void Blocking::setROI(const ofRectangle& roi) {
-				this->addAction(Action(Action::Type_SetROI, roi), true);
+				this->addAction(Action(Action::Type_SetROI, roi), false);
 			}
 			
 			//----------
 			void Blocking::setTriggerMode(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
 				TriggerSettings triggerSettings(triggerMode, triggerSignalType);
-				this->addAction(Action(Action::Type_SetTriggerSettings, triggerSettings), true);
+				this->addAction(Action(Action::Type_SetTriggerSettings, triggerSettings), false);
+			}
+
+			//----------
+			void Blocking::setGPOMode(const GPOMode & gpoMode) {
+				this->addAction(Action(Action::Type_SetGPOMode, gpoMode), false);
 			}
 
 			//----------
@@ -119,24 +129,35 @@ namespace ofxMachineVision {
 							case Action::Type_StopFreeRun:
 								this->device->stopCapture();
 								break;
+							case Action::Type_SetExposure:
+								{
+									const Microseconds & exposure = action.getArgument<Microseconds>();
+									this->device->setExposure(exposure);
+								}
+								break;
 							case Action::Type_SetBinning:
 								{
-									array<int, 2> binning = action.getArrayArgument<int, 2>();
+									const array<int, 2> & binning = action.getArrayArgument<int, 2>();
 									this->device->setBinning(binning[0], binning[1]);
 								}
 								break;
 							case Action::Type_SetROI:
 								{
-									ofRectangle roi = action.getArgument<ofRectangle>();
+									const ofRectangle & roi = action.getArgument<ofRectangle>();
 									this->device->setROI(roi);
 								}
 								break;
 							case Action::Type_SetTriggerSettings:
 								{
-									TriggerSettings triggerSettings = action.getArgument<TriggerSettings>();
+									const TriggerSettings & triggerSettings = action.getArgument<TriggerSettings>();
 									this->device->setTriggerMode(triggerSettings.first, triggerSettings.second);
 								}
 								break;
+							case Action::Type_SetGPOMode:
+								{
+									const GPOMode & gpoMode = action.getArgument<GPOMode>();
+									this->device->setGPOMode(gpoMode);
+								}
 							}
 							actionQueue.pop();
 						}

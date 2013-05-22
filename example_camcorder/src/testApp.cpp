@@ -6,8 +6,12 @@ void testApp::setup(){
     ofEnableSmoothing();
 	ofBackground(50);
 
+	ofRectangle roi(0, 768, 2048, 160);
+	ofSetWindowShape(roi.width, roi.height);
+
 	grabber.open();
-	grabber.setROI(ofRectangle(0, 768, 2048, 160));
+	grabber.setROI(roi);
+	grabber.setExposure(1);
 	grabber.startCapture();
 	recorder.setGrabber(grabber);
 
@@ -269,7 +273,7 @@ void testApp::draw(){
 }
 
 //--------------------------------------------------------------
-unsigned char testApp::getValue(Frame::Timestamp timestamp, ofVec2f position) { 
+unsigned char testApp::getValue(Microseconds timestamp, ofVec2f position) { 
 	const auto &pixels = this->recorder[timestamp].getPixelsRef();
 	position *= ofVec2f(pixels.getWidth(), pixels.getHeight());
 	return pixels[pixels.getPixelIndex(position.x, position.y)];
@@ -308,7 +312,7 @@ void testApp::mouseDragged(int x, int y, int button){
 	time *= timeWindow;
 	time += timeStart;
 
-	Stream::Recorder::iterator frame = recorder.lower_bound( (Frame::Timestamp) time);
+	Stream::Recorder::iterator frame = recorder.lower_bound( (Microseconds) time);
 	if (frame == recorder.end()) {
 		return;
 	}

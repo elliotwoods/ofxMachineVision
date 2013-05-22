@@ -16,7 +16,7 @@ class testApp : public ofBaseApp{
 
 	void draw();
 
-	unsigned char getValue(Frame::Timestamp, ofVec2f position);
+	unsigned char getValue(Microseconds, ofVec2f position);
 
 	void keyPressed  (int key);
 	void keyReleased(int key);
@@ -48,12 +48,12 @@ class testApp : public ofBaseApp{
 	bool toggleSave;
 	bool toggleProgress;
 
-	Frame::Timestamp timeStart;
-	Frame::Timestamp timeWindow;
+	Microseconds timeStart;
+	Microseconds timeWindow;
 	
 	ofTexture selectionView;
-	Frame::Timestamp selectionTimestamp;
-	Frame::Timestamp selectionDuration;
+	Microseconds selectionTimestamp;
+	Microseconds selectionDuration;
 
 	vector<ofVec2f> pipets;
 };

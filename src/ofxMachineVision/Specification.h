@@ -13,6 +13,7 @@ namespace ofxMachineVision {
         typedef std::set<PixelMode> PixelModeSet;
         typedef std::set<TriggerMode> TriggerModeSet;
         typedef std::set<TriggerSignalType> TriggerSignalTypeSet;
+		typedef std::set<GPOMode> GPOModeSet;
 
         Specification();
 		Specification(int deviceID) { this->deviceID = deviceID;}
@@ -26,11 +27,13 @@ namespace ofxMachineVision {
         const PixelModeSet & getPixelModes() const { return this->pixelModes; }
         const TriggerModeSet & getTriggerModes() const { return this->triggerModes; }
         const TriggerSignalTypeSet & getTriggerSignalTypes() const { return this->triggerSignalTypes; }
-            
+		const GPOModeSet & getGPOModes() const { return this->gpoModes; }
+
         bool supports(const Feature &);
         bool supports(const PixelMode &);
         bool supports(const TriggerMode &);
         bool supports(const TriggerSignalType &);
+		bool supports(const GPOMode &);
 
         int getSensorWidth() const { return this->sensorWidth; }
         int getSensorHeight() const { return this->sensorHeight; }
@@ -39,12 +42,14 @@ namespace ofxMachineVision {
         const string & getModelName() const { return this->modelName; }
 
         string toString() const;
+		friend ostream& operator<<(ostream&, const Specification&);
 
 		void setDeviceID(int deviceID) { this->deviceID = deviceID; }
         void addFeature(const Feature &);
         void addPixelMode(const PixelMode &);
         void addTriggerMode(const TriggerMode &);
         void addTriggerSignalType(const TriggerSignalType &);
+		void addGPOMode(const GPOMode &);
 
     protected:
         bool valid;
@@ -52,7 +57,8 @@ namespace ofxMachineVision {
         PixelModeSet pixelModes;
         TriggerModeSet triggerModes;
         TriggerSignalTypeSet triggerSignalTypes;
-            
+		GPOModeSet gpoModes;
+
         int sensorWidth;
         int sensorHeight;
             
@@ -61,4 +67,10 @@ namespace ofxMachineVision {
 			
 		int deviceID;
     };
+
+	//---------
+	inline ostream& operator<<(ostream& os, const Specification& specification) {
+		os << specification.toString();
+		return os;
+	}
 }
