@@ -6,13 +6,13 @@ void testApp::setup(){
     ofEnableSmoothing();
 	ofBackground(50);
 
-	ofRectangle roi(0, 768, 2048, 160);
-	ofSetWindowShape(roi.width, roi.height);
+	ofRectangle roi(0, 512, 2048, 1024);
+	ofSetWindowShape(roi.width, max(roi.height, 256.0f));
 
 	grabber.open();
 	grabber.setROI(roi);
-	grabber.setExposure(1);
-	grabber.startCapture();
+	grabber.setExposure(1291);
+	grabber.startCapture(TriggerMode::Trigger_GPIO1, TriggerSignalType::TriggerSignal_RisingEdge);
 	recorder.setGrabber(grabber);
 
 	this->toggleRecord = false;
@@ -68,6 +68,7 @@ void testApp::update(){
 
 	if (this->bangClear) {
 		this->recorder.clear();
+		this->selectionView.clear();
 	}
 
 	if (this->bangClearBefore) {
