@@ -6,6 +6,7 @@
 #ifndef __func__
 #define __func__ __FUNCTION__
 #endif
+#define OFXMV_WARNING ofLogWarning(string(__func__))
 #define OFXMV_ERROR ofLogError(string(__func__))
 #define OFXMV_FATAL ofLogFatalError(string(__func__))
 
@@ -28,6 +29,7 @@ namespace ofxMachineVision {
         Feature_OneShot,
         Feature_Exposure,
         Feature_Gain,
+		Feature_Focus,
 		Feature_DeviceID
     };
         

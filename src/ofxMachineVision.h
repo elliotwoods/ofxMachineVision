@@ -15,8 +15,11 @@
 
 #include "ofxMachineVision/Constants.h"
 #include "ofxMachineVision/Device/Blocking.h"
+#include "ofxMachineVision/Device/Updating.h"
 #include "ofxMachineVision/Grabber/Simple.h"
 #include "ofxMachineVision/Stream/Recorder.h"
+
+#include "ofxMachineVision/Device/VideoInputDevice.h"
 
 namespace ofxMachineVision {
 	/**

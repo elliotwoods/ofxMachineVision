@@ -80,11 +80,15 @@ namespace ofxMachineVision {
 				std::swap(this->pixels, this->waitingPixels);
 				this->waitingPixelsLock.unlock();
 
+				if (!this->pixels.isAllocated()) {
+					//we have no pixels allocated
+					this->texture.clear();
+					return;
+				}
 				if (this->useTexture) {
 					if ((int) this->texture.getWidth() != this->pixels.getWidth() || (int) this->texture.getHeight() != this->pixels.getHeight()) {
 						this->texture.allocate(this->pixels);
 					}
-
 					this->texture.loadData(this->pixels);
 				}
 			}
@@ -129,11 +133,32 @@ namespace ofxMachineVision {
 			CHECK_OPEN
 			REQUIRES(Feature_Exposure)
 			
-			switch (this->getDeviceType())
-			{
+			switch (this->getDeviceType()) {
 			case Device::Type_Blocking:
 				this->threadBlocking->setExposure(exposure);
 				break;
+			}
+		}
+		
+		//----------
+		void Simple::setGain(float percent) {
+			CHECK_OPEN
+			REQUIRES(Feature_Gain)
+
+			switch(this->getDeviceType()) {
+			case Device::Type_Blocking:
+				this->threadBlocking->setGain(percent);
+			}
+		}
+
+		//----------
+		void Simple::setFocus(float percent) {
+			CHECK_OPEN
+			REQUIRES(Feature_Focus)
+
+			switch(this->getDeviceType()) {
+			case Device::Type_Blocking:
+				this->threadBlocking->setFocus(percent);
 			}
 		}
 

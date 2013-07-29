@@ -30,6 +30,8 @@ namespace ofxMachineVision {
 						Type_StartFreeRun,
 						Type_StopFreeRun,
 						Type_SetExposure,
+						Type_SetGain,
+						Type_SetFocus,
 						Type_SetBinning,
 						Type_SetROI,
 						Type_SetTriggerSettings,
@@ -75,6 +77,8 @@ namespace ofxMachineVision {
 				void startFreeRun();
 				void stopFreeRun();
 				void setExposure(Microseconds exposure);
+				void setGain(float percent);
+				void setFocus(float percent);
 				void setBinning(int binningX = 1, int binningY = 1);
 				void setROI(const ofRectangle &);
 				void setTriggerMode(const TriggerMode &, const TriggerSignalType &);

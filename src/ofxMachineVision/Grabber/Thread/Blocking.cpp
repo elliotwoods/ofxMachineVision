@@ -59,6 +59,16 @@ namespace ofxMachineVision {
 			}
 
 			//----------
+			void Blocking::setGain(float percent) {
+				this->addAction(Action(Action::Type_SetGain, percent), false);
+			}
+
+			//----------
+			void Blocking::setFocus(float percent) {
+				this->addAction(Action(Action::Type_SetFocus, percent), false);
+			}
+
+			//----------
 			void Blocking::setBinning(int binningX, int binningY) {
 				Binning binning = {binningX, binningY};
 				this->addAction(Action(Action::Type_SetBinning, binning), false);
@@ -133,6 +143,18 @@ namespace ofxMachineVision {
 								{
 									const Microseconds & exposure = action.getArgument<Microseconds>();
 									this->device->setExposure(exposure);
+								}
+								break;
+							case Action::Type_SetGain:
+								{
+									const float & gain = action.getArgument<float>();
+									this->device->setGain(gain);
+								}
+								break;
+							case Action::Type_SetFocus:
+								{
+									const float & focus = action.getArgument<float>();
+									this->device->setFocus(focus);
 								}
 								break;
 							case Action::Type_SetBinning:

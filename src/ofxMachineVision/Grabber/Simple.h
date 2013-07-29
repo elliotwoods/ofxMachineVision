@@ -64,6 +64,8 @@ namespace ofxMachineVision {
 			*/
 			//@{
 			void setExposure(Microseconds exposure);
+			void setGain(float percent);
+			void setFocus(float percent);
 			void setBinning(int binningX = 1, int binningY = 1);
 			void setROI(const ofRectangle &);
 			void setTriggerMode(const TriggerMode &, const TriggerSignalType &);

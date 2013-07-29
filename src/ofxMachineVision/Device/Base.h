@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ofRectangle.h"
+
+#include "ofxMachineVision/Specification.h"
 #include "ofxMachineVision/Constants.h"
 
 namespace ofxMachineVision {
@@ -25,6 +28,8 @@ namespace ofxMachineVision {
 			*/
 			//@{
 			virtual void setExposure(Microseconds exposure) = 0;
+			virtual void setGain(float percent) = 0;
+			virtual void setFocus(float percent) = 0;
 			virtual void setBinning(int binningX = 1, int binningY = 1) = 0;
 			virtual void setROI(const ofRectangle &) = 0;
 			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) = 0;
