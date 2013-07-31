@@ -10,7 +10,7 @@ namespace ofxMachineVision {
 	namespace Grabber {
 		/**
 		\brief Grabber::Simple is designed to give the same personality as ofVideoGrabber.
-		Often you can get better performance by using Blocking or Callback Grabber instead
+		You may be able to get improved performance by using Blocking or Callback Grabber instead
 		*/
 		class Simple : public Base, public ofBaseDraws, public ofBaseHasTexture, public ofBaseHasPixels, public ofBaseUpdates {
 		public:

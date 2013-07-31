@@ -15,7 +15,7 @@ namespace ofxMachineVision {
 			this->deviceID = deviceID;
 			this->device.setupDevice(deviceID, width, height);
 			this->device.setVideoSettingFilter(this->deviceID, this->device.propSharpness, 0);
-
+			this->device.setIdealFramerate(deviceID, 60);
 			QueryPerformanceCounter(&this->timerStart);
 
 			Specification specification(width, height, "videoInput", this->device.getDeviceName(this->deviceID));
@@ -67,6 +67,7 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInputDevice::getFrame(Frame & frame) {
+			forSleeping.sleep(1);
 			LARGE_INTEGER timestampLong;
 			
 			ofPixels & pixels(frame.getPixelsRef());

@@ -31,6 +31,7 @@ namespace ofxMachineVision {
 			LARGE_INTEGER timerFrequency;
 			LARGE_INTEGER timerStart;
 			int frameIndex;
+			ofThread forSleeping;
 		};
 	}
 }
