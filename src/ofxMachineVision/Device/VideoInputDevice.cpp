@@ -80,7 +80,7 @@ namespace ofxMachineVision {
 			
 			this->frameIndex++;
 
-			frame.setTimestamp(timestampLong.QuadPart * 1e6 / this->timerFrequency.QuadPart);
+			frame.setTimestamp((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart);
 			frame.setFrameIndex(this->frameIndex);
 		}
 

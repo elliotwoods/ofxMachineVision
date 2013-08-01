@@ -1,7 +1,5 @@
 #pragma once
 
-//#include "ofxXimea.h"
-
 #include "ofxMachineVision/Frame.h"
 #include "ofxMachineVision/Grabber/Base.h"
 

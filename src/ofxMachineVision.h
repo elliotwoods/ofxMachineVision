@@ -18,6 +18,7 @@
 #include "ofxMachineVision/Device/Updating.h"
 #include "ofxMachineVision/Grabber/Simple.h"
 #include "ofxMachineVision/Stream/Recorder.h"
+#include "ofxMachineVision/Stream/DiskStreamer.h"
 
 #include "ofxMachineVision/Device/VideoInputDevice.h"
 

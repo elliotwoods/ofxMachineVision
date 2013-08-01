@@ -8,6 +8,8 @@
 #include "ofxMachineVision/Constants.h"
 #include "Thread/Blocking.h"
 
+#include "ofxCvGui/Utils/LambdaStack.h"
+
 #define CHECK_OPEN if(!this->getIsDeviceOpen()) { OFXMV_ERROR << " Method cannot be called whilst device is not open"; return; }
 #define REQUIRES(feature) if(!this->specification.supports(feature)) { OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; return; }
 
@@ -47,6 +49,9 @@ namespace ofxMachineVision {
 			virtual void open(int deviceID = 0) = 0;
 			virtual void close() = 0;
 
+			virtual void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) = 0;
+			virtual void stopCapture() = 0;
+
 			/**
 			\name Capture properties
 			*/
@@ -78,7 +83,7 @@ namespace ofxMachineVision {
 			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }
 			bool getIsDeviceRunning() const { return this->getDeviceState() == State_Running; }
 
-			ofEvent<FrameEventArgs> newFrameReceived;
+			ofxCvGui::Utils::LambdaStack<FrameEventArgs> onNewFrameReceived;
 		protected:
 			void setSpecification(const Specification & specification) { this->specification = specification; }
 

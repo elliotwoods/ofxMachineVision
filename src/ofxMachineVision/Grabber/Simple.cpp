@@ -238,9 +238,7 @@ namespace ofxMachineVision {
 			this->lastTimestamp = frame.getTimestamp();
 			this->lastFrameIndex = frame.getFrameIndex();
 
-			if (!this->newFrameReceived.empty()) {
-				ofNotifyEvent(this->newFrameReceived, frameEventArgs, this);
-			}
+			this->onNewFrameReceived(frameEventArgs);
 		}
 	}
 }

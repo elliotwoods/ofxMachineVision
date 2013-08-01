@@ -32,14 +32,16 @@ namespace ofxMachineVision {
 				return;
 			}
 
-			ofAddListener(this->grabber->newFrameReceived, this, &Recorder::callbackNewFrame);
+			this->grabber->onNewFrameReceived.addListener([this] (FrameEventArgs& frame) {
+				this->callbackNewFrame(frame);
+			}, this);
 			this->state = State_Recording;
 		}
 
 		//---------
 		void Recorder::stop() {
 			if (this->getIsRecording()) {
-				ofRemoveListener(this->grabber->newFrameReceived, this, &Recorder::callbackNewFrame);
+				this->grabber->onNewFrameReceived.removeListeners(this);
 				this->state = State_Ready;
 			}
 		}
