@@ -13,9 +13,9 @@ namespace ofxMachineVision {
 		//---------
 		Specification VideoInputDevice::open(int deviceID) {
 			this->deviceID = deviceID;
+			this->device.setIdealFramerate(deviceID, 20);
 			this->device.setupDevice(deviceID, width, height);
 			this->device.setVideoSettingFilter(this->deviceID, this->device.propSharpness, 0);
-			this->device.setIdealFramerate(deviceID, 60);
 			QueryPerformanceCounter(&this->timerStart);
 
 			Specification specification(width, height, "videoInput", this->device.getDeviceName(this->deviceID));
