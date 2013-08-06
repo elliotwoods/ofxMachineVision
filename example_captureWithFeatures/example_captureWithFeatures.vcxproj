@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7FD42DF7-442E-479A-BA76-D0022F99702A}</ProjectGuid>
-    <RootNamespace>example_camcorder</RootNamespace>
+    <RootNamespace>example_captureWithFeatures</RootNamespace>
     <Keyword>Win32Proj</Keyword>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -61,7 +61,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>../../../addons/ofxXmlSettings/libs;../../../addons/ofxXmlSettings/src;../../../addons/ofxUI/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\addons\ofxXmlSettings\libs;..\..\..\addons\ofxXmlSettings\src;..\..\..\addons\ofxUI\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -84,7 +84,7 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat />
-      <AdditionalIncludeDirectories>../../../addons/ofxXmlSettings/libs;../../../addons/ofxXmlSettings/src;../../../addons/ofxUI/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -138,6 +138,7 @@
     <ClInclude Include="..\..\ofxUI\src\ofxUIMultiImageSlider.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIMultiImageToggle.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUINumberDialer.h" />
+    <ClInclude Include="..\..\ofxUI\src\ofxUIOFWrapper.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIRadio.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIRangeSlider.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIRectangle.h" />
@@ -151,6 +152,7 @@
     <ClInclude Include="..\..\ofxUI\src\ofxUITextInput.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIToggle.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIToggleMatrix.h" />
+    <ClInclude Include="..\..\ofxUI\src\ofxUIUtils.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIValuePlotter.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIWaveform.h" />
     <ClInclude Include="..\..\ofxUI\src\ofxUIWidget.h" />

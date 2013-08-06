@@ -2,37 +2,33 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-	grabber.open();
-
-	grabber.setExposure(100);
-	grabber.setROI(ofRectangle(0,0,2048,1024));
-
-	grabber.startCapture(Trigger_GPIO0, TriggerSignal_RisingEdge);
+	camera.open();
+	if (!camera.getIsDeviceOpen()) {
+		ofSystemAlertDialog("Device did not open");
+	}
+	camera.startCapture(Trigger_GPIO1, TriggerSignal_RisingEdge);
+	camera.setExposure(1291);
+	camera.setROI(ofRectangle(0, 0, 2048, 1024));
 }
 
 //--------------------------------------------------------------
 void testApp::update(){
-	grabber.update();
+	camera.update();
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-	grabber.draw(ofGetCurrentViewport());
-
-	stringstream status;
-	status << "Last timestamp : \t" << grabber.getLastTimestamp() << endl;
-	status << "Last frame index : \t" << grabber.getLastFrameIndex() << endl;
-	status << "Framerate : \t\t" << grabber.getFps() << endl;
-	status << endl;
-	status << grabber.getDeviceSpecification();
-
-	ofEnableAlphaBlending();
-	ofDrawBitmapStringHighlight(status.str(), 10, 20, ofColor(100,0,0,100));
+	camera.draw(ofGetCurrentViewport());
 }
 
 //--------------------------------------------------------------
 void testApp::keyPressed(int key){
-
+	if (key == ' ') {
+		static int index = 0;
+		string filename = ofToString(index++) + ".bmp";
+		ofSaveImage(camera.getPixelsRef(), filename);
+		ofLogNotice("captureWithFeatures") << "Camera image saved to " << filename;
+	}
 }
 
 //--------------------------------------------------------------

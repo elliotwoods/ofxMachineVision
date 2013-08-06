@@ -1,0 +1,177 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\testApp.cpp" />
+    <ClCompile Include="..\..\ofxXmlSettings\src\ofxXmlSettings.cpp">
+      <Filter>ofxXmlSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxml.cpp">
+      <Filter>ofxXmlSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxmlerror.cpp">
+      <Filter>ofxXmlSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxXmlSettings\libs\tinyxmlparser.cpp">
+      <Filter>ofxXmlSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ofxXimea\src\ofxXimea.cpp">
+      <Filter>ofxXimea</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\testApp.h" />
+    <ClInclude Include="..\..\ofxUI\src\ofxUI.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUI2DGraph.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUI2DPad.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIBaseDraws.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIBiLabelSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIButton.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUICanvas.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUICircleSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUICustomImageButton.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIDropDownList.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIEventArgs.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIFPS.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIFPSSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIImage.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIImageButton.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIImageSampler.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIImageSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIImageToggle.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUILabel.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUILabelButton.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUILabelToggle.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIMinimalSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIMovingGraph.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIMultiImageButton.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIMultiImageSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIMultiImageToggle.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUINumberDialer.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIRadio.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIRangeSlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIRectangle.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIRotarySlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIScrollableCanvas.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUISlider.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUISpacer.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUISpectrum.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUISuperCanvas.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUITextArea.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUITextInput.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIToggle.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIToggleMatrix.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIValuePlotter.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIWaveform.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIWidget.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxUI\src\ofxUIWidgetWithLabel.h">
+      <Filter>ofxUI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxXmlSettings\src\ofxXmlSettings.h">
+      <Filter>ofxXmlSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxXmlSettings\libs\tinyxml.h">
+      <Filter>ofxXmlSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ofxXimea\src\ofxXimea.h">
+      <Filter>ofxXimea</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="ofxUI">
+      <UniqueIdentifier>{5b8e01cf-23fe-4648-a9bc-32de8e1d01d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ofxXmlSettings">
+      <UniqueIdentifier>{c605aad1-c134-4ec5-b185-0200a485ffec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ofxXimea">
+      <UniqueIdentifier>{0b4db9b2-4a48-4931-bd32-dc91d99a19ab}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

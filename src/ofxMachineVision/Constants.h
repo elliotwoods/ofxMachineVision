@@ -51,8 +51,8 @@ namespace ofxMachineVision {
     enum TriggerMode {
         Trigger_Device,
         Trigger_Software,
-        Trigger_GPIO0,
-        Trigger_GPIO1
+        Trigger_GPIO1,
+        Trigger_GPIO2
     };
         
 	/**
@@ -138,10 +138,10 @@ namespace ofxMachineVision {
 		switch (triggerMode) {
 			case Trigger_Device:
 				return "Device";
-			case Trigger_GPIO0:
-				return "GPIO0";
 			case Trigger_GPIO1:
 				return "GPIO1";
+			case Trigger_GPIO2:
+				return "GPIO2";
 			case Trigger_Software:
 				return "Software";
 		}

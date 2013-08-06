@@ -36,6 +36,9 @@ namespace ofxMachineVision {
 				this->draw(x, y, this->getWidth(), this->getHeight());
 			}
 			void draw(float x, float y, float w, float h);
+			void draw(const ofRectangle & rect) {
+				draw(rect.x, rect.y, rect.width, rect.height);
+			}
 			/** \brief Get the width of the most recent captured frame */
 			float getWidth();
 			/** \brief Get the height of the most recent captured frame */
