@@ -3,9 +3,10 @@
 namespace ofxMachineVision {
 	namespace Device {
 		//---------
-		VideoInputDevice::VideoInputDevice(int width, int height) {
+		VideoInputDevice::VideoInputDevice(int width, int height, float desiredFramerate) {
 			this->width = width;
 			this->height = height;
+			this->desiredFramerate = desiredFramerate;
 			QueryPerformanceFrequency(&this->timerFrequency);
 			this->device.setComMultiThreaded(true);
 		}
@@ -13,10 +14,11 @@ namespace ofxMachineVision {
 		//---------
 		Specification VideoInputDevice::open(int deviceID) {
 			this->deviceID = deviceID;
-			this->device.setIdealFramerate(deviceID, 20);
+			this->device.setIdealFramerate(deviceID, desiredFramerate);
+			this->device.setRequestedMediaSubType(VI_MEDIASUBTYPE_MJPG);
 			this->device.setupDevice(deviceID, width, height);
 			this->device.setVideoSettingFilter(this->deviceID, this->device.propSharpness, 0);
-			QueryPerformanceCounter(&this->timerStart);
+			this->resetTimestamp();
 
 			Specification specification(width, height, "videoInput", this->device.getDeviceName(this->deviceID));
 			
@@ -88,5 +90,11 @@ namespace ofxMachineVision {
 		void VideoInputDevice::showSettings() {
 			this->device.showSettingsWindow(this->deviceID);
 		}
+
+		//---------
+		void VideoInputDevice::resetTimestamp() {
+			QueryPerformanceCounter(&this->timerStart);
+		}
+
 	}
 }

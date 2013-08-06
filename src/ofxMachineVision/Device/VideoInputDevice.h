@@ -12,7 +12,7 @@ namespace ofxMachineVision {
 		*/
 		class VideoInputDevice : public Blocking {
 		public:
-			VideoInputDevice(int width = 640, int height = 480);
+			VideoInputDevice(int width = 640, int height = 480, float desiredFramerate = 30);
 			Specification open(int deviceID);
 			void close();
 			void setExposure(Microseconds exposure);
@@ -22,11 +22,14 @@ namespace ofxMachineVision {
 			void stopCapture();
 			void getFrame(Frame & frame);
 			
-			void showSettings(); //must be called directly on this type
+			//--
+			void showSettings();
+			void resetTimestamp();
 		protected:
 			videoInput device;
 			int deviceID;
 			int width, height;
+			float desiredFramerate;
 
 			LARGE_INTEGER timerFrequency;
 			LARGE_INTEGER timerStart;

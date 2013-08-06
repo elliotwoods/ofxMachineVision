@@ -78,6 +78,7 @@ namespace ofxMachineVision {
 			const string & getModelName() const { return this->getDeviceSpecification().getModelName(); };
 			//@}
 
+			DevicePtr getDevice() { return this->baseDevice; }
 			const Device::Type & getDeviceType() const { return this->deviceType; }
 			const DeviceState & getDeviceState() const { return this->deviceState; }
 			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }
@@ -92,7 +93,7 @@ namespace ofxMachineVision {
 
 			ofxMachineVision::Grabber::Thread::Blocking * threadBlocking;
 		private:
-			DevicePtr baseDevice;
+			DevicePtr baseDevice; // why is this private and not protected?
 			Device::Type deviceType;
 
 			friend Thread::Blocking;
