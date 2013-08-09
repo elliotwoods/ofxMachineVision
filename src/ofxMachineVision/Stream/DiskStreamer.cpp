@@ -33,6 +33,11 @@ namespace ofxMachineVision {
 		}
 
 		//---------
+		ofxMachineVision::GrabberPtr DiskStreamer::getGrabber() {
+			return this->grabber;
+		}
+
+		//---------
 		void DiskStreamer::clearGrabber() {
 			if (this->getHasGrabber()) {
 				this->grabber->onNewFrameReceived.removeListeners(this);

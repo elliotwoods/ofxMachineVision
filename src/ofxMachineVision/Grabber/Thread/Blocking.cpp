@@ -27,7 +27,19 @@ namespace ofxMachineVision {
 			//----------
 			Blocking::~Blocking() {
 				this->close();
-				actionQueueLock.lock();
+				bool waitForActionQueue = true;
+				while (true) {
+					this->actionQueueLock.lock();
+					if (this->actionQueue.empty()) {
+						waitForActionQueue = false;
+					}
+					this->actionQueueLock.unlock();
+					if (waitForActionQueue) {
+						sleep(10);
+					} else {
+						break;
+					}
+				}
 				actionQueueLock.unlock();
 			}
 
@@ -119,6 +131,7 @@ namespace ofxMachineVision {
 					this->actionQueueLock.lock();
 					if (!this->actionQueue.empty()) {
 						while (!this->actionQueue.empty()) {
+							bool clearedQueue = false;
 							Action & action(this->actionQueue.front());
 							switch (action.getType()) {
 							case Action::Type_Open:
@@ -132,7 +145,8 @@ namespace ofxMachineVision {
 								this->device->close();
 								while (!this->actionQueue.empty())
 									this->actionQueue.pop();
-								this->actionQueueLock.unlock();
+								clearedQueue = true;
+								break;
 							case Action::Type_StartFreeRun:
 								this->device->startCapture();
 								break;
@@ -181,7 +195,10 @@ namespace ofxMachineVision {
 									this->device->setGPOMode(gpoMode);
 								}
 							}
-							actionQueue.pop();
+							if (!clearedQueue) {
+								//we clear the queue when closing
+								actionQueue.pop();
+							}
 						}
 						actionQueueLock.unlock();
 					} else {

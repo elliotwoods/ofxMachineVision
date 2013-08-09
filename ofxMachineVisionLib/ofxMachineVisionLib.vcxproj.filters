@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{10189856-d6f7-4931-8aa1-a1be89c6ab97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxMachineVision">
+      <UniqueIdentifier>{8ad59e8e-1278-4ef2-bbed-08ef40ead930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxMachineVision\Device">
+      <UniqueIdentifier>{161c2002-8a53-4972-adcd-a8282ac5ee29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxMachineVision\Grabber">
+      <UniqueIdentifier>{acf0ace3-6bd7-4f40-8137-9932a2a4050b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxMachineVision\Grabber\Thread">
+      <UniqueIdentifier>{b24b22e1-e93a-4cae-a04e-d2a336db867e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\ofxMachineVision\Stream">
+      <UniqueIdentifier>{8592239b-f986-4be5-9a2b-b6e571c0e1da}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\readme.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ofxMachineVision.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Constants.h">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Frame.h">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Specification.h">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Grabber\Simple.h">
+      <Filter>src\ofxMachineVision\Grabber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\Base.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\Blocking.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\Types.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.h">
+      <Filter>src\ofxMachineVision\Grabber\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Stream\Recorder.h">
+      <Filter>src\ofxMachineVision\Stream</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Grabber\Base.h">
+      <Filter>src\ofxMachineVision\Grabber</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\Updating.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\VideoInputDevice.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Stream\DiskStreamer.h">
+      <Filter>src\ofxMachineVision\Stream</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Grabber\Simple.cpp">
+      <Filter>src\ofxMachineVision\Grabber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.cpp">
+      <Filter>src\ofxMachineVision\Grabber\Thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Stream\Recorder.cpp">
+      <Filter>src\ofxMachineVision\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Frame.cpp">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\VideoInputDevice.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Stream\DiskStreamer.cpp">
+      <Filter>src\ofxMachineVision\Stream</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

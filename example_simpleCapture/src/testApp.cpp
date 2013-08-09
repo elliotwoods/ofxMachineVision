@@ -15,18 +15,15 @@ void testApp::setup(){
 
 //--------------------------------------------------------------
 void testApp::update(){
-    
     //update the texture in the Device class
     camera.update();
-    
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
-    
     //draw the texture in the Device class
     camera.draw(0, 0);
-    
+	ofDrawBitmapStringHighlight(ofToString(camera.getFps()), 10, 10);
 }
 
 //--------------------------------------------------------------

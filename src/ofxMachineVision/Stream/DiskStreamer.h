@@ -21,6 +21,7 @@ namespace ofxMachineVision {
 			virtual ~DiskStreamer();
 
 			void setGrabber(ofxMachineVision::GrabberPtr);
+			ofxMachineVision::GrabberPtr getGrabber();
 			void clearGrabber();
 
 			/** \b Set the folder to stream output to, if folder doesn't exist, we'll try and create it **/
