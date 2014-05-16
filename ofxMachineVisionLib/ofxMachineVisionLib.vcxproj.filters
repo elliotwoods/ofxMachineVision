@@ -19,6 +19,9 @@
     <Filter Include="src\ofxMachineVision\Stream">
       <UniqueIdentifier>{8592239b-f986-4be5-9a2b-b6e571c0e1da}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\ofxMachineVision\Utils">
+      <UniqueIdentifier>{0b7ebcb1-6e42-481a-9e1e-bcb85ce70740}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\readme.md" />
@@ -66,6 +69,9 @@
     <ClInclude Include="..\src\ofxMachineVision\Stream\DiskStreamer.h">
       <Filter>src\ofxMachineVision\Stream</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Utils\ActionQueueThread.h">
+      <Filter>src\ofxMachineVision\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
@@ -88,6 +94,12 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Stream\DiskStreamer.cpp">
       <Filter>src\ofxMachineVision\Stream</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Utils\ActionQueueThread.cpp">
+      <Filter>src\ofxMachineVision\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

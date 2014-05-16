@@ -2,12 +2,12 @@
 
 #include <queue>
 #include <array>
-#include "Poco/Any.h"
 	
 #include "ofThread.h"
 #include "ofEvents.h"
 
 #include "ofxMachineVision/Constants.h"
+#include "ofxMachineVision/Utils/ActionQueueThread.h"
 #include "ofxMachineVision/Device/Blocking.h"
 
 namespace ofxMachineVision {
@@ -20,48 +20,8 @@ namespace ofxMachineVision {
 			\brief Thread::Blocking is a thread for handling Device::Blocking type devices
 			We presume that the thread is running whilst the device is open
 			*/
-			class Blocking : public ofThread {
+			class Blocking : public Utils::ActionQueueThread {
 			public:
-				class Action {
-				public:
-					enum Type {
-						Type_Open,
-						Type_Close,
-						Type_StartFreeRun,
-						Type_StopFreeRun,
-						Type_SetExposure,
-						Type_SetGain,
-						Type_SetFocus,
-						Type_SetBinning,
-						Type_SetROI,
-						Type_SetTriggerSettings,
-						Type_SetGPOMode
-					};
-
-					Action(const Type &);
-					Action(const Type &, Poco::Any);
-
-					const Type & getType() const { return this->type; }
-					const Poco::Any & getArguments() const { return this->arguments; }
-					
-					template<typename T>
-					T getArgument() const {
-						if (this->getArguments().type() == typeid(T)) {
-							return Poco::AnyCast<T>(this->getArguments());
-						} else {
-							return T();
-						}
-					}
-
-					template<typename T, int size>
-					array<T, size> getArrayArgument() const {
-						return this->getArgument<array<T, size>>();
-					}
-				protected:
-					Type type;
-					Poco::Any arguments;
-				};
-
 				Blocking(shared_ptr<Device::Blocking>, Grabber::Base *);
 				~Blocking();
             
@@ -84,13 +44,9 @@ namespace ofxMachineVision {
 				void setTriggerMode(const TriggerMode &, const TriggerSignalType &);
 				void setGPOMode(const GPOMode &);
 
-				void addAction(const Action &, bool blockUntilComplete = false);
-				void blockUntilActionQueueEmpty();
-
 				ofEvent<FrameEventArgs> evtNewFrame;
 			protected:
-				void threadedFunction();
-				queue<Action> actionQueue;
+				void idleFunction() override;
 				ofMutex actionQueueLock;
 				shared_ptr<Device::Blocking> device;
 				Grabber::Base * grabber;

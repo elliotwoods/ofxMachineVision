@@ -88,8 +88,10 @@
     <ClInclude Include="..\src\ofxMachineVision\Specification.h" />
     <ClInclude Include="..\src\ofxMachineVision\Stream\DiskStreamer.h" />
     <ClInclude Include="..\src\ofxMachineVision\Stream\Recorder.h" />
+    <ClInclude Include="..\src\ofxMachineVision\Utils\ActionQueueThread.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\ofxMachineVision.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInputDevice.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Frame.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Grabber\Simple.cpp" />
@@ -97,6 +99,7 @@
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Stream\DiskStreamer.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Stream\Recorder.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Utils\ActionQueueThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\libs\openFrameworksCompiled\project\vs\openframeworksLib.vcxproj">
