@@ -18,10 +18,10 @@ namespace ofxMachineVision {
 
 #pragma mark Blocking
 			//----------
-			Blocking::Blocking(ofPtr<Device::Blocking> device, Grabber::Base * grabber) {
+			Blocking::Blocking(shared_ptr<Device::Blocking> device, Grabber::Base * grabber) {
 				this->device = device;
 				this->grabber = grabber;
-				this->frame = ofPtr<Frame>(new Frame());
+				this->frame = shared_ptr<Frame>(new Frame());
 			}
 
 			//----------

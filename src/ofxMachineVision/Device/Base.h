@@ -38,5 +38,5 @@ namespace ofxMachineVision {
 		};
 	}
 
-	typedef ofPtr<Device::Base> DevicePtr;
+	typedef shared_ptr<Device::Base> DevicePtr;
 }

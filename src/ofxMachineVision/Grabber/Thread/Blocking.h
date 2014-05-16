@@ -62,7 +62,7 @@ namespace ofxMachineVision {
 					Poco::Any arguments;
 				};
 
-				Blocking(ofPtr<Device::Blocking>, Grabber::Base *);
+				Blocking(shared_ptr<Device::Blocking>, Grabber::Base *);
 				~Blocking();
             
 				/**
@@ -92,9 +92,9 @@ namespace ofxMachineVision {
 				void threadedFunction();
 				queue<Action> actionQueue;
 				ofMutex actionQueueLock;
-				ofPtr<Device::Blocking> device;
+				shared_ptr<Device::Blocking> device;
 				Grabber::Base * grabber;
-				ofPtr<Frame> frame;
+				shared_ptr<Frame> frame;
 			};
 		}
 	}

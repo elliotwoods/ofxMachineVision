@@ -25,7 +25,7 @@ namespace ofxMachineVision {
 				this->deviceType = getType(device);
 				switch(this->deviceType) {
 				case Device::Type_Blocking: {
-					ofPtr<Device::Blocking> blockingDevice = static_pointer_cast<Device::Blocking>(device);
+					shared_ptr<Device::Blocking> blockingDevice = static_pointer_cast<Device::Blocking>(device);
 					this->threadBlocking = new Thread::Blocking(blockingDevice, this);
 					break;
 				}
@@ -100,5 +100,5 @@ namespace ofxMachineVision {
 		};
 	}
 
-	typedef ofPtr<Grabber::Base> GrabberPtr;
+	typedef shared_ptr<Grabber::Base> GrabberPtr;
 }
