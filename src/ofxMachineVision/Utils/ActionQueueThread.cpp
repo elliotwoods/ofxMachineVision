@@ -33,20 +33,23 @@ namespace ofxMachineVision {
 		//----------
 		void ActionQueueThread::threadedFunction() {
 			while(this->isThreadRunning()) {
-				ActionFunction action;
-				this->lockFunctionQueue.lock();
-				if (!this->functionQueue.empty()) {
-					action = this->functionQueue.front();
-				}
-				this->lockFunctionQueue.unlock();
-
-				if (action) {
-					action();
+				while (true) {
+					ActionFunction action;
 					this->lockFunctionQueue.lock();
-					this->functionQueue.pop();
+					if (!this->functionQueue.empty()) {
+						action = this->functionQueue.front();
+					}
 					this->lockFunctionQueue.unlock();
-				}
 
+					if (action) {
+						action();
+						this->lockFunctionQueue.lock();
+						this->functionQueue.pop();
+						this->lockFunctionQueue.unlock();
+					} else {
+						break;
+					}
+				}
 				this->idleFunction();
 			}
 		}
