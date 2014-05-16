@@ -72,6 +72,7 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::update() {
+			CHECK_OPEN
 			currentFrameNew = this->newFrameWaiting;
 			this->newFrameWaiting = false;
 

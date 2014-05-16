@@ -8,8 +8,7 @@
 #include "ofxMachineVision/Constants.h"
 #include "Thread/Blocking.h"
 
-//sorry! but we need this for the time being. please clone ofxCvGui2 with branch feature-lambdaStack
-#include "../../../../ofxCvGui2/src/ofxCvGui/Utils/LambdaStack.h"
+#include "../../../../ofxLiquidEvent/src/ofxLiquidEvent.h"
 
 #define CHECK_OPEN if(!this->getIsDeviceOpen()) { OFXMV_ERROR << " Method cannot be called whilst device is not open"; return; }
 #define REQUIRES(feature) if(!this->specification.supports(feature)) { OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; return; }
@@ -85,7 +84,7 @@ namespace ofxMachineVision {
 			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }
 			bool getIsDeviceRunning() const { return this->getDeviceState() == State_Running; }
 
-			ofxCvGui::Utils::LambdaStack<FrameEventArgs> onNewFrameReceived;
+			ofxLiquidEvent<FrameEventArgs> onNewFrameReceived;
 		protected:
 			void setSpecification(const Specification & specification) { this->specification = specification; }
 

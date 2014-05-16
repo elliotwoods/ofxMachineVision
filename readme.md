@@ -2,6 +2,13 @@
 
 A set of tools for dealing with machine vision cameras, based on interface ofxMachineVision::Device.
 
+# Pre-requisites
+
+Requires:
+
+* C++11 support (e.g. Visual Studio, XCode with openFrameworks C++11 branch, Linux)
+* ofxLiquidEvent (https://github.com/elliotwoods/ofxLiquidEvent)
+
 # Usage
 
 ## Visual Studio
