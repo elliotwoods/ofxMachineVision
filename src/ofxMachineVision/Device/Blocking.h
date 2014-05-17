@@ -26,6 +26,7 @@ namespace ofxMachineVision {
 			virtual void setExposure(Microseconds exposure) override { };
 			virtual void setGain(float percent) override { };
 			virtual void setFocus(float percent) override { };
+			virtual void setSharpness(float percent) = 0;
 			virtual void setBinning(int binningX = 1, int binningY = 1) override { };
 			virtual void setROI(const ofRectangle &) override { };
 			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) override { };

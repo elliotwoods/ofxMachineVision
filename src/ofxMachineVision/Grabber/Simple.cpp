@@ -185,6 +185,16 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		void Simple::setSharpness(float percent) {
+			CHECK_OPEN
+			REQUIRES(Feature_Sharpness)
+			
+			this->callInRightThread([=] () {
+				this->getDevice()->setSharpness(percent);
+			});
+		}
+
+		//----------
 		void Simple::setBinning(int binningX, int binningY) {
 			CHECK_OPEN
 			REQUIRES(Feature_Binning)

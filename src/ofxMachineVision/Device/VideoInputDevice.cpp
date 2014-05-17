@@ -27,6 +27,7 @@ namespace ofxMachineVision {
 			specification.addFeature(Feature::Feature_FreeRun);
 			specification.addFeature(Feature::Feature_Gain);
 			specification.addFeature(Feature::Feature_Focus);
+			specification.addFeature(Feature::Feature_Sharpness);
 			
 			specification.addPixelMode(PixelMode::Pixel_RGB8);
 
@@ -54,7 +55,7 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInputDevice::setExposure(Microseconds exposure) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, 1.0f - (float) exposure / 1000.0f);
+			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, (float) exposure / 1000.0f);
 		}
 	
 		//---------
@@ -65,6 +66,11 @@ namespace ofxMachineVision {
 		//---------
 		void VideoInputDevice::setFocus(float percent) {
 			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propFocus, percent);
+		}
+
+		//---------
+		void VideoInputDevice::setSharpness(float percent) {
+			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propSharpness, percent);
 		}
 
 		//---------

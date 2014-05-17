@@ -30,6 +30,7 @@ namespace ofxMachineVision {
         Feature_Exposure,
         Feature_Gain,
 		Feature_Focus,
+		Feature_Sharpness,
 		Feature_DeviceID
     };
         

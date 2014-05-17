@@ -25,32 +25,32 @@ namespace ofxMachineVision {
 			 \name ofBaseUpdates
 			 */
 			//@{
-			void update();
+			void update() override;
 			//@}
 			
 			/**
 			 \name ofBaseDraws
 			 */
 			//@{
-			void draw(float x, float y) {
+			void draw(float x, float y) override {
 				this->draw(x, y, this->getWidth(), this->getHeight());
 			}
-			void draw(float x, float y, float w, float h);
-			void draw(const ofRectangle & rect) {
+			void draw(float x, float y, float w, float h) override;
+			void draw(const ofRectangle & rect) override {
 				draw(rect.x, rect.y, rect.width, rect.height);
 			}
 			/** \brief Get the width of the most recent captured frame */
-			float getWidth();
+			float getWidth() override;
 			/** \brief Get the height of the most recent captured frame */
-			float getHeight();
+			float getHeight() override;
 			//@}
 
 		    /**
 			 \name ofBaseHasTexture
 			 */
 			//@{
-			ofTexture & getTextureReference() { return this->texture; }
-			void setUseTexture(bool useTexture);
+			ofTexture & getTextureReference() override { return this->texture; }
+			void setUseTexture(bool useTexture) override;
 			//@}
         
 			/**
@@ -58,21 +58,22 @@ namespace ofxMachineVision {
 			 \brief These functions are virtual in case you want to allocate your own ofPixels
 			 */
 			//@{
-			unsigned char * getPixels();
-			ofPixels & getPixelsRef();
+			unsigned char * getPixels() override;
+			ofPixels & getPixelsRef() override;
 			//@}
 
 			/**
 			\name Capture properties
 			*/
 			//@{
-			void setExposure(Microseconds exposure);
-			void setGain(float percent);
-			void setFocus(float percent);
-			void setBinning(int binningX = 1, int binningY = 1);
-			void setROI(const ofRectangle &);
-			void setTriggerMode(const TriggerMode &, const TriggerSignalType &);
-			void setGPOMode(const GPOMode &);
+			void setExposure(Microseconds exposure) override;
+			void setGain(float percent) override;
+			void setFocus(float percent) override;
+			void setSharpness(float percent) override;
+			void setBinning(int binningX = 1, int binningY = 1) override;
+			void setROI(const ofRectangle &) override;
+			void setTriggerMode(const TriggerMode &, const TriggerSignalType &) override;
+			void setGPOMode(const GPOMode &) override;
 			//@}
 
 			bool isFrameNew() const { return this->currentFrameNew; }

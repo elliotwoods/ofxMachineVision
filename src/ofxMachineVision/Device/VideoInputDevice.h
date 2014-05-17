@@ -20,6 +20,7 @@ namespace ofxMachineVision {
 			void setExposure(Microseconds exposure) override;
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
+			void setSharpness(float percent) override;
 			void getFrame(shared_ptr<Frame>) override;
 			
 			//--
