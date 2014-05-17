@@ -1,4 +1,5 @@
 #include "Simple.h"
+#include "ofAppRunner.h"
 
 namespace ofxMachineVision {
 	namespace Grabber {
@@ -20,10 +21,34 @@ namespace ofxMachineVision {
 			try {
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
-					this->threadBlocking->open(deviceID);
-					this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
-					ofAddListener(this->threadBlocking->evtNewFrame, this, &Simple::callbackNewFrame);
-					break;
+					{
+						auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
+						if (!device) {
+							OFXMV_FATAL << "Type mismatch with Device::Blocking";
+							throw(std::exception());
+						}
+					
+						this->frame = shared_ptr<Frame>(new Frame());
+						this->thread->startThread();
+
+						this->thread->performInThread([=] () {
+							this->setSpecification(device->open(deviceID));
+						});
+
+						this->thread->setIdleFunction(
+							[=] () {
+							if (this->getIsDeviceRunning()) {
+								device->getFrame(this->frame);
+								if (!this->frame->isEmpty()) {
+									this->callbackNewFrame(this->frame);
+								}
+							} else {
+								ofSleepMillis(2);
+							}
+						});
+						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						break;
+					}
 				default:
 					throw std::exception("Device not implemented");
 				}
@@ -38,11 +63,13 @@ namespace ofxMachineVision {
 			if (this->getIsDeviceRunning()) {
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
-					this->threadBlocking->close();
-					this->deviceState = State_Closed;
-					ofRemoveListener(this->threadBlocking->evtNewFrame, this, &Simple::callbackNewFrame);
+					{
+						this->thread->stopThread();
+						this->thread->waitForThread(true);
+					}
 					break;
 				}
+				this->deviceState = State_Closed;
 			}
 		}
 
@@ -52,22 +79,20 @@ namespace ofxMachineVision {
 
 			this->setTriggerMode(triggerMode, triggerSignalType);
 		
-			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->startFreeRun();
+			this->callInRightThread([=] () {
+				this->getDevice()->startCapture();
 				this->deviceState = State_Running;
-				break;
-			}
+			});
 		}
 
 		//----------
 		void Simple::stopCapture() {
 			CHECK_OPEN
-			switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
-					this->threadBlocking->stopFreeRun();
-					break;
-			}
+
+			this->callInRightThread([=] () {
+				this->getDevice()->stopCapture();
+				this->deviceState = State_Waiting;
+			});
 		}
 
 		//----------
@@ -134,11 +159,9 @@ namespace ofxMachineVision {
 			CHECK_OPEN
 			REQUIRES(Feature_Exposure)
 			
-			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setExposure(exposure);
-				break;
-			}
+			this->callInRightThread([=] () {
+				this->getDevice()->setExposure(exposure);
+			});
 		}
 		
 		//----------
@@ -146,33 +169,29 @@ namespace ofxMachineVision {
 			CHECK_OPEN
 			REQUIRES(Feature_Gain)
 
-			switch(this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setGain(percent);
-			}
+			this->callInRightThread([=] () {
+				this->getDevice()->setGain(percent);
+			});
 		}
 
 		//----------
 		void Simple::setFocus(float percent) {
 			CHECK_OPEN
 			REQUIRES(Feature_Focus)
-
-			switch(this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setFocus(percent);
-			}
+			
+			this->callInRightThread([=] () {
+				this->getDevice()->setFocus(percent);
+			});
 		}
 
 		//----------
 		void Simple::setBinning(int binningX, int binningY) {
 			CHECK_OPEN
 			REQUIRES(Feature_Binning)
-
-			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setBinning(binningX, binningY);
-				break;
-			}
+			
+			this->callInRightThread([=] () {
+				this->getDevice()->setBinning(binningX, binningY);
+			});
 		}
 
 		//----------
@@ -180,11 +199,9 @@ namespace ofxMachineVision {
 			CHECK_OPEN
 			REQUIRES(Feature_ROI);
 
-			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setROI(roi);
-				break;
-			}
+			this->callInRightThread([=] () {
+				this->getDevice()->setROI(roi);
+			});
 		}
 
 		//----------
@@ -194,10 +211,9 @@ namespace ofxMachineVision {
 			REQUIRES(triggerMode);
 			REQUIRES(triggerSignalType);
 
-			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
-				this->threadBlocking->setTriggerMode(triggerMode, triggerSignalType);
-			}
+			this->callInRightThread([=] () {
+				this->getDevice()->setTriggerMode(triggerMode, triggerSignalType);
+			});
 		}
 
 		//----------
@@ -206,27 +222,34 @@ namespace ofxMachineVision {
 			REQUIRES(Feature_GPO);
 			REQUIRES(gpoMode);
 
+			this->callInRightThread([=] () {
+				this->getDevice()->setGPOMode(gpoMode);
+			});
+		}
+
+		//----------
+		void Simple::callInRightThread(std::function<void()> function) {
 			switch (this->getDeviceType()) {
 			case Device::Type_Blocking:
-				this->threadBlocking->setGPOMode(gpoMode);
+				this->thread->performInThread(function);
+				break;
 			}
 		}
 
 		//----------
-		void Simple::callbackNewFrame(FrameEventArgs & frameEventArgs) {
+		void Simple::callbackNewFrame(shared_ptr<Frame> frame) {
 			if (this->getDeviceState() == State_Deleting) {
 				return;
 			}
 
-			Frame & frame(*frameEventArgs.frame);
 
-			frame.lockForReading();
+			frame->lockForReading();
 			this->waitingPixelsLock.lock();
-			this->waitingPixels = frame.getPixelsRef();
+			this->waitingPixels = frame->getPixelsRef();
 			this->waitingPixelsLock.unlock();
-			frame.unlock();
+			frame->unlock();
 
-			float interval = (frame.getTimestamp() - this->lastTimestamp) / 1e6;
+			float interval = (frame->getTimestamp() - this->lastTimestamp) / 1e6;
 
 			float newfps = (1.0f / interval);
 			if (this->fps == this->fps && abs(log(this->fps) - log(newfps)) < 10) {
@@ -236,10 +259,11 @@ namespace ofxMachineVision {
 			}
 
 			this->newFrameWaiting = true;
-			this->lastTimestamp = frame.getTimestamp();
-			this->lastFrameIndex = frame.getFrameIndex();
+			this->lastTimestamp = frame->getTimestamp();
+			this->lastFrameIndex = frame->getFrameIndex();
 
-			this->onNewFrameReceived(frameEventArgs);
+			FrameEventArgs frameEvent(frame);
+			this->onNewFrameReceived(frameEvent);
 		}
 	}
 }

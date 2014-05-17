@@ -5,8 +5,8 @@
 #include "ofxMachineVision/Device/Blocking.h"
 #include "ofxMachineVision/Device/Types.h"
 #include "ofxMachineVision/Specification.h"
+#include "ofxMachineVision/Utils/ActionQueueThread.h"
 #include "ofxMachineVision/Constants.h"
-#include "Thread/Blocking.h"
 
 #include "../../../../ofxLiquidEvent/src/ofxLiquidEvent.h"
 
@@ -21,30 +21,8 @@ namespace ofxMachineVision {
 		*/
 		class Base {
 		public:
-			Base(DevicePtr device) {
-				this->deviceType = getType(device);
-				switch(this->deviceType) {
-				case Device::Type_Blocking: {
-					shared_ptr<Device::Blocking> blockingDevice = static_pointer_cast<Device::Blocking>(device);
-					this->threadBlocking = new Thread::Blocking(blockingDevice, this);
-					break;
-				}
-				case Device::Type_NotImplemented:
-					OFXMV_FATAL << "Device not implemented";
-					break;
-				}
-				this->baseDevice = device;
-				this->deviceState = State_Closed;
-			}
-
-			virtual ~Base() {
-				this->deviceState = State_Deleting;
-				switch(this->deviceType) {
-				case Device::Type_Blocking:
-					delete this->threadBlocking;
-					break;
-				}
-			}
+			Base(DevicePtr device);
+			virtual ~Base();
 
 			virtual void open(int deviceID = 0) = 0;
 			virtual void close() = 0;
@@ -91,12 +69,10 @@ namespace ofxMachineVision {
 			Specification specification;
 			DeviceState deviceState;
 
-			ofxMachineVision::Grabber::Thread::Blocking * threadBlocking;
+			shared_ptr<ofxMachineVision::Utils::ActionQueueThread> thread;
 		private:
 			DevicePtr baseDevice; // why is this private and not protected?
 			Device::Type deviceType;
-
-			friend Thread::Blocking;
 		};
 	}
 

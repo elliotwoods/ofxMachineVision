@@ -4,7 +4,12 @@
 namespace ofxMachineVision {
 	namespace Utils {
 		//-----------
-		void ActionQueueThread::perform(std::function<void ()> action, bool blocking) {
+		void ActionQueueThread::setIdleFunction(std::function<void()> function) {
+			this->idleFunction = function;
+		}
+
+		//-----------
+		void ActionQueueThread::performInThread(std::function<void ()> action, bool blocking) {
 			if (!this->isThreadRunning()) {
 				ofLogWarning("ofxMachineVision") << "Cannot add items to ActionQueueThread whilst it is closed / closing";
 				return;
@@ -50,7 +55,9 @@ namespace ofxMachineVision {
 						break;
 					}
 				}
-				this->idleFunction();
+				if (this->idleFunction) {
+					this->idleFunction();
+				}
 			}
 		}
 	}

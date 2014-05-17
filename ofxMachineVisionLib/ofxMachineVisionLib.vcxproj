@@ -84,7 +84,6 @@
     <ClInclude Include="..\src\ofxMachineVision\Frame.h" />
     <ClInclude Include="..\src\ofxMachineVision\Grabber\Base.h" />
     <ClInclude Include="..\src\ofxMachineVision\Grabber\Simple.h" />
-    <ClInclude Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.h" />
     <ClInclude Include="..\src\ofxMachineVision\Specification.h" />
     <ClInclude Include="..\src\ofxMachineVision\Stream\DiskStreamer.h" />
     <ClInclude Include="..\src\ofxMachineVision\Stream\Recorder.h" />
@@ -94,8 +93,8 @@
     <ClCompile Include="..\src\ofxMachineVision.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInputDevice.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Frame.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Grabber\Base.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Grabber\Simple.cpp" />
-    <ClCompile Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Stream\DiskStreamer.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Stream\Recorder.cpp" />

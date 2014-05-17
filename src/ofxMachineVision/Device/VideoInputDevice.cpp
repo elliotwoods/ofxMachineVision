@@ -40,7 +40,7 @@ namespace ofxMachineVision {
 		void VideoInputDevice::close() {
 			this->device.stopDevice(this->deviceID);
 		}
-
+		
 		//---------
 		bool VideoInputDevice::startCapture() {
 			OFXMV_WARNING << "startCapture is not used with VideoInputDevice";
@@ -68,22 +68,21 @@ namespace ofxMachineVision {
 		}
 
 		//---------
-		void VideoInputDevice::getFrame(Frame & frame) {
-			forSleeping.sleep(1);
+		void VideoInputDevice::getFrame(shared_ptr<Frame> frame) {
 			LARGE_INTEGER timestampLong;
 			
-			ofPixels & pixels(frame.getPixelsRef());
+			ofPixels & pixels(frame->getPixelsRef());
 			if (pixels.getWidth() != this->device.getWidth(this->deviceID) || pixels.getHeight() != this->device.getHeight(this->deviceID)) {
 				pixels.allocate(this->device.getWidth(this->deviceID), this->device.getHeight(this->deviceID), OF_IMAGE_COLOR);
 			}
 
-			this->device.getPixels(this->deviceID, frame.getPixels(), true, true);
+			this->device.getPixels(this->deviceID, frame->getPixels(), true, true);
 			QueryPerformanceCounter(&timestampLong);
 			
 			this->frameIndex++;
 
-			frame.setTimestamp((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart);
-			frame.setFrameIndex(this->frameIndex);
+			frame->setTimestamp((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart);
+			frame->setFrameIndex(this->frameIndex);
 		}
 
 		//---------

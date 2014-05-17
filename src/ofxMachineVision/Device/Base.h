@@ -21,6 +21,8 @@ namespace ofxMachineVision {
 			virtual ~Base() { }
 			virtual Specification open(int deviceID = 0) = 0;
 			virtual void close() = 0;
+			virtual bool startCapture() = 0;
+			virtual void stopCapture() = 0;
 				
 			/**
 			\name Optional interfaces

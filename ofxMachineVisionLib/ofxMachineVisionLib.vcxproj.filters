@@ -13,9 +13,6 @@
     <Filter Include="src\ofxMachineVision\Grabber">
       <UniqueIdentifier>{acf0ace3-6bd7-4f40-8137-9932a2a4050b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\ofxMachineVision\Grabber\Thread">
-      <UniqueIdentifier>{b24b22e1-e93a-4cae-a04e-d2a336db867e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\ofxMachineVision\Stream">
       <UniqueIdentifier>{8592239b-f986-4be5-9a2b-b6e571c0e1da}</UniqueIdentifier>
     </Filter>
@@ -51,9 +48,6 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\Types.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.h">
-      <Filter>src\ofxMachineVision\Grabber\Thread</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ofxMachineVision\Stream\Recorder.h">
       <Filter>src\ofxMachineVision\Stream</Filter>
     </ClInclude>
@@ -80,9 +74,6 @@
     <ClCompile Include="..\src\ofxMachineVision\Grabber\Simple.cpp">
       <Filter>src\ofxMachineVision\Grabber</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ofxMachineVision\Grabber\Thread\Blocking.cpp">
-      <Filter>src\ofxMachineVision\Grabber\Thread</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Stream\Recorder.cpp">
       <Filter>src\ofxMachineVision\Stream</Filter>
     </ClCompile>
@@ -100,6 +91,9 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Utils\ActionQueueThread.cpp">
       <Filter>src\ofxMachineVision\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Grabber\Base.cpp">
+      <Filter>src\ofxMachineVision\Grabber</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

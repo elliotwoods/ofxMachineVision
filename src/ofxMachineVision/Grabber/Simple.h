@@ -82,8 +82,10 @@ namespace ofxMachineVision {
 			long getLastFrameIndex() const { return this->lastFrameIndex; }
 
 		protected:
-			void callbackNewFrame(FrameEventArgs &);
+			void callInRightThread(std::function<void()>);
+			void callbackNewFrame(shared_ptr<Frame>);
 
+			shared_ptr<Frame> frame;
 			ofPixels pixels;
 			ofMutex waitingPixelsLock;
 			ofPixels waitingPixels;

@@ -13,14 +13,14 @@ namespace ofxMachineVision {
 		class VideoInputDevice : public Blocking {
 		public:
 			VideoInputDevice(int width = 640, int height = 480, float desiredFramerate = 30);
-			Specification open(int deviceID);
-			void close();
-			void setExposure(Microseconds exposure);
-			void setGain(float percent);
-			void setFocus(float percent);
-			bool startCapture();
-			void stopCapture();
-			void getFrame(Frame & frame);
+			Specification open(int deviceID) override;
+			bool startCapture() override;
+			void stopCapture() override;
+			void close() override;
+			void setExposure(Microseconds exposure) override;
+			void setGain(float percent) override;
+			void setFocus(float percent) override;
+			void getFrame(shared_ptr<Frame>) override;
 			
 			//--
 			void showSettings();
@@ -34,7 +34,6 @@ namespace ofxMachineVision {
 			LARGE_INTEGER timerFrequency;
 			LARGE_INTEGER timerStart;
 			int frameIndex;
-			ofThread forSleeping;
 		};
 	}
 }

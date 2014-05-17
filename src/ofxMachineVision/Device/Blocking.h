@@ -19,23 +19,24 @@ namespace ofxMachineVision {
 			\name Interface::Base
 			*/
 			//@{
-			virtual Specification open(int deviceID = 0) = 0;
-			virtual void close() = 0;
-			virtual void setExposure(Microseconds exposure) { };
-			virtual void setGain(float percent) { };
-			virtual void setFocus(float percent) { };
-			virtual void setBinning(int binningX = 1, int binningY = 1) { };
-			virtual void setROI(const ofRectangle &) { };
-			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) { };
-			virtual void setGPOMode(const GPOMode &) { };
+			virtual Specification open(int deviceID = 0) override = 0;
+			virtual void close() override = 0;
+			virtual bool startCapture() override = 0;
+			virtual void stopCapture() override = 0;
+			virtual void setExposure(Microseconds exposure) override { };
+			virtual void setGain(float percent) override { };
+			virtual void setFocus(float percent) override { };
+			virtual void setBinning(int binningX = 1, int binningY = 1) override { };
+			virtual void setROI(const ofRectangle &) override { };
+			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) override { };
+			virtual void setGPOMode(const GPOMode &) override { };
 			//@}
 
-			virtual bool startCapture() = 0;
-			virtual void stopCapture() = 0;
+
 			/**
 			Note : Make sure to lock the Frame for writing whilst you write to it.
 			*/
-			virtual void getFrame(Frame &) = 0;
+			virtual void getFrame(shared_ptr<Frame>) = 0;
 		};
 	}
 }
