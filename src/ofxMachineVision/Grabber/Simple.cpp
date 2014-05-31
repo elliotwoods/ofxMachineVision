@@ -49,8 +49,22 @@ namespace ofxMachineVision {
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 						break;
 					}
+						
+				case Device::Type_Updating:
+					{
+						auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
+						if (!device) {
+							OFXMV_FATAL << "Type mismatch with Device::Updating";
+							throw(std::exception());
+						}
+						this->setSpecification(device->open(deviceID));
+						this->frame = shared_ptr<Frame>(new Frame());
+						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						break;
+					}
+						
 				default:
-					throw std::exception("Device not implemented");
+					throw Exception("Device not implemented");
 				}
 			} catch (std::exception e) {
 				OFXMV_ERROR << e.what();
@@ -68,7 +82,17 @@ namespace ofxMachineVision {
 						this->thread->waitForThread(true);
 					}
 					break;
+				case Device::Type_Updating:
+					{
+						auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
+						if (device) {
+							device->close();
+						}
+					}
+				case Device::Type_NotImplemented:
+					break;
 				}
+				
 				this->deviceState = State_Closed;
 			}
 		}
@@ -98,8 +122,28 @@ namespace ofxMachineVision {
 		//----------
 		void Simple::update() {
 			CHECK_OPEN
-			currentFrameNew = this->newFrameWaiting;
-			this->newFrameWaiting = false;
+			
+			switch (this->getDeviceType()) {
+				case Device::Type_Blocking:
+					currentFrameNew = this->newFrameWaiting;
+					this->newFrameWaiting = false;
+					break;
+				case Device::Type_Updating:
+				{
+					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
+					if (device) {
+						device->updateIsFrameNew();
+						this->currentFrameNew = device->isFrameNew();
+						if (this->currentFrameNew) {
+							this->frame = device->getFrame();
+							this->callbackNewFrame(this->frame);
+						}
+					}
+					break;
+				}
+				case Device::Type_NotImplemented:
+					break;
+			}
 
 			if (this->isFrameNew()) {
 				this->waitingPixelsLock.lock();
@@ -243,6 +287,11 @@ namespace ofxMachineVision {
 			case Device::Type_Blocking:
 				this->thread->performInThread(function);
 				break;
+			case Device::Type_Updating:
+				function();
+				break;
+			case Device::Type_NotImplemented:
+				break;
 			}
 		}
 
@@ -251,7 +300,6 @@ namespace ofxMachineVision {
 			if (this->getDeviceState() == State_Deleting) {
 				return;
 			}
-
 
 			frame->lockForReading();
 			this->waitingPixelsLock.lock();

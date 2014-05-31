@@ -92,6 +92,18 @@ namespace ofxMachineVision {
     };
 
 	/**
+	 \brief An exception class
+	 */
+	class Exception : std::exception {
+	public:
+		Exception(std::string & message) : message(message) { }
+		Exception(const char * message) : message(string(message)) { }
+		virtual const char * what() { return this->message.c_str(); }
+	protected:
+		const string message;
+	};
+	
+	/**
 	@name Static helpers
 	*/
 	//@{
@@ -115,6 +127,12 @@ namespace ofxMachineVision {
 				return "Exposure";
 			case Feature_Gain:
 				return "Gain";
+			case Feature_Focus:
+				return "Focus";
+			case Feature_Sharpness:
+				return "Sharpness";
+			case Feature_DeviceID:
+				return "DeviceID";
 		}
 	}
 

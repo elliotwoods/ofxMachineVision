@@ -3,6 +3,7 @@
 #include <string>
 
 #include "ofxMachineVision/Device/Blocking.h"
+#include "ofxMachineVision/Device/Updating.h"
 #include "ofxMachineVision/Device/Types.h"
 #include "ofxMachineVision/Specification.h"
 #include "ofxMachineVision/Utils/ActionQueueThread.h"

@@ -1,9 +1,11 @@
 #pragma once
 
-#include "ofRectangle.h"
-
 #include "ofxMachineVision/Specification.h"
+#include "ofxMachineVision/Frame.h"
+
 #include "ofxMachineVision/Constants.h"
+
+#include "ofRectangle.h"
 
 namespace ofxMachineVision {
 	namespace Device {

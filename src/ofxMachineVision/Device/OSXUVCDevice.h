@@ -1,5 +1,9 @@
 #pragma once
 
+#include "ofConstants.h"
+
+#ifdef TARGET_OSX
+
 #include "ofxUVC.h"
 #include "ofQTKitGrabber.h"
 
@@ -22,10 +26,12 @@ namespace ofxMachineVision {
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
-			void getFrame(shared_ptr<Frame>) override;
+			
+			void updateIsFrameNew();
+			bool isFrameNew();
+			shared_ptr<Frame> getFrame();
 			
 			//--
-			void showSettings();
 			void resetTimestamp();
 		protected:
 			ofQTKitGrabber device;
@@ -35,9 +41,14 @@ namespace ofxMachineVision {
 			int width, height;
 			float desiredFramerate;
 			
-			LARGE_INTEGER timerFrequency;
-			LARGE_INTEGER timerStart;
-			int frameIndex;
+			uint64_t timerStart;
+			long frameIndex;
+			
+			shared_ptr<Frame> frame;
 		};
+		
+		typedef OSXUVCDevice Webcam;
 	}
 }
+
+#endif

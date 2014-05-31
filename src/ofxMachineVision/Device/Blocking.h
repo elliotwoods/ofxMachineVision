@@ -1,10 +1,5 @@
 #pragma once
 
-#include "ofPixels.h"
-#include "ofRectangle.h"
-
-#include "ofxMachineVision/Specification.h"
-#include "ofxMachineVision/Frame.h"
 #include "Base.h"
 
 namespace ofxMachineVision {

@@ -23,6 +23,8 @@
 #include "ofxMachineVision/Device/VideoInputDevice.h"
 #include "ofxMachineVision/Device/OSXUVCDevice.h"
 
+#include "ofConstants.h"
+
 namespace ofxMachineVision {
 	/**
 	\brief A simple class for wrapping camera drivers

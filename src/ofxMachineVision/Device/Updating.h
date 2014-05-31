@@ -24,6 +24,7 @@ namespace ofxMachineVision {
 
 			virtual void updateIsFrameNew() = 0;
 			virtual bool isFrameNew() = 0;
+			virtual shared_ptr<Frame> getFrame() = 0;
 		};
 	}
 }

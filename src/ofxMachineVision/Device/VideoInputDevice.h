@@ -39,6 +39,8 @@ namespace ofxMachineVision {
 			LARGE_INTEGER timerStart;
 			int frameIndex;
 		};
+		
+		typedef VideoInputDevice Webcam;
 	}
 }
 
