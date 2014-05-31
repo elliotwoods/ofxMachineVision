@@ -1,5 +1,8 @@
 #pragma once
 
+#include "ofConstants.h"
+#ifdef TARGET_WIN32
+
 #include "videoInput.h"
 
 #include "ofxMachineVision/Specification.h"
@@ -8,7 +11,7 @@
 namespace ofxMachineVision {
 	namespace Device {
 		/**
-		\brief Implementation of Theo's videoInput library as an ofxMachineVision::Device::Updating class
+		\brief Implementation of Theo's videoInput library as an ofxMachineVision::Device::Blocking class
 		*/
 		class VideoInputDevice : public Blocking {
 		public:
@@ -38,3 +41,5 @@ namespace ofxMachineVision {
 		};
 	}
 }
+
+#endif

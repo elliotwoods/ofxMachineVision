@@ -21,6 +21,7 @@
 #include "ofxMachineVision/Stream/DiskStreamer.h"
 
 #include "ofxMachineVision/Device/VideoInputDevice.h"
+#include "ofxMachineVision/Device/OSXUVCDevice.h"
 
 namespace ofxMachineVision {
 	/**

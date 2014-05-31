@@ -1,5 +1,8 @@
 #include "VideoInputDevice.h"
 
+#include "ofConstants.h"
+#ifdef TARGET_WIN32
+
 namespace ofxMachineVision {
 	namespace Device {
 		//---------
@@ -103,3 +106,5 @@ namespace ofxMachineVision {
 
 	}
 }
+
+#endif

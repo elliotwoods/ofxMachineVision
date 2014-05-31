@@ -105,7 +105,8 @@ namespace ofxMachineVision {
 		//---------
 		void Recorder::callbackNewFrame(FrameEventArgs & frameEventArgs) {
 			Frame & frame = * frameEventArgs.frame;
-			this->insert(std::pair<Microseconds, Frame>(frame.getTimestamp(), Frame(frame)));
+			auto addition = std::pair<Microseconds, Frame>(frame.getTimestamp(), Frame(frame));
+			std::map<Microseconds, Frame>::insert(addition);
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace ofxMachineVision {
 	class Frame {
 	public:
 		Frame();
-		Frame(Frame &);
+		Frame(const Frame &);
 		~Frame();
 
 		bool lockForReading();
@@ -21,6 +21,9 @@ namespace ofxMachineVision {
 		void unlock();
 
 		ofPixels & getPixelsRef() { return this->pixels; }
+		const ofPixels & getPixelsRef() const { return this->pixels; }
+		
+		const unsigned char * getPixels() const { return this->getPixelsRef().getPixels(); }
 		unsigned char * getPixels() { return this->getPixelsRef().getPixels(); }
 
 		/** Set the frame timestamp

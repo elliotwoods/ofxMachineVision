@@ -11,7 +11,7 @@ namespace ofxMachineVision {
 	}
 
 	//----------
-	Frame::Frame(Frame & other) {
+	Frame::Frame(const Frame & other) {
 		if (other.isEmpty()) {
 			this->empty = true;
 			this->frameIndex = 0;

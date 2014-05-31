@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxMachineVision.h"
-#include "ofxXimea.h"
 
 class testApp : public ofBaseApp{
 
@@ -24,5 +23,5 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
     
-    ofxMachineVision::SimpleGrabber<ofxXimea::Device> camera;
+    ofxMachineVision::SimpleGrabber<ofxMachineVision::Device::Webcam> camera;
 };
