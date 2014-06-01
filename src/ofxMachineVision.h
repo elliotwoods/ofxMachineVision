@@ -38,4 +38,6 @@ namespace ofxMachineVision {
 		SimpleGrabber() : Grabber::Simple(DevicePtr(new DeviceClass())) {
 		}
 	};
+	
+	typedef SimpleGrabber<Device::Webcam> Webcam;
 }
