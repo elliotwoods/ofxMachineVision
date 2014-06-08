@@ -18,11 +18,13 @@ namespace ofxMachineVision {
 		//-----------
 		Specification OSXUVCDevice::open(int deviceID) {
 			this->deviceID = deviceID;
+			this->device.setDeviceID(this->deviceID);
 			this->device.initGrabber(this->width, this->height);
 			this->device.setDesiredFrameRate(this->desiredFramerate);
 			
 			this->controller.useCamera(0x046d, 0x082d, deviceID);
 			this->controller.setAutoExposure(false);
+			this->controller.setAutoFocus(false);
 			
 			this->setSharpness(0.0f);
 			this->resetTimestamp();

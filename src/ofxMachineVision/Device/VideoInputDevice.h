@@ -15,7 +15,7 @@ namespace ofxMachineVision {
 		*/
 		class VideoInputDevice : public Blocking {
 		public:
-			VideoInputDevice(int width = 640, int height = 480, float desiredFramerate = 30);
+			VideoInputDevice(int width = 1920, int height = 1080, float desiredFramerate = 30);
 			Specification open(int deviceID) override;
 			bool startCapture() override;
 			void stopCapture() override;
