@@ -27,9 +27,9 @@ namespace ofxMachineVision {
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
 			
-			void updateIsFrameNew();
-			bool isFrameNew();
-			shared_ptr<Frame> getFrame();
+			void updateIsFrameNew() override;
+			bool isFrameNew() override;
+			shared_ptr<Frame> getFrame() override;
 			
 			//--
 			void resetTimestamp();
