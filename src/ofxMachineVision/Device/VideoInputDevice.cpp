@@ -73,7 +73,8 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInputDevice::setSharpness(float percent) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propSharpness, percent);
+			OFXMV_ERROR << "Error with setting sharpness, videoInput seems to be incompatible with this property right now";
+			//this->device.setVideoSettingCameraPct(this->deviceID, this->device.propSharpness, percent);
 		}
 
 		//---------

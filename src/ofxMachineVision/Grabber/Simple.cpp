@@ -15,6 +15,11 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		Simple::~Simple() {
+			this->close();
+		}
+
+		//----------
 		void Simple::open(int deviceID) {
 			this->close();
 

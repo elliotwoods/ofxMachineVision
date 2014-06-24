@@ -23,10 +23,10 @@ namespace ofxMachineVision {
 	}
 
 	//---------
-	Specification::Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName) :
+	Specification::Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName, string serialNumber) :
 	valid(true),
 	sensorWidth(sensorWidth), sensorHeight(sensorHeight),
-	manufacturer(manufacturer), modelName(modelName) {
+	manufacturer(manufacturer), modelName(modelName), serialNumber(serialNumber) {
 	}
 
 	//---------
@@ -61,6 +61,7 @@ namespace ofxMachineVision {
 
 		ss << "[Manufacturer]\t\t" << this->getManufacturer() << endl;
 		ss << "[Model]\t\t\t" << this->getModelName() << endl;
+		ss << "[Serial]\t\t\t" << this->getSerialNumber() << endl;
         
 		ss << "[Sensor width]\t\t" << this->getSensorWidth() << endl;
 		ss << "[Sensor height]\t\t" << this->getSensorHeight() << endl;

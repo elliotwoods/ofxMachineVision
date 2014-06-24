@@ -18,7 +18,7 @@ namespace ofxMachineVision {
         Specification();
 		Specification(int deviceID) { this->deviceID = deviceID;}
         Specification(const Specification &);
-        Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName);
+        Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName, string serialNumber = "");
             
         bool getValid() const { return this->valid; }
 		int getDeviceID() const { return this->deviceID; }
@@ -40,6 +40,7 @@ namespace ofxMachineVision {
 
         const string & getManufacturer() const { return this->manufacturer; }
         const string & getModelName() const { return this->modelName; }
+		const string & getSerialNumber() const { return this->serialNumber; }
 
         string toString() const;
 		friend ostream& operator<<(ostream&, const Specification&);
@@ -64,6 +65,7 @@ namespace ofxMachineVision {
             
         string manufacturer;
         string modelName;
+		string serialNumber;
 			
 		int deviceID;
     };
