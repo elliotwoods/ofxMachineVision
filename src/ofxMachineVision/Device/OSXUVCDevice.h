@@ -17,7 +17,7 @@ namespace ofxMachineVision {
 		 */
 		class OSXUVCDevice : public Updating {
 		public:
-			OSXUVCDevice(int width = 640, int height = 480, float desiredFramerate = 30);
+			OSXUVCDevice(int width = 1920, int height = 1080, float desiredFramerate = 30);
 			Specification open(int deviceID) override;
 			bool startCapture() override;
 			void stopCapture() override;
@@ -27,9 +27,9 @@ namespace ofxMachineVision {
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
 			
-			void updateIsFrameNew();
-			bool isFrameNew();
-			shared_ptr<Frame> getFrame();
+			void updateIsFrameNew() override;
+			bool isFrameNew() override;
+			shared_ptr<Frame> getFrame() override;
 			
 			//--
 			void resetTimestamp();

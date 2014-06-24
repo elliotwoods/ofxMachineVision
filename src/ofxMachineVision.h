@@ -5,9 +5,12 @@
  \brief     Include this file in your project to have access to the namespace ofxMachineVision.
  \author    Elliot Woods
 
- Only Device::Blocking and Grabber::Simple have been implemented so far.
- Awaiting:
- - Device::Polling
+Implemented:
+ - Device::Blocking
+ - Device::Updating
+ - Grabber::Simple (Updating + Callback + draws)
+ 
+Awaiting:
  - Device::Callback
  - Grabber::Callback
  - Grabber::Blocking
@@ -22,6 +25,7 @@
 
 #include "ofxMachineVision/Device/VideoInputDevice.h"
 #include "ofxMachineVision/Device/OSXUVCDevice.h"
+#include "ofxMachineVision/Device/NullDevice.h"
 
 #include "ofConstants.h"
 
