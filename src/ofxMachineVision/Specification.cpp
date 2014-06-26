@@ -30,27 +30,27 @@ namespace ofxMachineVision {
 	}
 
 	//---------
-	bool Specification::supports(const Feature & feature) {
+	bool Specification::supports(const Feature & feature) const {
 		return this->features.count(feature) > 0;
 	}
 
 	//---------
-	bool Specification::supports(const PixelMode & pixelMode) {
+	bool Specification::supports(const PixelMode & pixelMode) const {
 		return this->pixelModes.count(pixelMode) > 0;
 	}
 
 	//---------
-	bool Specification::supports(const TriggerMode & triggerMode) {
+	bool Specification::supports(const TriggerMode & triggerMode) const {
 		return this->triggerModes.count(triggerMode) > 0;
 	}
 	
 	//---------
-	bool Specification::supports(const TriggerSignalType & triggerSignalType) {
+	bool Specification::supports(const TriggerSignalType & triggerSignalType) const {
 		return this->triggerSignalTypes.count(triggerSignalType) > 0;
 	}
 
 	//---------
-	bool Specification::supports(const GPOMode & gpoMode) {
+	bool Specification::supports(const GPOMode & gpoMode) const {
 		return this->gpoModes.count(gpoMode) > 0;
 	}
 

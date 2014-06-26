@@ -58,7 +58,7 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInputDevice::setExposure(Microseconds exposure) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, (float) exposure / 1000.0f);
+			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, (float) exposure / 1000000.0f);
 		}
 	
 		//---------

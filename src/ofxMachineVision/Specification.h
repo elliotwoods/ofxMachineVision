@@ -29,11 +29,11 @@ namespace ofxMachineVision {
         const TriggerSignalTypeSet & getTriggerSignalTypes() const { return this->triggerSignalTypes; }
 		const GPOModeSet & getGPOModes() const { return this->gpoModes; }
 
-        bool supports(const Feature &);
-        bool supports(const PixelMode &);
-        bool supports(const TriggerMode &);
-        bool supports(const TriggerSignalType &);
-		bool supports(const GPOMode &);
+        bool supports(const Feature &) const;
+        bool supports(const PixelMode &) const;
+        bool supports(const TriggerMode &) const;
+        bool supports(const TriggerSignalType &) const;
+		bool supports(const GPOMode &) const;
 
         int getSensorWidth() const { return this->sensorWidth; }
         int getSensorHeight() const { return this->sensorHeight; }
