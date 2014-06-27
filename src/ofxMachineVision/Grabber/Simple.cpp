@@ -125,6 +125,29 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		shared_ptr<Frame> Simple::getFreshFrame() {
+			shared_ptr<Frame> frame(new Frame());
+			switch (this->getDeviceType()) {
+			case Device::Type_Blocking:
+				{
+					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
+					this->thread->performInThread([device, frame] () {
+						device->getFrame(frame);
+					});
+				}
+				break;
+			case Device::Type_Updating:
+				{
+					OFXMV_FATAL << "getFreshFrame not implemented for [Updating] cameras";
+				}
+			case Device::Type_NotImplemented:
+				break;
+			}
+
+			return frame;
+		}
+
+		//----------
 		void Simple::update() {
 			CHECK_OPEN
 			

@@ -22,6 +22,12 @@ namespace ofxMachineVision {
 			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default);
 			void stopCapture();
 
+			bool isFrameNew() const { return this->currentFrameNew; }
+			float getFps() const { return this->fps; }
+			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
+			long getLastFrameIndex() const { return this->lastFrameIndex; }
+			shared_ptr<Frame> getFreshFrame();
+
 			/**
 			 \name ofBaseUpdates
 			 */
@@ -76,12 +82,6 @@ namespace ofxMachineVision {
 			void setTriggerMode(const TriggerMode &, const TriggerSignalType &) override;
 			void setGPOMode(const GPOMode &) override;
 			//@}
-
-			bool isFrameNew() const { return this->currentFrameNew; }
-			
-			float getFps() const { return this->fps; }
-			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
-			long getLastFrameIndex() const { return this->lastFrameIndex; }
 
 		protected:
 			void callInRightThread(std::function<void()>);
