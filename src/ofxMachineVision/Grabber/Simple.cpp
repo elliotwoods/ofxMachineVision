@@ -138,7 +138,14 @@ namespace ofxMachineVision {
 				break;
 			case Device::Type_Updating:
 				{
-					OFXMV_FATAL << "getFreshFrame not implemented for [Updating] cameras";
+					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
+					device->updateIsFrameNew();
+					while(true) {
+						device->updateIsFrameNew();
+						if (!device->isFrameNew()) {
+							ofSleepMillis(1);
+						}
+					}
 				}
 			case Device::Type_NotImplemented:
 				break;
