@@ -105,6 +105,7 @@ namespace ofxMachineVision {
 		//----------
 		void Simple::startCapture(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
 			CHECK_OPEN
+			REQUIRES(Feature::Feature_FreeRun)
 
 			this->setTriggerMode(triggerMode, triggerSignalType);
 		
@@ -117,6 +118,7 @@ namespace ofxMachineVision {
 		//----------
 		void Simple::stopCapture() {
 			CHECK_OPEN
+			REQUIRES(Feature::Feature_FreeRun)
 
 			this->callInRightThread([=] () {
 				this->getDevice()->stopCapture();
@@ -125,33 +127,95 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		shared_ptr<Frame> Simple::getFreshFrame() {
-			shared_ptr<Frame> frame(new Frame());
+		void Simple::singleShot() {
+			CHECK_OPEN
+			REQUIRES(Feature::Feature_OneShot);
 			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
+				case Device::Type_Blocking:
 				{
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
-					this->thread->performInThread([device, frame] () {
+					this->thread->performInThread([device]() {
+						device->singleShot();
+					});
+					break;
+				}
+				case Device::Type_Updating:
+				{
+					this->getDevice()->singleShot();
+					break;
+				}
+				case Device::Type_NotImplemented:
+				{
+					break;
+				}
+			}
+		}
+
+		//----------
+		shared_ptr<Frame> Simple::getFreshFrame(float timeout) {
+			if (this->specification.supports(Feature::Feature_OneShot)) {
+				this->singleShot();
+				float startWait = ofGetElapsedTimef();
+				while (true) {
+					this->update();
+					if (isFrameNew()) {
+						break;
+					}
+					if (ofGetElapsedTimef() - startWait > timeout) {
+						throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
+					}
+				}
+				switch (this->getDeviceType()) {
+				case Device::Type::Type_Blocking:
+				{
+					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
+					shared_ptr<Frame> frame(new Frame());
+					device->getFrame(frame);
+					return frame;
+					break;
+				}
+				case Device::Type::Type_Updating:
+				{
+					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
+					return device->getFrame();
+					break;
+				}
+				case Device::Type::Type_NotImplemented:
+				{
+					shared_ptr<Frame> frame(new Frame());
+					return frame;
+				}
+				}
+			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
+				shared_ptr<Frame> frame(new Frame());
+				switch (this->getDeviceType()) {
+				case Device::Type_Blocking:
+				{
+					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
+					this->thread->performInThread([device, frame]() {
 						device->getFrame(frame);
 					});
+					break;
 				}
-				break;
-			case Device::Type_Updating:
+				case Device::Type_Updating:
 				{
 					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 					device->updateIsFrameNew();
-					while(true) {
+					while (true) {
 						device->updateIsFrameNew();
 						if (!device->isFrameNew()) {
 							ofSleepMillis(1);
 						}
 					}
+					break;
 				}
-			case Device::Type_NotImplemented:
-				break;
-			}
+				case Device::Type_NotImplemented:
+					break;
+				}
 
-			return frame;
+				return frame;
+			}
+			
 		}
 
 		//----------

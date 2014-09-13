@@ -4,7 +4,7 @@
 #include "ofPixels.h"
 #include "ofThread.h"
 
-#include "ofxMachineVision/Constants.h"
+#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Constants.h"
 
 namespace ofxMachineVision {
 	/**

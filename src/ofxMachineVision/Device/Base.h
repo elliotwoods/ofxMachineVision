@@ -1,9 +1,8 @@
 #pragma once
 
-#include "ofxMachineVision/Specification.h"
-#include "ofxMachineVision/Frame.h"
-
-#include "ofxMachineVision/Constants.h"
+#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Specification.h"
+#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Frame.h"
+#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Constants.h"
 
 #include "ofRectangle.h"
 
@@ -23,8 +22,14 @@ namespace ofxMachineVision {
 			virtual ~Base() { }
 			virtual Specification open(int deviceID = 0) = 0;
 			virtual void close() = 0;
-			virtual bool startCapture() = 0;
-			virtual void stopCapture() = 0;
+
+			virtual bool startCapture() {
+				return false;
+			};
+			virtual void stopCapture() {
+
+			}
+			virtual void singleShot() { }
 				
 			/**
 			\name Optional interfaces

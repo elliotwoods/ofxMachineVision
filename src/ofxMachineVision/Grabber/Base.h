@@ -11,8 +11,15 @@
 
 #include "../../../../ofxLiquidEvent/src/ofxLiquidEvent.h"
 
-#define CHECK_OPEN if(!this->getIsDeviceOpen()) { OFXMV_ERROR << " Method cannot be called whilst device is not open"; return; }
-#define REQUIRES(feature) if(!this->specification.supports(feature)) { OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; return; }
+#define CHECK_OPEN if(!this->getIsDeviceOpen()) { \
+	OFXMV_ERROR << " Method cannot be called whilst device is not open"; \
+	return; \
+}
+
+#define REQUIRES(feature) if(!this->specification.supports(feature)) { \
+	OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; \
+	return; \
+}
 
 namespace ofxMachineVision {
 	namespace Grabber {
