@@ -1,5 +1,6 @@
 #include "Simple.h"
 #include "ofAppRunner.h"
+#include "ofSystemUtils.h"
 
 namespace ofxMachineVision {
 	namespace Grabber {
@@ -33,7 +34,7 @@ namespace ofxMachineVision {
 							throw(std::exception());
 						}
 					
-						this->frame = shared_ptr<Frame>(new Frame());
+						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->thread->startThread();
 
 						this->thread->performInThread([=] () {
@@ -43,9 +44,11 @@ namespace ofxMachineVision {
 						this->thread->setIdleFunction(
 							[=] () {
 							if (this->getIsDeviceRunning()) {
-								device->getFrame(this->frame);
-								if (!this->frame->isEmpty()) {
-									this->callbackNewFrame(this->frame);
+								shared_ptr<Frame> frame(new Frame());
+								device->getFrame(frame);
+								if (!frame->isEmpty()) {
+									this->setFrame(frame);
+									this->callbackNewFrame(frame);
 								}
 							} else {
 								ofSleepMillis(2);
@@ -63,7 +66,7 @@ namespace ofxMachineVision {
 							throw(std::exception());
 						}
 						this->setSpecification(device->open(deviceID));
-						this->frame = shared_ptr<Frame>(new Frame());
+						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 						break;
 					}
@@ -155,37 +158,15 @@ namespace ofxMachineVision {
 		shared_ptr<Frame> Simple::getFreshFrame(float timeout) {
 			if (this->specification.supports(Feature::Feature_OneShot)) {
 				this->singleShot();
-				float startWait = ofGetElapsedTimef();
-				while (true) {
-					this->update();
-					if (isFrameNew()) {
-						break;
-					}
-					if (ofGetElapsedTimef() - startWait > timeout) {
+				auto startTime = ofGetElapsedTimef();
+				while (!this->isFrameNew()) {
+					if (ofGetElapsedTimef() - startTime > timeout) {
 						throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
 					}
+					this->update();
+					ofSleepMillis(1);
 				}
-				switch (this->getDeviceType()) {
-				case Device::Type::Type_Blocking:
-				{
-					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
-					shared_ptr<Frame> frame(new Frame());
-					device->getFrame(frame);
-					return frame;
-					break;
-				}
-				case Device::Type::Type_Updating:
-				{
-					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
-					return device->getFrame();
-					break;
-				}
-				case Device::Type::Type_NotImplemented:
-				{
-					shared_ptr<Frame> frame(new Frame());
-					return frame;
-				}
-				}
+				return this->frame;
 			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
 				shared_ptr<Frame> frame(new Frame());
 				switch (this->getDeviceType()) {
@@ -234,8 +215,9 @@ namespace ofxMachineVision {
 						device->updateIsFrameNew();
 						this->currentFrameNew = device->isFrameNew();
 						if (this->currentFrameNew) {
-							this->frame = device->getFrame();
-							this->callbackNewFrame(this->frame);
+							auto frame = device->getFrame();
+							this->setFrame(frame);
+							this->callbackNewFrame(frame);
 						}
 					}
 					break;
@@ -245,20 +227,18 @@ namespace ofxMachineVision {
 			}
 
 			if (this->isFrameNew()) {
-				this->waitingPixelsLock.lock();
-				std::swap(this->pixels, this->waitingPixels);
-				this->waitingPixelsLock.unlock();
-
-				if (!this->pixels.isAllocated()) {
+				auto frame = this->getFrame();
+				auto & pixels = frame->getPixelsRef();
+				if (!pixels.isAllocated()) {
 					//we have no pixels allocated
 					this->texture.clear();
 					return;
 				}
 				if (this->useTexture) {
-					if ((int) this->texture.getWidth() != this->pixels.getWidth() || (int) this->texture.getHeight() != this->pixels.getHeight()) {
-						this->texture.allocate(this->pixels);
+					if ((int) this->texture.getWidth() != pixels.getWidth() || (int) this->texture.getHeight() != pixels.getHeight()) {
+						this->texture.allocate(pixels);
 					}
-					this->texture.loadData(this->pixels);
+					this->texture.loadData(pixels);
 				}
 			}
 		}
@@ -270,12 +250,14 @@ namespace ofxMachineVision {
 
 		//----------
 		float Simple::getWidth() {
-			return this->pixels.getWidth();
+			auto frame = this->getFrame();
+			return frame->getPixelsRef().getWidth();
 		}
 
 		//----------
 		float Simple::getHeight() {
-			return this->pixels.getHeight();
+			auto frame = this->getFrame();
+			return frame->getPixelsRef().getHeight();
 		}
 
 		//----------
@@ -294,7 +276,8 @@ namespace ofxMachineVision {
 
 		//----------
 		ofPixels & Simple::getPixelsRef() {
-			return this->pixels;
+			auto frame = this->getFrame();
+			return frame->getPixelsRef();
 		}
 
 		//----------
@@ -381,6 +364,21 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		shared_ptr<Frame> Simple::getFrame() {
+			this->frameLock.lock();
+			auto frame = this->frame;
+			this->frameLock.unlock();
+			return frame;
+		}
+
+		//----------
+		void Simple::setFrame(shared_ptr<Frame> frame) {
+			this->frameLock.lock();
+			this->frame = frame;
+			this->frameLock.unlock();
+		}
+
+		//----------
 		void Simple::callInRightThread(std::function<void()> function) {
 			switch (this->getDeviceType()) {
 			case Device::Type_Blocking:
@@ -400,12 +398,6 @@ namespace ofxMachineVision {
 				return;
 			}
 
-			frame->lockForReading();
-			this->waitingPixelsLock.lock();
-			this->waitingPixels = frame->getPixelsRef();
-			this->waitingPixelsLock.unlock();
-			frame->unlock();
-
 			float interval = (frame->getTimestamp() - this->lastTimestamp) / 1e6;
 
 			float newfps = (1.0f / interval);
@@ -419,7 +411,7 @@ namespace ofxMachineVision {
 			this->lastTimestamp = frame->getTimestamp();
 			this->lastFrameIndex = frame->getFrameIndex();
 
-			FrameEventArgs frameEvent(frame);
+			FrameEventArgs frameEvent(this->getFrame());
 			this->onNewFrameReceived(frameEvent);
 		}
 	}

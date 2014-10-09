@@ -27,7 +27,7 @@ namespace ofxMachineVision {
 			float getFps() const { return this->fps; }
 			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
 			long getLastFrameIndex() const { return this->lastFrameIndex; }
-			shared_ptr<Frame> getFreshFrame(float timeoutSeconds);
+			shared_ptr<Frame> getFreshFrame(float timeoutSeconds = 5.0f);
 
 			/**
 			 \name ofBaseUpdates
@@ -84,14 +84,14 @@ namespace ofxMachineVision {
 			void setGPOMode(const GPOMode &) override;
 			//@}
 
+			shared_ptr<Frame> getFrame();
+			void setFrame(shared_ptr<Frame>);
 		protected:
 			void callInRightThread(std::function<void()>);
 			void callbackNewFrame(shared_ptr<Frame>);
 
 			shared_ptr<Frame> frame;
-			ofPixels pixels;
-			ofMutex waitingPixelsLock;
-			ofPixels waitingPixels;
+			ofMutex frameLock;
 
 			ofTexture texture;
 			bool useTexture;
