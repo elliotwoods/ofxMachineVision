@@ -95,7 +95,7 @@ namespace ofxMachineVision {
 	/**
 	 \brief An exception class
 	 */
-	class Exception : std::exception {
+	class Exception : public std::exception {
 	public:
 		Exception(std::string & message) : message(message) { }
 		Exception(const char * message) : message(string(message)) { }
