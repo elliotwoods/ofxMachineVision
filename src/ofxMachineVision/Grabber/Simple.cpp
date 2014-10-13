@@ -196,7 +196,9 @@ namespace ofxMachineVision {
 
 				return frame;
 			}
-			
+			else {
+				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));
+			}
 		}
 
 		//----------
