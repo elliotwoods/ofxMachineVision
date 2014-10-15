@@ -139,7 +139,7 @@ namespace ofxMachineVision {
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
 					this->thread->performInThread([device]() {
 						device->singleShot();
-					});
+					}, true);
 					break;
 				}
 				case Device::Type_Updating:
