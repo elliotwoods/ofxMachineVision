@@ -48,7 +48,7 @@ namespace ofxMachineVision {
 								device->getFrame(frame);
 								if (!frame->isEmpty()) {
 									this->setFrame(frame);
-									this->callbackNewFrame(frame);
+									this->notifyNewFrame(frame);
 								}
 							} else {
 								ofSleepMillis(2);
@@ -166,7 +166,7 @@ namespace ofxMachineVision {
 					this->update();
 					ofSleepMillis(1);
 				}
-				return this->frame;
+				return this->getFrame();
 			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
 				shared_ptr<Frame> frame(new Frame());
 				switch (this->getDeviceType()) {
@@ -219,7 +219,7 @@ namespace ofxMachineVision {
 						if (this->currentFrameNew) {
 							auto frame = device->getFrame();
 							this->setFrame(frame);
-							this->callbackNewFrame(frame);
+							this->notifyNewFrame(frame);
 						}
 					}
 					break;
@@ -367,17 +367,17 @@ namespace ofxMachineVision {
 
 		//----------
 		shared_ptr<Frame> Simple::getFrame() {
-			this->frameLock.lock();
+			this->framePointerLock.lock();
 			auto frame = this->frame;
-			this->frameLock.unlock();
+			this->framePointerLock.unlock();
 			return frame;
 		}
 
 		//----------
 		void Simple::setFrame(shared_ptr<Frame> frame) {
-			this->frameLock.lock();
+			this->framePointerLock.lock();
 			this->frame = frame;
-			this->frameLock.unlock();
+			this->framePointerLock.unlock();
 		}
 
 		//----------
@@ -395,7 +395,7 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::callbackNewFrame(shared_ptr<Frame> frame) {
+		void Simple::notifyNewFrame(shared_ptr<Frame> frame) {
 			if (this->getDeviceState() == State_Deleting) {
 				return;
 			}

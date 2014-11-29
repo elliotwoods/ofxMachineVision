@@ -63,7 +63,6 @@ namespace ofxMachineVision {
         
 			/**
 			 \name ofBaseHasPixels
-			 \brief These functions are virtual in case you want to allocate your own ofPixels
 			 */
 			//@{
 			unsigned char * getPixels() override;
@@ -84,14 +83,27 @@ namespace ofxMachineVision {
 			void setGPOMode(const GPOMode &) override;
 			//@}
 
+			/**
+			\name Frame functions
+
+			Note our Frame policy:
+			* frame is a shared_ptr inside Grabber::Simple
+			* For each frame capture, a new shared_ptr<Frame> is instantiated (so you can keep old copies of frames elsewhere as you wish)
+			* Where no valid frame is avalable, frame == Frame() (e.g. before first frame arrives).
+			* getFrame() and setFrame() lock the pointer. You should not use frame = ... directly
+
+			Other Grabbers can have different policies (e.g. you may choose to reuse the same Frame object for mulitple frame captures).
+			*/
+			//@{
 			shared_ptr<Frame> getFrame();
 			void setFrame(shared_ptr<Frame>);
+			//@}
 		protected:
 			void callInRightThread(std::function<void()>);
-			void callbackNewFrame(shared_ptr<Frame>);
+			void notifyNewFrame(shared_ptr<Frame>);
 
 			shared_ptr<Frame> frame;
-			ofMutex frameLock;
+			ofMutex framePointerLock;
 
 			ofTexture texture;
 			bool useTexture;
