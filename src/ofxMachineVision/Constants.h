@@ -134,6 +134,8 @@ namespace ofxMachineVision {
 				return "Sharpness";
 			case Feature_DeviceID:
 				return "DeviceID";
+			default:
+				return "Unsupported";
 		}
 	}
 
@@ -151,6 +153,8 @@ namespace ofxMachineVision {
 				return "RGB8";
 			case Pixel_BAYER8:
 				return "BAYER8";
+			default:
+				return "Unsupported";
 		}
 	}
 
@@ -164,6 +168,8 @@ namespace ofxMachineVision {
 				return "GPIO2";
 			case Trigger_Software:
 				return "Software";
+			default:
+				return "Unsupported";
 		}
 	}
 
@@ -179,6 +185,8 @@ namespace ofxMachineVision {
 				return "Whilst high";
 			case TriggerSignal_WhilstLow:
 				return "Whilst low";
+			default:
+				return "Unsupported";
 		}
 	}
 
@@ -196,6 +204,8 @@ namespace ofxMachineVision {
 			return "Low whilst exposure";
 		case GPOMode_LowWhilstFrameActive:
 			return "Low whilst frame active";
+		default:
+			return "Unsupported";
 		}
 	}
 
@@ -209,6 +219,8 @@ namespace ofxMachineVision {
 			return "Running";
 		case State_Waiting:
 			return "Waiting";
+		default:
+			return "Unsupported";
 		}
 	}
     
@@ -222,6 +234,8 @@ namespace ofxMachineVision {
 				return false;
 			case Pixel_RGB8:
 				return true;
+			default:
+				return false;
 		}
 	}
 	//@}

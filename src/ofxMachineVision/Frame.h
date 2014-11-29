@@ -8,7 +8,7 @@
 
 namespace ofxMachineVision {
 	/**
-	\brief An instance of ofPixels with some other metadata and a thread lock
+	\brief An instance of ofPixels with some other metadata and a thread lock.
 	*/
 	class Frame {
 	public:

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxMachineVision.h"
+#include "../../../addons/ofxMachineVision/src/ofxMachineVision.h"
 
 class testApp : public ofBaseApp{
 
@@ -9,9 +9,6 @@ public:
 	void setup();
 	void update();
 	void draw();
-	
-	void advance();
-	void reset();
 
 	void keyPressed  (int key);
 	void keyReleased(int key);
