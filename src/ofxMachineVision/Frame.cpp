@@ -51,7 +51,7 @@ namespace ofxMachineVision {
 	}
 #pragma mark Frame
 	//----------
-	FrameEventArgs::FrameEventArgs (shared_ptr<Frame> & frame) {
+	FrameEventArgs::FrameEventArgs (const shared_ptr<Frame> & frame) {
 		this->frame = frame;
 	}
 }
