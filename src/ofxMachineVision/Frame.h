@@ -53,7 +53,7 @@ namespace ofxMachineVision {
 
 	class FrameEventArgs {
 	public:
-		FrameEventArgs(shared_ptr<Frame> &);
+		FrameEventArgs(const shared_ptr<Frame> &);
 		shared_ptr<Frame> frame;
 	};
 }
