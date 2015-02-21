@@ -41,6 +41,10 @@ namespace ofxMachineVision {
 	public:
 		SimpleGrabber() : Grabber::Simple(DevicePtr(new DeviceClass())) {
 		}
+
+		shared_ptr<DeviceClass> getDeviceTyped() const {
+			return static_pointer_cast<DeviceClass>(this->getDevice());
+		}
 	};
 	
 	typedef SimpleGrabber<Device::Webcam> Webcam;

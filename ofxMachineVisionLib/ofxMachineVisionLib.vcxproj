@@ -141,6 +141,7 @@
     <ClInclude Include="..\src\ofxMachineVision\Constants.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Base.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Blocking.h" />
+    <ClInclude Include="..\src\ofxMachineVision\Device\Callback.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Types.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Updating.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\VideoInputDevice.h" />

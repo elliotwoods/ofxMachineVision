@@ -49,6 +49,20 @@ namespace ofxMachineVision {
 	bool Frame::operator<(const Frame& rhs) const {
 		return this->getTimestamp() < rhs.getTimestamp();
 	}
+
+	//----------
+	void Frame::operator=(Frame & other) {
+		this->lockForWriting();
+		other.lockForReading();
+
+		this->empty = other.isEmpty();
+		this->pixels = other.getPixelsRef();
+		this->setTimestamp(other.getTimestamp());
+		this->setFrameIndex(other.frameIndex);
+
+		this->unlock();
+		other.unlock();
+	}
 #pragma mark Frame
 	//----------
 	FrameEventArgs::FrameEventArgs (const shared_ptr<Frame> & frame) {

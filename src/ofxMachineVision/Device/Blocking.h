@@ -7,6 +7,11 @@ namespace ofxMachineVision {
 		/**
 		\brief A class interface to implement for blocking camera API's
 		Implement this interface if your camera api is blocking, i.e. thread waits whilst new frame arrives.
+		
+		Please implement in your derived class :
+		* Virtual functions below
+		* Virtual functions in Device::Base
+
 		*/
 		class Blocking : public Base {
 		public:

@@ -5,6 +5,7 @@
 #include "ofxMachineVision/Device/Blocking.h"
 #include "ofxMachineVision/Device/Updating.h"
 #include "ofxMachineVision/Device/Types.h"
+
 #include "ofxMachineVision/Specification.h"
 #include "ofxMachineVision/Utils/ActionQueueThread.h"
 #include "ofxMachineVision/Constants.h"
@@ -65,7 +66,7 @@ namespace ofxMachineVision {
 			const string & getModelName() const { return this->getDeviceSpecification().getModelName(); };
 			//@}
 
-			DevicePtr getDevice() { return this->baseDevice; }
+			DevicePtr getDevice() const { return this->baseDevice; }
 			const Device::Type & getDeviceType() const { return this->deviceType; }
 			const DeviceState & getDeviceState() const { return this->deviceState; }
 			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }

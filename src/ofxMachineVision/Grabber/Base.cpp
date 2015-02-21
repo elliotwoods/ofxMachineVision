@@ -11,8 +11,10 @@ namespace ofxMachineVision {
 					break;
 				}
 				case Device::Type_Updating:
+				case Device::Type_Callback:
 					break;
 				case Device::Type_NotImplemented:
+				default:
 					OFXMV_FATAL << "Device not implemented";
 					break;
 			}

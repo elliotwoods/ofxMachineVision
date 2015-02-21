@@ -43,6 +43,9 @@ namespace ofxMachineVision {
 
 		bool operator<(const Frame&) const;
 
+		///Copy operator
+		void operator=(Frame &);
+
 	protected:
 		bool empty;
 		Poco::RWLock * lock;

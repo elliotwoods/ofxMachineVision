@@ -62,19 +62,46 @@ namespace ofxMachineVision {
 					{
 						auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 						if (!device) {
-							OFXMV_FATAL << "Type mismatch with Device::Updating";
-							throw(std::exception());
+							throw(ofxMachineVision::Exception("Type mismatch with Device::Updating"));
 						}
 						this->setSpecification(device->open(deviceID));
 						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 						break;
 					}
-						
+				case Device::Type_Callback:
+					{
+						auto device = dynamic_pointer_cast<Device::Callback>(this->getDevice());
+						if (!device) {
+							throw(ofxMachineVision::Exception("Type mismatch with Device::Callback"));
+						}
+						this->setSpecification(device->open(deviceID));
+						this->setFrame(shared_ptr<Frame>(new Frame()));
+						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+
+						//callback on frames received
+						device->onNewFrame += [this](shared_ptr<Frame> & incomingFrame) {
+							//copy the incoming frame
+							auto frameCopy = make_shared<Frame>();
+							*frameCopy = *incomingFrame; //<- copy operator
+
+							//fill our local copy
+							this->setFrame(frameCopy);
+
+							//alert the grabber's listeners
+							this->notifyNewFrame(frameCopy);
+						};
+						break;
+					}
 				default:
 					throw Exception("Device not implemented");
 				}
-			} catch (std::exception e) {
+			}
+			catch (ofxMachineVision::Exception e) {
+				OFXMV_ERROR << e.what();
+				this->deviceState = State_Closed;
+			}
+			catch (std::exception e) {
 				OFXMV_ERROR << e.what();
 				this->deviceState = State_Closed;
 			}
@@ -82,7 +109,9 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::close() {
-			if (this->getIsDeviceRunning()) {
+			if (this->getIsDeviceOpen()) {
+				this->stopCapture();
+
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
 					{
@@ -91,12 +120,9 @@ namespace ofxMachineVision {
 					}
 					break;
 				case Device::Type_Updating:
-					{
-						auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
-						if (device) {
-							device->close();
-						}
-					}
+				case Device::Type_Callback:
+					this->getDevice()->close();
+					break;
 				case Device::Type_NotImplemented:
 					break;
 				}
@@ -123,10 +149,12 @@ namespace ofxMachineVision {
 			CHECK_OPEN
 			REQUIRES(Feature::Feature_FreeRun)
 
-			this->callInRightThread([=] () {
-				this->getDevice()->stopCapture();
-				this->deviceState = State_Waiting;
-			});
+			if (this->getIsDeviceRunning()) {
+				this->callInRightThread([=]() {
+					this->getDevice()->stopCapture();
+					this->deviceState = State_Waiting;
+				});
+			}
 		}
 
 		//----------
@@ -143,6 +171,7 @@ namespace ofxMachineVision {
 					break;
 				}
 				case Device::Type_Updating:
+				case Device::Type_Callback:
 				{
 					this->getDevice()->singleShot();
 					break;
@@ -184,13 +213,26 @@ namespace ofxMachineVision {
 					device->updateIsFrameNew();
 					while (true) {
 						device->updateIsFrameNew();
-						if (!device->isFrameNew()) {
-							ofSleepMillis(1);
+						if (device->isFrameNew()) {
+							break;
 						}
+						ofSleepMillis(1);
 					}
 					break;
 				}
+				case Device::Type_Callback:
+				{
+					// Method : Wait for a new callback to come through from the Device
+					this->newFrameWaiting = false;
+					while (true) {
+						if (this->newFrameWaiting) {
+							break;
+						}
+						ofSleepMillis(1);
+					}
+				}
 				case Device::Type_NotImplemented:
+					throw(ofxMachineVision::Exception("Single Shot not implemented for this device type"));
 					break;
 				}
 
@@ -207,6 +249,7 @@ namespace ofxMachineVision {
 			
 			switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
+				case Device::Type_Callback:
 					currentFrameNew = this->newFrameWaiting;
 					this->newFrameWaiting = false;
 					break;
@@ -225,6 +268,7 @@ namespace ofxMachineVision {
 					break;
 				}
 				case Device::Type_NotImplemented:
+					throw(ofxMachineVision::Exception("Simple::update is not implemented for your camera type"));
 					break;
 			}
 
@@ -387,6 +431,9 @@ namespace ofxMachineVision {
 				this->thread->performInThread(function);
 				break;
 			case Device::Type_Updating:
+				function();
+				break;
+			case Device::Type_Callback:
 				function();
 				break;
 			case Device::Type_NotImplemented:
