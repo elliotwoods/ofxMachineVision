@@ -8,7 +8,7 @@
 Implemented:
  - Device::Blocking
  - Device::Updating
- - Grabber::Simple (Updating + Callback + draws)
+ - Grabber::Simple (Acts like Updating + Callback + draws)
  
 Awaiting:
  - Device::Callback

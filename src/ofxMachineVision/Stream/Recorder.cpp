@@ -27,7 +27,7 @@ namespace ofxMachineVision {
 				return;
 			}
 			if (!this->grabber->getIsDeviceOpen()) {
-				OFXMV_ERROR << "Cannot start recorder, grabby is not open.";
+				OFXMV_ERROR << "Cannot start recorder, grabber is not open.";
 				this->state = State_GrabberNotReady;
 				return;
 			}
