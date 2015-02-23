@@ -23,9 +23,10 @@ Awaiting:
 #include "ofxMachineVision/Stream/Recorder.h"
 #include "ofxMachineVision/Stream/DiskStreamer.h"
 
-#include "ofxMachineVision/Device/VideoInputDevice.h"
-#include "ofxMachineVision/Device/OSXUVCDevice.h"
+#include "ofxMachineVision/Device/VideoInput.h"
+#include "ofxMachineVision/Device/OSXUVC.h"
 #include "ofxMachineVision/Device/NullDevice.h"
+#include "ofxMachineVision/Device/FactoryRegister.h"
 
 #include "ofConstants.h"
 

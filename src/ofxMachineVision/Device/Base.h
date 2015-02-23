@@ -20,6 +20,7 @@ namespace ofxMachineVision {
 		class Base {
 		public:
 			virtual ~Base() { }
+			virtual string getTypeName() const = 0;
 			virtual Specification open(int deviceID = 0) = 0;
 			virtual void close() = 0;
 

@@ -1,23 +1,22 @@
 #pragma once
 
 #include "ofConstants.h"
+#ifdef TARGET_WIN32
 
-#ifdef TARGET_OSX
-
-#include "ofxUVC.h"
-#include "ofQTKitGrabber.h"
+#include "../../../libs/videoInput/include/videoInput.h"
 
 #include "ofxMachineVision/Specification.h"
-#include "Updating.h"
+#include "Blocking.h"
 
 namespace ofxMachineVision {
 	namespace Device {
 		/**
-		 \brief Implementation of Greg Borenstein's ofxUVC library as an ofxMachineVision::Device::Updating class
-		 */
-		class OSXUVCDevice : public Updating {
+		\brief Implementation of Theo's videoInput library as an ofxMachineVision::Device::Blocking class
+		*/
+		class VideoInput : public Blocking {
 		public:
-			OSXUVCDevice(int width = 1920, int height = 1080, float desiredFramerate = 30);
+			VideoInput(int width = 1920, int height = 1080, float desiredFramerate = 30);
+			string getTypeName() const override;
 			Specification open(int deviceID) override;
 			bool startCapture() override;
 			void stopCapture() override;
@@ -26,28 +25,23 @@ namespace ofxMachineVision {
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
-			
-			void updateIsFrameNew() override;
-			bool isFrameNew() override;
-			shared_ptr<Frame> getFrame() override;
+			void getFrame(shared_ptr<Frame>) override;
 			
 			//--
+			void showSettings();
 			void resetTimestamp();
 		protected:
-			ofQTKitGrabber device;
-			ofxUVC controller;
-			
+			::videoInput device;
 			int deviceID;
 			int width, height;
 			float desiredFramerate;
-			
-			uint64_t timerStart;
-			long frameIndex;
-			
-			shared_ptr<Frame> frame;
+
+			LARGE_INTEGER timerFrequency;
+			LARGE_INTEGER timerStart;
+			int frameIndex;
 		};
 		
-		typedef OSXUVC Webcam;
+		typedef VideoInput Webcam;
 	}
 }
 

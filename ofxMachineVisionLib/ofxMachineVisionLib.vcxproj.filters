@@ -57,9 +57,6 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\Updating.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\ofxMachineVision\Device\VideoInputDevice.h">
-      <Filter>src\ofxMachineVision\Device</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ofxMachineVision\Stream\DiskStreamer.h">
       <Filter>src\ofxMachineVision\Stream</Filter>
     </ClInclude>
@@ -67,6 +64,12 @@
       <Filter>src\ofxMachineVision\Utils</Filter>
     </ClInclude>
     <ClInclude Include="..\src\ofxMachineVision\Device\Callback.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\FactoryRegister.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\VideoInput.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
   </ItemGroup>
@@ -83,9 +86,6 @@
     <ClCompile Include="..\src\ofxMachineVision\Frame.cpp">
       <Filter>src\ofxMachineVision</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\ofxMachineVision\Device\VideoInputDevice.cpp">
-      <Filter>src\ofxMachineVision\Device</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Stream\DiskStreamer.cpp">
       <Filter>src\ofxMachineVision\Stream</Filter>
     </ClCompile>
@@ -97,6 +97,12 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Grabber\Base.cpp">
       <Filter>src\ofxMachineVision\Grabber</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\VideoInput.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -15,9 +15,9 @@ namespace ofxMachineVision {
 		/**
 		 \brief Implementation of Greg Borenstein's ofxUVC library as an ofxMachineVision::Device::Updating class
 		 */
-		class OSXUVCDevice : public Updating {
+		class OSXUVC : public Updating {
 		public:
-			OSXUVCDevice(int width = 1920, int height = 1080, float desiredFramerate = 30);
+			OSXUVC(int width = 1920, int height = 1080, float desiredFramerate = 30);
 			Specification open(int deviceID) override;
 			bool startCapture() override;
 			void stopCapture() override;

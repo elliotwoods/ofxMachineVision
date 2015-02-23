@@ -1,4 +1,4 @@
-#include "OSXUVCDevice.h"
+#include "OSXUVC.h"
 
 #ifdef TARGET_OSX
 
@@ -8,7 +8,7 @@
 namespace ofxMachineVision {
 	namespace Device {
 		//-----------
-		OSXUVCDevice::OSXUVCDevice(int width, int height, float desiredFramerate) {
+		OSXUVC::OSXUVC(int width, int height, float desiredFramerate) {
 			this->width = width;
 			this->height = height;
 			this->desiredFramerate = desiredFramerate;
@@ -16,7 +16,7 @@ namespace ofxMachineVision {
 		}
 		
 		//-----------
-		Specification OSXUVCDevice::open(int deviceID) {
+		Specification OSXUVC::open(int deviceID) {
 			this->deviceID = deviceID;
 			this->device.setDeviceID(this->deviceID);
 			this->device.initGrabber(this->width, this->height);
@@ -53,43 +53,43 @@ namespace ofxMachineVision {
 		}
 		
 		//-----------
-		bool OSXUVCDevice::startCapture() {
+		bool OSXUVC::startCapture() {
 			OFXMV_WARNING << "startCapture is not used with OSXUVCDevice";
 			return true;
 		}
 		
 		//-----------
-		void OSXUVCDevice::stopCapture() {
+		void OSXUVC::stopCapture() {
 			OFXMV_WARNING << "stopCapture is not supported by VideoInputDevice";
 		}
 		
 		//----------
-		void OSXUVCDevice::close() {
+		void OSXUVC::close() {
 			this->device.close();
 		}
 		
 		//---------
-		void OSXUVCDevice::setExposure(Microseconds exposure) {
+		void OSXUVC::setExposure(Microseconds exposure) {
 			this->controller.setExposure((float) exposure / 1000.0f);
 		}
 		
 		//---------
-		void OSXUVCDevice::setGain(float percent) {
+		void OSXUVC::setGain(float percent) {
 			this->controller.setGain(percent);
 		}
 		
 		//---------
-		void OSXUVCDevice::setFocus(float percent) {
+		void OSXUVC::setFocus(float percent) {
 			this->controller.setAbsoluteFocus(percent);
 		}
 		
 		//---------
-		void OSXUVCDevice::setSharpness(float percent) {
+		void OSXUVC::setSharpness(float percent) {
 			this->controller.setSharpness(percent);
 		}
 		
 		//---------
-		void OSXUVCDevice::updateIsFrameNew() {
+		void OSXUVC::updateIsFrameNew() {
 			this->device.update();
 			if (this->device.isFrameNew()) {
 				this->frame->lockForWriting();
@@ -104,17 +104,17 @@ namespace ofxMachineVision {
 		}
 		
 		//---------
-		bool OSXUVCDevice::isFrameNew() {
+		bool OSXUVC::isFrameNew() {
 			return this->device.isFrameNew();
 		}
 		
 		//---------
-		shared_ptr<Frame> OSXUVCDevice::getFrame() {
+		shared_ptr<Frame> OSXUVC::getFrame() {
 			return this->frame;
 		}
 		
 		//---------
-		void OSXUVCDevice::resetTimestamp() {
+		void OSXUVC::resetTimestamp() {
 			this->timerStart = mach_absolute_time();
 			this->frameIndex = 0;
 		}
