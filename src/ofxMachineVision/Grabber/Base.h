@@ -17,6 +17,10 @@
 	return; \
 }
 
+#define CHECK_OPEN_SILENT if(!this->getIsDeviceOpen()) { \
+	return; \
+}
+
 #define REQUIRES(feature) if(!this->specification.supports(feature)) { \
 	OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; \
 	return; \
@@ -30,8 +34,12 @@ namespace ofxMachineVision {
 		*/
 		class Base {
 		public:
-			Base(DevicePtr device);
+			Base();
 			virtual ~Base();
+
+			void setDevice(DevicePtr);
+			void clearDevice();
+			DevicePtr getDevice() const;
 
 			virtual void open(int deviceID = 0) = 0;
 			virtual void close() = 0;
@@ -66,11 +74,11 @@ namespace ofxMachineVision {
 			const string & getModelName() const { return this->getDeviceSpecification().getModelName(); };
 			//@}
 
-			DevicePtr getDevice() const { return this->baseDevice; }
 			const Device::Type & getDeviceType() const { return this->deviceType; }
 			const DeviceState & getDeviceState() const { return this->deviceState; }
-			bool getIsDeviceOpen() const { return this->getDeviceState() != State_Closed; }
-			bool getIsDeviceRunning() const { return this->getDeviceState() == State_Running; }
+			bool getIsDeviceExists() const { return this->getDeviceState() & State_ExistsBit; }
+			bool getIsDeviceOpen() const { return this->getDeviceState() & State_OpenBit; }
+			bool getIsDeviceRunning() const { return this->getDeviceState() & State_RunningBit; }
 
 			ofxLiquidEvent<FrameEventArgs> onNewFrameReceived;
 		protected:

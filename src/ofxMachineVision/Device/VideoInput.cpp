@@ -62,6 +62,24 @@ namespace ofxMachineVision {
 		}
 
 		//---------
+		void VideoInput::getFrame(shared_ptr<Frame> frame) {
+			LARGE_INTEGER timestampLong;
+
+			ofPixels & pixels(frame->getPixelsRef());
+			if (pixels.getWidth() != this->device.getWidth(this->deviceID) || pixels.getHeight() != this->device.getHeight(this->deviceID)) {
+				pixels.allocate(this->device.getWidth(this->deviceID), this->device.getHeight(this->deviceID), OF_IMAGE_COLOR);
+			}
+
+			this->device.getPixels(this->deviceID, frame->getPixels(), true, true);
+			QueryPerformanceCounter(&timestampLong);
+
+			this->frameIndex++;
+
+			frame->setTimestamp((Microseconds)((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart));
+			frame->setFrameIndex(this->frameIndex);
+		}
+
+		//---------
 		void VideoInput::setExposure(Microseconds exposure) {
 			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, (float) exposure / 1000000.0f);
 		}
@@ -80,24 +98,6 @@ namespace ofxMachineVision {
 		void VideoInput::setSharpness(float percent) {
 			OFXMV_ERROR << "Error with setting sharpness, videoInput seems to be incompatible with this property right now";
 			//this->device.setVideoSettingCameraPct(this->deviceID, this->device.propSharpness, percent);
-		}
-
-		//---------
-		void VideoInput::getFrame(shared_ptr<Frame> frame) {
-			LARGE_INTEGER timestampLong;
-			
-			ofPixels & pixels(frame->getPixelsRef());
-			if (pixels.getWidth() != this->device.getWidth(this->deviceID) || pixels.getHeight() != this->device.getHeight(this->deviceID)) {
-				pixels.allocate(this->device.getWidth(this->deviceID), this->device.getHeight(this->deviceID), OF_IMAGE_COLOR);
-			}
-
-			this->device.getPixels(this->deviceID, frame->getPixels(), true, true);
-			QueryPerformanceCounter(&timestampLong);
-			
-			this->frameIndex++;
-
-			frame->setTimestamp((Microseconds) ((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart));
-			frame->setFrameIndex(this->frameIndex);
 		}
 
 		//---------

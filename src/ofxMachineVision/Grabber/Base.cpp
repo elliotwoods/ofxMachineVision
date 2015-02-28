@@ -3,23 +3,8 @@
 namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
-		Base::Base(DevicePtr device) {
-			this->deviceType = getType(device);
-			switch(this->deviceType) {
-				case Device::Type_Blocking: {
-					this->thread = shared_ptr<Utils::ActionQueueThread>(new Utils::ActionQueueThread());
-					break;
-				}
-				case Device::Type_Updating:
-				case Device::Type_Callback:
-					break;
-				case Device::Type_NotImplemented:
-				default:
-					OFXMV_FATAL << "Device not implemented";
-					break;
-			}
-			this->baseDevice = device;
-			this->deviceState = State_Closed;
+		Base::Base() {
+			this->deviceState = State_Empty;
 		}
 
 		//----------
@@ -34,6 +19,44 @@ namespace ofxMachineVision {
 				case Device::Type_NotImplemented:
 					break;
 			}
+			this->baseDevice.reset();
+			this->deviceState = State_Empty;
+		}
+
+		//----------
+		void Base::setDevice(DevicePtr device) {
+			this->close();
+			this->baseDevice = device;
+
+			this->deviceType = getType(device);
+
+			//open a thread for the device if required
+			switch (this->deviceType) {
+			case Device::Type_Blocking: {
+				this->thread = shared_ptr<Utils::ActionQueueThread>(new Utils::ActionQueueThread());
+				break;
+			}
+			case Device::Type_Updating:
+			case Device::Type_Callback:
+				this->thread.reset();
+				break;
+			case Device::Type_NotImplemented:
+			default:
+				OFXMV_FATAL << "Device not implemented";
+				break;
+			}
+
+			this->deviceState = (bool) this->baseDevice ? DeviceState::State_Waiting : DeviceState::State_Empty;
+		}
+
+		//----------
+		void Base::clearDevice() {
+			this->setDevice(DevicePtr());
+		}
+
+		//----------
+		DevicePtr Base::getDevice() const {
+			return this->baseDevice;
 		}
 	}
 }

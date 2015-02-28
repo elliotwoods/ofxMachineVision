@@ -12,11 +12,12 @@ namespace ofxMachineVision {
 		 */
 		class NullDevice : public Blocking {
 		public:
-			NullDevice(int width = 1920, int height = 1080, float desiredFramerate = 30);
+			NullDevice(int width = 1024, int height = 768, float desiredFramerate = 30);
+			string getTypeName() const override;
 			Specification open(int deviceID) override;
+			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
-			void close() override;
 			void getFrame(shared_ptr<Frame>) override;
 		protected:
 			Specification specification;

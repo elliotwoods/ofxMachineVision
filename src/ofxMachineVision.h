@@ -37,16 +37,22 @@ namespace ofxMachineVision {
 	this will give you an instance of ofxMachineVision::Grabber::Simple which
 	holds an instance of ofxXimea::Device
 	*/
-	template<class DeviceClass>
+	template<typename DeviceType>
 	class SimpleGrabber : public Grabber::Simple {
 	public:
-		SimpleGrabber() : Grabber::Simple(DevicePtr(new DeviceClass())) {
+		SimpleGrabber() : Grabber::Simple() {
+			this->setDevice(make_shared<DeviceType>());
 		}
 
-		shared_ptr<DeviceClass> getDeviceTyped() const {
+		shared_ptr<DeviceType> getDeviceTyped() const {
 			return static_pointer_cast<DeviceClass>(this->getDevice());
 		}
 	};
 	
 	typedef SimpleGrabber<Device::Webcam> Webcam;
+
+	template<typename DeviceType>
+	void registerDevice() {
+		Device::FactoryRegister::X().registerDevice<DeviceType>();
+	}
 }

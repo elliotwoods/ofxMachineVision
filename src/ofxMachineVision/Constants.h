@@ -86,10 +86,16 @@ namespace ofxMachineVision {
 	\brief The current state of the capture device
 	*/
     enum DeviceState {
-        State_Closed,
-        State_Waiting,
-        State_Running,
-		State_Deleting
+		//bit pattern = [reserved] [reserved] [running] [open] [exists] 
+		State_ExistsBit = 1 << 0,
+		State_OpenBit = 1 << 1,
+		State_RunningBit = 1 << 2,
+
+		State_Empty = 0,
+		State_Deleting = 1 << 5,
+		State_Closed = State_ExistsBit,
+        State_Waiting = State_OpenBit + State_ExistsBit,
+		State_Running = State_RunningBit + State_OpenBit + State_ExistsBit
     };
 
 	/**

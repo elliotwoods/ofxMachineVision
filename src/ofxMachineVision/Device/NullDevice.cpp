@@ -10,10 +10,15 @@ namespace ofxMachineVision {
 			this->specification.addFeature(Feature::Feature_FreeRun);
 			this->specification.addFeature(Feature::Feature_DeviceID);
 			this->specification.addPixelMode(PixelMode::Pixel_L8);
-			this->frameInterval = 1000.0f / desiredFramerate;
+			this->frameInterval = (int) (1000.0f / desiredFramerate);
 			this->frameIndex = 0;
 		}
 		
+		//----------
+		string NullDevice::getTypeName() const {
+			return "NullDevice";
+		}
+
 		//----------
 		Specification NullDevice::open(int deviceID) {
 			this->specification.setDeviceID(0);

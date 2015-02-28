@@ -21,5 +21,10 @@ namespace ofxMachineVision {
 
 			return factoryRegister;
 		}
+
+		//----------
+		const map<string, shared_ptr<BaseFactory>> & FactoryRegister::getFactories() const {
+			return this->factories;
+		}
 	}
 }

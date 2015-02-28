@@ -50,8 +50,9 @@ namespace ofxMachineVision {
 			void registerFactory(shared_ptr<BaseFactory> factory) {
 				const auto deviceName = factory->getDeviceName();
 				this->factories.insert(pair<string, shared_ptr<BaseFactory>>(deviceName, factory));
-				
 			}
+
+			const map<string, shared_ptr<BaseFactory>> & getFactories() const;
 		protected:
 			map<string, shared_ptr<BaseFactory>> factories;
 		};

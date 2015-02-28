@@ -143,6 +143,7 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\Blocking.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Callback.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\FactoryRegister.h" />
+    <ClInclude Include="..\src\ofxMachineVision\Device\NullDevice.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Types.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Updating.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\VideoInput.h" />
@@ -157,6 +158,7 @@
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInput.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Frame.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Grabber\Base.cpp" />

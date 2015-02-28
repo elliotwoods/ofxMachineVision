@@ -5,7 +5,7 @@
 namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
-		Simple::Simple(DevicePtr device) : Base(device) {
+		Simple::Simple() {
 			this->useTexture = true;
 			this->newFrameWaiting = false;
 			this->currentFrameNew = false;
@@ -24,16 +24,19 @@ namespace ofxMachineVision {
 		void Simple::open(int deviceID) {
 			this->close();
 
+			if (!this->getIsDeviceExists()) {
+				OFXMV_ERROR << "Cannot open device. Grabber has no Device";
+				return;
+			}
+
 			try {
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
 					{
 						auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
 						if (!device) {
-							OFXMV_FATAL << "Type mismatch with Device::Blocking";
-							throw(std::exception());
+							throw(ofxMachineVision::Exception("Type mismatch with Device::Blocking"));
 						}
-					
 						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->thread->startThread();
 
@@ -245,7 +248,7 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::update() {
-			CHECK_OPEN
+			CHECK_OPEN_SILENT
 			
 			switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
@@ -297,13 +300,23 @@ namespace ofxMachineVision {
 		//----------
 		float Simple::getWidth() {
 			auto frame = this->getFrame();
-			return frame->getPixelsRef().getWidth();
+			if (frame) {
+				return frame->getPixelsRef().getWidth();
+			}
+			else {
+				return 0.0f;
+			}
 		}
 
 		//----------
 		float Simple::getHeight() {
 			auto frame = this->getFrame();
-			return frame->getPixelsRef().getHeight();
+			if (frame) {
+				return frame->getPixelsRef().getHeight();
+			}
+			else {
+				return 0.0f;
+			}
 		}
 
 		//----------

@@ -14,7 +14,7 @@ namespace ofxMachineVision {
 		*/
 		class Simple : public Base, public ofBaseDraws, public ofBaseHasTexture, public ofBaseHasPixels, public ofBaseUpdates {
 		public:
-			Simple(DevicePtr device);
+			Simple();
 			~Simple();
 
 			void open(int deviceID = 0);

@@ -18,14 +18,15 @@ namespace ofxMachineVision {
 			VideoInput(int width = 1920, int height = 1080, float desiredFramerate = 30);
 			string getTypeName() const override;
 			Specification open(int deviceID) override;
+			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
-			void close() override;
+			void getFrame(shared_ptr<Frame>) override;
+			
 			void setExposure(Microseconds exposure) override;
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
-			void getFrame(shared_ptr<Frame>) override;
 			
 			//--
 			void showSettings();

@@ -72,6 +72,9 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\VideoInput.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\NullDevice.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
@@ -102,6 +105,9 @@
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
   </ItemGroup>
