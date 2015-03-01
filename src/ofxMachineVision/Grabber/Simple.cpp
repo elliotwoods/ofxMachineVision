@@ -200,13 +200,13 @@ namespace ofxMachineVision {
 				}
 				return this->getFrame();
 			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
-				shared_ptr<Frame> frame(new Frame());
+				shared_ptr<Frame> freshFrame(new Frame());
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
 				{
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
-					this->thread->performInThread([device, frame]() {
-						device->getFrame(frame);
+					this->thread->performInThread([device, freshFrame]() {
+						device->getFrame(freshFrame);
 					});
 					break;
 				}
@@ -217,6 +217,7 @@ namespace ofxMachineVision {
 					while (true) {
 						device->updateIsFrameNew();
 						if (device->isFrameNew()) {
+							freshFrame = device->getFrame();
 							break;
 						}
 						ofSleepMillis(1);
@@ -229,17 +230,19 @@ namespace ofxMachineVision {
 					this->newFrameWaiting = false;
 					while (true) {
 						if (this->newFrameWaiting) {
+							freshFrame = this->frame;
 							break;
 						}
 						ofSleepMillis(1);
 					}
+					break;
 				}
 				case Device::Type_NotImplemented:
 					throw(ofxMachineVision::Exception("Single Shot not implemented for this device type"));
 					break;
 				}
 
-				return frame;
+				return freshFrame;
 			}
 			else {
 				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));

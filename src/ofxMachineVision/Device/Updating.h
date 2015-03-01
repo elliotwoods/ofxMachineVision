@@ -16,7 +16,7 @@ namespace ofxMachineVision {
 		public:
 			virtual void updateIsFrameNew() = 0;
 			virtual bool isFrameNew() = 0;
-			virtual shared_ptr<Frame> getFrame() = 0;
+			virtual shared_ptr<Frame> getFrame() = 0;  //needs a comment - what does this mean?
 		};
 	}
 }
