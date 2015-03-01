@@ -16,7 +16,7 @@ namespace ofxMachineVision {
 		class VideoInput : public Blocking {
 		public:
 			VideoInput(int width = 1920, int height = 1080, float desiredFramerate = 30);
-			string getTypeName() const override;
+			virtual string getTypeName() const override;
 			Specification open(int deviceID) override;
 			void close() override;
 			bool startCapture() override;
@@ -42,7 +42,12 @@ namespace ofxMachineVision {
 			int frameIndex;
 		};
 		
-		typedef VideoInput Webcam;
+		class Webcam : public VideoInput {
+		public:
+			string getTypeName() const override {
+				return "Webcam";
+			}
+		};
 	}
 }
 
