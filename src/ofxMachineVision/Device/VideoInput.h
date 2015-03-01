@@ -32,7 +32,7 @@ namespace ofxMachineVision {
 			void showSettings();
 			void resetTimestamp();
 		protected:
-			::videoInput device;
+			shared_ptr<::videoInput> device; // since we may allocate this Device class to find its name, let's use pointer here
 			int deviceID;
 			int width, height;
 			float desiredFramerate;

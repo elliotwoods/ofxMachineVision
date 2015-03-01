@@ -36,14 +36,9 @@ namespace ofxMachineVision {
 				this->thread = shared_ptr<Utils::ActionQueueThread>(new Utils::ActionQueueThread());
 				break;
 			}
-			case Device::Type_Updating:
-			case Device::Type_Callback:
-				this->thread.reset();
-				break;
-			case Device::Type_NotImplemented:
 			default:
-				OFXMV_FATAL << "Device not implemented";
-				break;
+				this->thread.reset();
+				break; 
 			}
 
 			this->deviceState = (bool) this->baseDevice ? DeviceState::State_Waiting : DeviceState::State_Empty;

@@ -11,7 +11,6 @@ namespace ofxMachineVision {
 			this->height = height;
 			this->desiredFramerate = desiredFramerate;
 			QueryPerformanceFrequency(&this->timerFrequency);
-			this->device.setComMultiThreaded(true);
 		}
 
 		//---------
@@ -22,13 +21,17 @@ namespace ofxMachineVision {
 		//---------
 		Specification VideoInput::open(int deviceID) {
 			this->deviceID = deviceID;
-			this->device.setIdealFramerate(deviceID, (int) this->desiredFramerate);
-			this->device.setRequestedMediaSubType(VI_MEDIASUBTYPE_MJPG);
-			this->device.setupDevice(deviceID, width, height);
-			this->device.setVideoSettingFilter(this->deviceID, this->device.propSharpness, 0);
+			if (!this->device) {
+				this->device = make_shared<::videoInput>();
+			}
+			this->device->setComMultiThreaded(true);
+			this->device->setIdealFramerate(deviceID, (int) this->desiredFramerate);
+			this->device->setRequestedMediaSubType(VI_MEDIASUBTYPE_MJPG);
+			this->device->setupDevice(deviceID, width, height);
+			this->device->setVideoSettingFilter(this->deviceID, this->device->propSharpness, 0);
 			this->resetTimestamp();
 
-			Specification specification(width, height, "videoInput", this->device.getDeviceName(this->deviceID));
+			Specification specification(width, height, "videoInput", this->device->getDeviceName(this->deviceID));
 			
 			specification.addFeature(Feature::Feature_DeviceID);
 			specification.addFeature(Feature::Feature_Exposure);
@@ -47,7 +50,7 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInput::close() {
-			this->device.stopDevice(this->deviceID);
+			this->device->stopDevice(this->deviceID);
 		}
 		
 		//---------
@@ -66,11 +69,11 @@ namespace ofxMachineVision {
 			LARGE_INTEGER timestampLong;
 
 			ofPixels & pixels(frame->getPixelsRef());
-			if (pixels.getWidth() != this->device.getWidth(this->deviceID) || pixels.getHeight() != this->device.getHeight(this->deviceID)) {
-				pixels.allocate(this->device.getWidth(this->deviceID), this->device.getHeight(this->deviceID), OF_IMAGE_COLOR);
+			if (pixels.getWidth() != this->device->getWidth(this->deviceID) || pixels.getHeight() != this->device->getHeight(this->deviceID)) {
+				pixels.allocate(this->device->getWidth(this->deviceID), this->device->getHeight(this->deviceID), OF_IMAGE_COLOR);
 			}
 
-			this->device.getPixels(this->deviceID, frame->getPixels(), true, true);
+			this->device->getPixels(this->deviceID, frame->getPixels(), true, true);
 			QueryPerformanceCounter(&timestampLong);
 
 			this->frameIndex++;
@@ -81,28 +84,28 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInput::setExposure(Microseconds exposure) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propExposure, (float) exposure / 1000000.0f);
+			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propExposure, (float) exposure / 1000000.0f);
 		}
 	
 		//---------
 		void VideoInput::setGain(float percent) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propGain, percent);
+			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propGain, percent);
 		}
 
 		//---------
 		void VideoInput::setFocus(float percent) {
-			this->device.setVideoSettingCameraPct(this->deviceID, this->device.propFocus, percent);
+			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propFocus, percent);
 		}
 
 		//---------
 		void VideoInput::setSharpness(float percent) {
 			OFXMV_ERROR << "Error with setting sharpness, videoInput seems to be incompatible with this property right now";
-			//this->device.setVideoSettingCameraPct(this->deviceID, this->device.propSharpness, percent);
+			//this->device->setVideoSettingCameraPct(this->deviceID, this->device->propSharpness, percent);
 		}
 
 		//---------
 		void VideoInput::showSettings() {
-			this->device.showSettingsWindow(this->deviceID);
+			this->device->showSettingsWindow(this->deviceID);
 		}
 
 		//---------

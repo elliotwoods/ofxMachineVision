@@ -22,7 +22,7 @@
 }
 
 #define REQUIRES(feature) if(!this->specification.supports(feature)) { \
-	OFXMV_ERROR << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; \
+	OFXMV_WARNING << " Device requires " << ofxMachineVision::toString(feature) << " to use this function."; \
 	return; \
 }
 
