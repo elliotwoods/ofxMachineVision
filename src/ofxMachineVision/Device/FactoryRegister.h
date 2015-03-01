@@ -27,7 +27,7 @@ namespace ofxMachineVision {
 				this->deviceTypeName = this->makeTyped()->getTypeName();
 			}
 
-			shared_ptr<Device::Base> make() override {
+			DevicePtr make() override {
 				return this->makeTyped();
 			}
 
@@ -50,6 +50,16 @@ namespace ofxMachineVision {
 			void registerFactory(shared_ptr<BaseFactory> factory) {
 				const auto deviceName = factory->getDeviceName();
 				this->factories.insert(pair<string, shared_ptr<BaseFactory>>(deviceName, factory));
+			}
+
+			DevicePtr make(const string & deviceTypeName) {
+				auto findFactory = this->factories.find(deviceTypeName);
+				if (findFactory == this->factories.end()) {
+					return DevicePtr();
+				}
+				else {
+					return findFactory->second->make();
+				}
 			}
 
 			const map<string, shared_ptr<BaseFactory>> & getFactories() const;
