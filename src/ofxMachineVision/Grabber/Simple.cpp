@@ -2,6 +2,9 @@
 #include "ofAppRunner.h"
 #include "ofSystemUtils.h"
 
+using namespace ofxCv;
+using namespace cv;
+
 namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
@@ -247,6 +250,30 @@ namespace ofxMachineVision {
 			else {
 				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));
 			}
+		}
+
+		//----------
+		shared_ptr<Frame> Simple::getFreshFrameAveraged(int numExposures) {
+			if (numExposures <= 1)
+				return this->getFreshFrame();
+
+			shared_ptr<Frame> averagedFrame(new Frame());
+			averagedFrame->getPixelsRef().allocate(this->getWidth(), this->getHeight(), OF_IMAGE_COLOR);
+
+			Mat exposureMat;
+			Mat accumulatedMat = Mat(this->getHeight(), this->getWidth(), CV_16UC3, Scalar(0));
+			for (int i = 0; i < numExposures; i++) {
+				auto frame = this->getFreshFrame();
+				frame->lockForReading();
+				toCv(frame->getPixelsRef()).convertTo(exposureMat, CV_16UC3);
+				frame->unlock();
+
+				accumulatedMat += exposureMat;
+			}
+			accumulatedMat *= (1.f / numExposures);
+			accumulatedMat.convertTo(toCv(averagedFrame->getPixelsRef()), CV_8UC3);
+
+			return averagedFrame;
 		}
 
 		//----------
