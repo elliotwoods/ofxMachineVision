@@ -5,6 +5,7 @@
 
 #include "Base.h"
 #include "ofxMachineVision/Frame.h"
+#include "ofxCvMin.h"
 
 namespace ofxMachineVision {
 	namespace Grabber {
@@ -28,6 +29,7 @@ namespace ofxMachineVision {
 			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
 			long getLastFrameIndex() const { return this->lastFrameIndex; }
 			shared_ptr<Frame> getFreshFrame(float timeoutSeconds = 5.0f);
+			shared_ptr<Frame> getFreshFrameAveraged(int numExposures = 1);
 
 			/**
 			 \name ofBaseUpdates
