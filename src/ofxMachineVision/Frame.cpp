@@ -20,7 +20,7 @@ namespace ofxMachineVision {
 			this->empty = false;
 			this->frameIndex = other.getFrameIndex();
 			this->timestamp = other.getTimestamp();
-			this->pixels = other.getPixelsRef();
+			this->pixels = other.getPixels();
 		}
 		this->lock = new Poco::RWLock();
 	}
@@ -56,7 +56,7 @@ namespace ofxMachineVision {
 		other.lockForReading();
 
 		this->empty = other.isEmpty();
-		this->pixels = other.getPixelsRef();
+		this->pixels = other.getPixels();
 		this->setTimestamp(other.getTimestamp());
 		this->setFrameIndex(other.frameIndex);
 

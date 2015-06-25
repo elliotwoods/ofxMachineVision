@@ -279,32 +279,40 @@ namespace ofxMachineVision {
 			}
 
 			if (this->isFrameNew()) {
+				//update our local pixels cache
 				auto frame = this->getFrame();
-				auto & pixels = frame->getPixelsRef();
-				if (!pixels.isAllocated()) {
-					//we have no pixels allocated
-					this->texture.clear();
-					return;
-				}
+				frame->lockForReading();
+				this->pixels = frame->getPixels();
+				frame->unlock();
+
 				if (this->useTexture) {
-					if ((int) this->texture.getWidth() != pixels.getWidth() || (int) this->texture.getHeight() != pixels.getHeight()) {
-						this->texture.allocate(pixels);
+					//if we have no pixels, clear the texture
+					if (!this->pixels.isAllocated()) {
+						this->texture.clear();
+						return;
 					}
-					this->texture.loadData(pixels);
+					else {
+						//check if we have to reallocate texture
+						if ((int) this->texture.getWidth() != this->pixels.getWidth() || (int) this->texture.getHeight() != this->pixels.getHeight()) {
+							this->texture.allocate(this->pixels);
+						}
+						//load the pixels into the texture
+						this->texture.loadData(this->pixels);
+					}
 				}
 			}
 		}
 
 		//----------
-		void Simple::draw(float x, float y, float w, float h) {
+		void Simple::draw(float x, float y, float w, float h) const {
 			this->texture.draw(x, y, w, h);
 		}
 
 		//----------
-		float Simple::getWidth() {
+		float Simple::getWidth() const {
 			auto frame = this->getFrame();
 			if (frame) {
-				return frame->getPixelsRef().getWidth();
+				return frame->getPixels().getWidth();
 			}
 			else {
 				return 0.0f;
@@ -312,14 +320,24 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		float Simple::getHeight() {
+		float Simple::getHeight() const {
 			auto frame = this->getFrame();
 			if (frame) {
-				return frame->getPixelsRef().getHeight();
+				return frame->getPixels().getHeight();
 			}
 			else {
 				return 0.0f;
 			}
+		}
+
+		//----------
+		ofTexture & Simple::getTexture() {
+			return this->texture;
+		}
+
+		//----------
+		const ofTexture & Simple::getTexture() const {
+			return this->texture;
 		}
 
 		//----------
@@ -332,14 +350,18 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		unsigned char * Simple::getPixels() {
-			return this->getPixelsRef().getPixels();
+		bool Simple::isUsingTexture() const {
+			return this->useTexture;
 		}
 
 		//----------
-		ofPixels & Simple::getPixelsRef() {
-			auto frame = this->getFrame();
-			return frame->getPixelsRef();
+		const ofPixels & Simple::getPixels() const {
+			return this->pixels;
+		}
+
+		//----------
+		ofPixels & Simple::getPixels() {
+			return this->pixels;
 		}
 
 		//----------
@@ -426,7 +448,7 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		shared_ptr<Frame> Simple::getFrame() {
+		shared_ptr<Frame> Simple::getFrame() const {
 			this->framePointerLock.lock();
 			auto frame = this->frame;
 			this->framePointerLock.unlock();

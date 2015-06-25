@@ -42,7 +42,7 @@ namespace ofxMachineVision {
 		
 		//----------
 		void NullDevice::getFrame(shared_ptr<Frame> frame) {
-			auto & pixels = frame->getPixelsRef();
+			auto & pixels = frame->getPixels();
 			if (pixels.getWidth() != this->specification.getSensorWidth() || pixels.getHeight() != this->specification.getSensorHeight()) {
 				pixels.allocate(this->specification.getSensorWidth(), this->specification.getSensorHeight(), OF_PIXELS_MONO);
 				pixels.set(0,0);

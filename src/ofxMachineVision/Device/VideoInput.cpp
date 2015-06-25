@@ -68,7 +68,7 @@ namespace ofxMachineVision {
 		void VideoInput::getFrame(shared_ptr<Frame> frame) {
 			LARGE_INTEGER timestampLong;
 
-			ofPixels & pixels(frame->getPixelsRef());
+			ofPixels & pixels(frame->getPixels());
 			if (pixels.getWidth() != this->device->getWidth(this->deviceID) || pixels.getHeight() != this->device->getHeight(this->deviceID)) {
 				pixels.allocate(this->device->getWidth(this->deviceID), this->device->getHeight(this->deviceID), OF_IMAGE_COLOR);
 			}

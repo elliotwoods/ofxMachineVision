@@ -20,11 +20,8 @@ namespace ofxMachineVision {
 		bool lockForWriting();
 		void unlock();
 
-		ofPixels & getPixelsRef() { return this->pixels; }
-		const ofPixels & getPixelsRef() const { return this->pixels; }
-		
-		const unsigned char * getPixels() const { return this->getPixelsRef().getPixels(); }
-		unsigned char * getPixels() { return this->getPixelsRef().getPixels(); }
+		ofPixels & getPixels() { return this->pixels; }
+		const ofPixels & getPixels() const { return this->pixels; }
 
 		/** Set the frame timestamp
 		\param timestamp Timestamp of frames in microseconds

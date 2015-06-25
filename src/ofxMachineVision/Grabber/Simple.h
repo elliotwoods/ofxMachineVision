@@ -40,33 +40,36 @@ namespace ofxMachineVision {
 			 \name ofBaseDraws
 			 */
 			//@{
-			void draw(float x, float y) override {
+			void draw(float x, float y) const override {
 				this->draw(x, y, this->getWidth(), this->getHeight());
 			}
-			void draw(float x, float y, float w, float h) override;
-			void draw(const ofRectangle & rect) override {
+			void draw(float x, float y, float w, float h) const override;
+			void draw(const ofRectangle & rect) const override {
 				draw(rect.x, rect.y, rect.width, rect.height);
 			}
 			/** \brief Get the width of the most recent captured frame */
-			float getWidth() override;
+			float getWidth() const override;
 			/** \brief Get the height of the most recent captured frame */
-			float getHeight() override;
+			float getHeight() const override;
 			//@}
 
 		    /**
 			 \name ofBaseHasTexture
 			 */
 			//@{
-			ofTexture & getTextureReference() override { return this->texture; }
+			ofTexture & getTexture() override;
+			const ofTexture & getTexture() const override;
 			void setUseTexture(bool useTexture) override;
+			bool isUsingTexture() const override;
 			//@}
         
 			/**
 			 \name ofBaseHasPixels
+			 \brief Note that these getter functions are cached once per app frame. Use getFrame() for more direct access.
 			 */
 			//@{
-			unsigned char * getPixels() override;
-			ofPixels & getPixelsRef() override;
+			const ofPixels & getPixels() const override;
+			ofPixels & getPixels() override;
 			//@}
 
 			/**
@@ -95,7 +98,7 @@ namespace ofxMachineVision {
 			Other Grabbers can have different policies (e.g. you may choose to reuse the same Frame object for mulitple frame captures).
 			*/
 			//@{
-			shared_ptr<Frame> getFrame();
+			shared_ptr<Frame> getFrame() const;
 			void setFrame(shared_ptr<Frame>);
 			//@}
 		protected:
@@ -103,8 +106,9 @@ namespace ofxMachineVision {
 			void notifyNewFrame(shared_ptr<Frame>);
 
 			shared_ptr<Frame> frame;
-			ofMutex framePointerLock;
+			mutable ofMutex framePointerLock;
 
+			ofPixels pixels; // every app frame we cache a set of pixels which we can use for simple access. if getPixels() returned from frame, then there would be locking issues.
 			ofTexture texture;
 			bool useTexture;
 
