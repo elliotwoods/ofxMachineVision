@@ -7,27 +7,14 @@
 namespace ofxMachineVision {
 	namespace Device {
 		//----------
-		FactoryRegister * FactoryRegister::singleton = nullptr;
+		OFXPLUGIN_FACTORY_REGISTER_SINGLETON_SOURCE(FactoryRegister);
 
 		//----------
-		FactoryRegister & FactoryRegister::X() {
-			if (!FactoryRegister::singleton) {
-				FactoryRegister::singleton = new FactoryRegister();
-			}
-
-			auto & factoryRegister = * FactoryRegister::singleton;
-
-			factoryRegister.registerDevice<NullDevice>();
+		FactoryRegister::FactoryRegister() {
+			this->add<NullDevice>();
 
 			//register the webcam device whatever it is on this platform
-			factoryRegister.registerDevice<Webcam>();
-
-			return factoryRegister;
-		}
-
-		//----------
-		const map<string, shared_ptr<BaseFactory>> & FactoryRegister::getFactories() const {
-			return this->factories;
+			this->add<Webcam>();
 		}
 	}
 }

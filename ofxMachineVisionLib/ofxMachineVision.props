@@ -9,4 +9,5 @@
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemGroup />
+  <Import Project="..\..\..\addons\ofxPlugin\ofxPluginLib\ofxPlugin.props" />
 </Project>

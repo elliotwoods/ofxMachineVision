@@ -59,11 +59,7 @@ namespace ofxMachineVision {
 				path = path / "";
 			}
 		
-			/*
-			//we don't have poco any more :'(
-			Poco::File dummyFile(path);
-			dummyFile.createDirectories();
-			*/
+			std::filesystem::create_directories(path);
 
 			this->outputFolder = path;
 		}

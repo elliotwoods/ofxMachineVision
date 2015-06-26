@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxMachineVision.h"
+#include "ofxCvGui.h"
 
 class testApp : public ofBaseApp{
 
@@ -20,5 +21,6 @@ public:
 	void dragEvent(ofDragInfo dragInfo);
 	void gotMessage(ofMessage msg);
     
-    ofxMachineVision::SimpleGrabber<ofxMachineVision::Device::Webcam> camera;
+	ofxCvGui::Builder gui;
+	int deviceIndex;
 };
