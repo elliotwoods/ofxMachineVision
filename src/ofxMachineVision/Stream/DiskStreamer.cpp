@@ -5,7 +5,7 @@ namespace ofxMachineVision {
 		//---------
 		DiskStreamer::DiskStreamer() {
 			this->state = NoGrabber;
-			this->outputFolder = Poco::Path(ofToDataPath(""));
+			this->outputFolder = ofToDataPath("");
 		}
 
 		//---------
@@ -53,14 +53,17 @@ namespace ofxMachineVision {
 				pathString = ofToDataPath(pathString, true);
 			}
 			
-			auto path = Poco::Path(pathString);
-			if (path.isFile()) {
+			auto path = std::filesystem::path(pathString);
+			if (path.has_filename()) {
 				//we're missing trailing slash
-				path = Poco::Path(pathString + "/");
+				path = path / "";
 			}
 		
+			/*
+			//we don't have poco any more :'(
 			Poco::File dummyFile(path);
 			dummyFile.createDirectories();
+			*/
 
 			this->outputFolder = path;
 		}
@@ -102,10 +105,10 @@ namespace ofxMachineVision {
 		void DiskStreamer::callbackFrame(FrameEventArgs & args) {
 			if (this->state == Streaming) {
 				stringstream filename;
-				filename << outputFolder.toString() << args.frame->getTimestamp() << ".raw";
-				int size = args.frame->getPixelsRef().size();
+				filename << outputFolder.string() << args.frame->getTimestamp() << ".raw";
+				int size = args.frame->getPixels().size();
 				ofstream file(filename.str(), ios::out | ios::binary);
-				file.write((char*) args.frame->getPixels(), size);
+				file.write((char*) args.frame->getPixels().getPixels(), size);
 				file.close();
 			}
 		}

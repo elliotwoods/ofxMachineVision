@@ -41,7 +41,7 @@ namespace ofxMachineVision {
 
 			State state;
 			ofxMachineVision::GrabberPtr grabber;
-			Poco::Path outputFolder;
+			std::filesystem::path outputFolder;
 		};
 	}
 }
