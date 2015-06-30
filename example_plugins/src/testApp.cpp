@@ -4,6 +4,14 @@ using namespace ofxCvGui;
 
 //--------------------------------------------------------------
 void testApp::setup(){
+	/*
+	Notes:
+
+	1. This project has a custom Post-Build step in VS2015 to copy the dll's from the
+		Solution's bin dir to this Project's bin dir. This is useful when you are testing
+		a plugin because the plugin's solution will be related to the location where the
+		plugin is built, whilst this Project's location is where all the dll's want to be.
+	*/
 	this->deviceIndex = 0;
 
 	this->gui.init();

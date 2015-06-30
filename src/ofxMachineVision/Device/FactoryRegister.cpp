@@ -15,6 +15,8 @@ namespace ofxMachineVision {
 
 			//register the webcam device whatever it is on this platform
 			this->add<Webcam>();
+
+			this->loadPlugins();
 		}
 	}
 }
