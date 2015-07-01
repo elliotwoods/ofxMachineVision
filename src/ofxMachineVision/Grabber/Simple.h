@@ -27,7 +27,12 @@ namespace ofxMachineVision {
 			float getFps() const { return this->fps; }
 			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
 			long getLastFrameIndex() const { return this->lastFrameIndex; }
-			shared_ptr<Frame> getFreshFrame(float timeoutSeconds = 5.0f);
+
+			///Get a frame from the grabber and (attempt to) ensure that it was captured after the time of the function call
+			/// Notes :
+			///		* This function (by default) gives you a copy of the frame, so you don't need to worry about locking
+			///		* If you want to ensure that this fresh frame is available from the other functions of this class (e.g. getPixels()), you should call update() after getFreshFrame()
+			shared_ptr<Frame> getFreshFrame(bool giveCopy = true, float timeoutSeconds = 5.0f);
 
 			/**
 			 \name ofBaseUpdates

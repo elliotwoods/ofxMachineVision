@@ -16,6 +16,8 @@ namespace ofxMachineVision {
 		Frame(const Frame &);
 		~Frame();
 
+		shared_ptr<Frame> clone();
+
 		bool lockForReading();
 		bool lockForWriting();
 		void unlock();

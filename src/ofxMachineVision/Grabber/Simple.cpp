@@ -187,8 +187,17 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		shared_ptr<Frame> Simple::getFreshFrame(float timeout) {
+		shared_ptr<Frame> Simple::getFreshFrame(bool giveCopy, float timeout) {
+			shared_ptr<Frame> freshFrame;
+			bool frameIsCopy = false; // flag which denotes whether freshFrame is not owned by anybody else (i.e. needs lock)
+
 			if (this->specification.supports(Feature::Feature_OneShot)) {
+				
+				// --
+				// One Shot
+				// --
+				// Trigger a capture, use our local 'update / isFrameNew' pattern
+				
 				this->singleShot();
 				auto startTime = ofGetElapsedTimef();
 				while (!this->isFrameNew()) {
@@ -198,26 +207,41 @@ namespace ofxMachineVision {
 					this->update();
 					ofSleepMillis(1);
 				}
-				return this->getFrame();
+				freshFrame = this->getFrame();
+
 			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
-				shared_ptr<Frame> freshFrame(new Frame());
+				
+				// --
+				// Free Run
+				// --
+				// Varies by device type
+
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
 				{
+					// --
+					// Blocking
+					// --
+					freshFrame = make_shared<Frame>();
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
 					this->thread->performInThread([device, freshFrame]() {
 						device->getFrame(freshFrame);
 					});
+					frameIsCopy = true;
 					break;
 				}
 				case Device::Type_Updating:
 				{
+					// --
+					// Updating
+					// --
 					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 					device->updateIsFrameNew();
 					while (true) {
 						device->updateIsFrameNew();
 						if (device->isFrameNew()) {
 							freshFrame = device->getFrame();
+							frameIsCopy = false;
 							break;
 						}
 						ofSleepMillis(1);
@@ -226,11 +250,15 @@ namespace ofxMachineVision {
 				}
 				case Device::Type_Callback:
 				{
+					// --
+					// Callback
+					// --
 					// Method : Wait for a new callback to come through from the Device
 					this->newFrameWaiting = false;
 					while (true) {
 						if (this->newFrameWaiting) {
 							freshFrame = this->frame;
+							frameIsCopy = false;
 							break;
 						}
 						ofSleepMillis(1);
@@ -241,11 +269,14 @@ namespace ofxMachineVision {
 					throw(ofxMachineVision::Exception("Single Shot not implemented for this device type"));
 					break;
 				}
-
-				return freshFrame;
-			}
-			else {
+			} else {
 				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));
+			}
+
+			if (giveCopy && !frameIsCopy) {
+				return freshFrame->clone();
+			} else {
+				return freshFrame;
 			}
 		}
 

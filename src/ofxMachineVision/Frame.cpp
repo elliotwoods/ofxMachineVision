@@ -31,6 +31,11 @@ namespace ofxMachineVision {
 	}
 
 	//----------
+	shared_ptr<Frame> Frame::clone() {
+		return make_shared<Frame>(*this);
+	}
+
+	//----------
 	bool Frame::lockForReading() {
 		return this->lock->tryReadLock();
 	}
