@@ -4,11 +4,10 @@
 #include "./VideoInput.h"
 #include "./OSXUVC.h"
 
+OFXSINGLETON_DEFINE(ofxMachineVision::Device::FactoryRegister);
+
 namespace ofxMachineVision {
 	namespace Device {
-		//----------
-		OFXPLUGIN_FACTORY_REGISTER_SINGLETON_SOURCE(FactoryRegister);
-
 		//----------
 		FactoryRegister::FactoryRegister() {
 			this->add<NullDevice>();

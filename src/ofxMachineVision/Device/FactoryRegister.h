@@ -8,8 +8,7 @@ using namespace std;
 
 namespace ofxMachineVision {
 	namespace Device {
-		class FactoryRegister : public ofxPlugin::FactoryRegister<Device::Base> {
-			OFXPLUGIN_FACTORY_REGISTER_SINGLETON_HEADER(FactoryRegister)
+		class FactoryRegister : public ofxPlugin::FactoryRegister<Device::Base>, public ofxSingleton::Singleton<FactoryRegister> {
 		public:
 			FactoryRegister();
 		};
