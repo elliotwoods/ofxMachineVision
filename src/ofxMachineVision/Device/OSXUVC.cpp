@@ -19,7 +19,7 @@ namespace ofxMachineVision {
 		Specification OSXUVC::open(int deviceID) {
 			this->deviceID = deviceID;
 			this->device.setDeviceID(this->deviceID);
-			this->device.initGrabber(this->width, this->height);
+			this->device.setup(this->width, this->height);
 			this->device.setDesiredFrameRate(this->desiredFramerate);
 			
 			this->controller.useCamera(0x046d, 0x082d, deviceID);
@@ -98,7 +98,7 @@ namespace ofxMachineVision {
 				auto timestamp = AbsoluteToNanoseconds(* (const AbsoluteTime *) & elapsedTime);
 				this->frame->setTimestamp(* (uint64_t *) & timestamp / 1000);
 				this->frame->setFrameIndex(this->frameIndex);
-				this->frame->getPixelsRef() = this->device.getPixelsRef();
+				this->frame->getPixels() = this->device.getPixels();
 				this->frame->unlock();
 			}
 		}

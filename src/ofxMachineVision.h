@@ -45,7 +45,7 @@ namespace ofxMachineVision {
 		}
 
 		shared_ptr<DeviceType> getDeviceTyped() const {
-			return static_pointer_cast<DeviceClass>(this->getDevice());
+			return static_pointer_cast<DeviceType>(this->getDevice());
 		}
 	};
 	
@@ -53,6 +53,6 @@ namespace ofxMachineVision {
 
 	template<typename DeviceType>
 	void registerDevice() {
-		Device::FactoryRegister::X().registerDevice<DeviceType>();
+		DeviceType::FactoryRegister::X().template registerDevice<DeviceType>();
 	}
 }

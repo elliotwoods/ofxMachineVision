@@ -18,7 +18,6 @@ namespace ofxMachineVision {
 		class OSXUVC : public Updating {
 		public:
 			OSXUVC(int width = 1920, int height = 1080, float desiredFramerate = 30);
-			virtual string getTypeName() const override;
 			Specification open(int deviceID) override;
 			bool startCapture() override;
 			void stopCapture() override;
