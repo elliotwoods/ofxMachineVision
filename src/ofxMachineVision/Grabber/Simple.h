@@ -17,10 +17,10 @@ namespace ofxMachineVision {
 			Simple();
 			~Simple();
 
-			void open(int deviceID = 0);
-			void close();
-			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default);
-			void stopCapture();
+			void open(int deviceID = 0) override;
+			void close() override;
+			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) override;
+			void stopCapture() override;
 			void singleShot();
 
 			bool isFrameNew() const { return this->currentFrameNew; }

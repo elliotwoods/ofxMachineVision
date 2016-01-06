@@ -93,10 +93,10 @@ namespace ofxMachineVision {
 			this->device.update();
 			if (this->device.isFrameNew()) {
 				this->frame->lockForWriting();
-				const auto elapsedTime = mach_absolute_time() - this->timerStart;
+				const auto now = chrono::high_resolution_clock::now();
+				const auto elapsedTime = chrono::duration_cast<chrono::duration<double>>(now - this->timerStart);
 				
-				auto timestamp = AbsoluteToNanoseconds(* (const AbsoluteTime *) & elapsedTime);
-				this->frame->setTimestamp(* (uint64_t *) & timestamp / 1000);
+				this->frame->setTimestamp(elapsedTime.count() * 1e6);
 				this->frame->setFrameIndex(this->frameIndex);
 				this->frame->getPixels() = this->device.getPixels();
 				this->frame->unlock();
@@ -115,7 +115,7 @@ namespace ofxMachineVision {
 		
 		//---------
 		void OSXUVC::resetTimestamp() {
-			this->timerStart = mach_absolute_time();
+			this->timerStart = chrono::high_resolution_clock::now();
 			this->frameIndex = 0;
 		}
 	}

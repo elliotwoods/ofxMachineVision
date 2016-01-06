@@ -10,6 +10,9 @@
 #include "ofxMachineVision/Specification.h"
 #include "Updating.h"
 
+#include <chrono>
+#include <ctime>
+
 namespace ofxMachineVision {
 	namespace Device {
 		/**
@@ -41,7 +44,7 @@ namespace ofxMachineVision {
 			int width, height;
 			float desiredFramerate;
 			
-			uint64_t timerStart;
+			chrono::high_resolution_clock::time_point timerStart;
 			long frameIndex;
 			
 			shared_ptr<Frame> frame;

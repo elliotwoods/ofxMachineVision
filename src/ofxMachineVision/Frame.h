@@ -34,7 +34,7 @@ namespace ofxMachineVision {
 		/** Set the frame index
 		\param index The index of the frame (can be reset in some camera API's on any parameter change).
 		*/
-		void setFrameIndex(int frameIndex) { this->frameIndex = frameIndex; }
+		void setFrameIndex(long frameIndex) { this->frameIndex = frameIndex; }
 		long getFrameIndex() const { return this->frameIndex; }
 
 		bool isEmpty() const { return this->empty; }
