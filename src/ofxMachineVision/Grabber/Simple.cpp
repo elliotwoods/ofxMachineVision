@@ -114,6 +114,10 @@ namespace ofxMachineVision {
 		void Simple::close() {
 			if (this->getIsDeviceOpen()) {
 				this->stopCapture();
+				
+				this->callInRightThread([this]() {
+					this->getDevice()->close();
+				});
 
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
@@ -124,9 +128,8 @@ namespace ofxMachineVision {
 					break;
 				case Device::Type_Updating:
 				case Device::Type_Callback:
-					this->getDevice()->close();
-					break;
 				case Device::Type_NotImplemented:
+				default:
 					break;
 				}
 				
