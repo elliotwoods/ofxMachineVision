@@ -8,9 +8,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "openframeworksLib", "..\..\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxMachineVisionLib", "..\ofxMachineVisionLib\ofxMachineVisionLib.vcxproj", "{CD4455E0-0454-4C3C-BB42-9D15D16A34DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxPluginLib", "..\..\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj", "{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxPluginLib", "..\..\..\addons\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj", "{68B9239B-5AE6-45C0-B1CB-6FC6B58BB6EE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCvGuiLib", "..\..\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj", "{6F0DDB4F-4014-4433-919B-9D956C034BAD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ofxCvGuiLib", "..\..\..\addons\ofxCvGui\ofxCvGuiLib\ofxCvGuiLib.vcxproj", "{6F0DDB4F-4014-4433-919B-9D956C034BAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
