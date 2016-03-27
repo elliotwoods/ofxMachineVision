@@ -6,32 +6,27 @@
 namespace ofxMachineVision {
 	namespace Device {
 		//---------
-		VideoInput::VideoInput(int width, int height, float desiredFramerate) {
-			this->width = width;
-			this->height = height;
-			this->desiredFramerate = desiredFramerate;
-			QueryPerformanceFrequency(&this->timerFrequency);
-		}
-
-		//---------
 		string VideoInput::getTypeName() const {
 			return "VideoInput";
 		}
 
 		//---------
-		Specification VideoInput::open(int deviceID) {
-			this->deviceID = deviceID;
+		Specification VideoInput::open(shared_ptr<Base::InitialisationSettings> initialisationSettings) {
+			auto settings = this->getTypedSettings<InitialisationSettings>(initialisationSettings);
+
 			if (!this->device) {
 				this->device = make_shared<::videoInput>();
 			}
+			this->deviceIndex = settings->deviceID;
+
 			this->device->setComMultiThreaded(true);
-			this->device->setIdealFramerate(deviceID, (int) this->desiredFramerate);
+			this->device->setIdealFramerate(this->deviceIndex, (int) settings->idealFrameRate);
 			this->device->setRequestedMediaSubType(VI_MEDIASUBTYPE_MJPG);
-			this->device->setupDevice(deviceID, width, height);
-			this->device->setVideoSettingFilter(this->deviceID, this->device->propSharpness, 0);
+			this->device->setupDevice(this->deviceIndex, settings->width, settings->height);
+			this->device->setVideoSettingFilter(this->deviceIndex, this->device->propSharpness, 0);
 			this->resetTimestamp();
 
-			Specification specification(width, height, "videoInput", this->device->getDeviceName(this->deviceID));
+			Specification specification(settings->width, settings->height, "videoInput", this->device->getDeviceName(this->deviceIndex));
 			
 			specification.addFeature(Feature::Feature_DeviceID);
 			specification.addFeature(Feature::Feature_Exposure);
@@ -50,7 +45,7 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInput::close() {
-			this->device->stopDevice(this->deviceID);
+			this->device->stopDevice(this->deviceIndex);
 		}
 		
 		//---------
@@ -69,32 +64,32 @@ namespace ofxMachineVision {
 			LARGE_INTEGER timestampLong;
 
 			ofPixels & pixels(frame->getPixels());
-			if (pixels.getWidth() != this->device->getWidth(this->deviceID) || pixels.getHeight() != this->device->getHeight(this->deviceID)) {
-				pixels.allocate(this->device->getWidth(this->deviceID), this->device->getHeight(this->deviceID), OF_IMAGE_COLOR);
+			if (pixels.getWidth() != this->device->getWidth(this->deviceIndex) || pixels.getHeight() != this->device->getHeight(this->deviceIndex)) {
+				pixels.allocate(this->device->getWidth(this->deviceIndex), this->device->getHeight(this->deviceIndex), OF_IMAGE_COLOR);
 			}
 
-			this->device->getPixels(this->deviceID, frame->getPixels(), true, true);
+			this->device->getPixels(this->deviceIndex, frame->getPixels(), true, true);
 			QueryPerformanceCounter(&timestampLong);
 
 			this->frameIndex++;
 
-			frame->setTimestamp((Microseconds)((timestampLong.QuadPart - timerStart.QuadPart)* 1e6 / this->timerFrequency.QuadPart));
+			frame->setTimestamp((Microseconds)chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - this->timerStart).count());
 			frame->setFrameIndex(this->frameIndex);
 		}
 
 		//---------
 		void VideoInput::setExposure(Microseconds exposure) {
-			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propExposure, (float) exposure / 1000000.0f);
+			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propExposure, (float) exposure / 1000000.0f);
 		}
 	
 		//---------
 		void VideoInput::setGain(float percent) {
-			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propGain, percent);
+			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propGain, percent);
 		}
 
 		//---------
 		void VideoInput::setFocus(float percent) {
-			this->device->setVideoSettingCameraPct(this->deviceID, this->device->propFocus, percent);
+			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propFocus, percent);
 		}
 
 		//---------
@@ -105,12 +100,12 @@ namespace ofxMachineVision {
 
 		//---------
 		void VideoInput::showSettings() {
-			this->device->showSettingsWindow(this->deviceID);
+			this->device->showSettingsWindow(this->deviceIndex);
 		}
 
 		//---------
 		void VideoInput::resetTimestamp() {
-			QueryPerformanceCounter(&this->timerStart);
+			this->timerStart = chrono::high_resolution_clock::now();
 		}
 	}
 }

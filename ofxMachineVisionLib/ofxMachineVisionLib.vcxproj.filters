@@ -110,5 +110,8 @@
     <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\Base.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

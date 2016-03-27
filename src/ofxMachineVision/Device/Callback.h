@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Base.h"
-#include "../../../../ofxLiquidEvent/src/ofxLiquidEvent.h"
+#include "ofxLiquidEvent.h"
 
 namespace ofxMachineVision {
 	namespace Device {

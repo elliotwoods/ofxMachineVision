@@ -7,6 +7,7 @@
 
 #include "ofxMachineVision/Specification.h"
 #include "Blocking.h"
+#include <chrono>
 
 namespace ofxMachineVision {
 	namespace Device {
@@ -15,9 +16,24 @@ namespace ofxMachineVision {
 		*/
 		class VideoInput : public Blocking {
 		public:
-			VideoInput(int width = 1920, int height = 1080, float desiredFramerate = 30);
+			struct InitialisationSettings : Base::InitialisationSettings {
+			public:
+				InitialisationSettings() {
+					add(width.set("Width", 1920));
+					add(height.set("Height", 1080));
+					add(idealFrameRate.set("Ideal frame rate", 30));
+				}
+
+				ofParameter<int> width;
+				ofParameter<int> height;
+				ofParameter<int> idealFrameRate;
+			};
+
 			virtual string getTypeName() const override;
-			Specification open(int deviceID) override;
+			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
+				return make_shared<InitialisationSettings>();
+			}
+			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
@@ -33,13 +49,11 @@ namespace ofxMachineVision {
 			void resetTimestamp();
 		protected:
 			shared_ptr<::videoInput> device; // since we may allocate this Device class to find its name, let's use pointer here
-			int deviceID;
-			int width, height;
-			float desiredFramerate;
 
-			LARGE_INTEGER timerFrequency;
-			LARGE_INTEGER timerStart;
+
+			chrono::high_resolution_clock::time_point timerStart;
 			int frameIndex;
+			int deviceIndex;
 		};
 		
 		class Webcam : public VideoInput {

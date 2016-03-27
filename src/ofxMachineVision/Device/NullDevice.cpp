@@ -5,24 +5,19 @@
 namespace ofxMachineVision {
 	namespace Device {
 		//----------
-		NullDevice::NullDevice(int width, int height, float desiredFramerate) {
-			this->specification = Specification(width, height, "ofxMachineVision", "NullDevice");
-			this->specification.addFeature(Feature::Feature_FreeRun);
-			this->specification.addFeature(Feature::Feature_DeviceID);
-			this->specification.addPixelMode(PixelMode::Pixel_L8);
-			this->frameInterval = (int) (1000.0f / desiredFramerate);
-			this->frameIndex = 0;
-		}
-		
-		//----------
 		string NullDevice::getTypeName() const {
 			return "NullDevice";
 		}
 
 		//----------
-		Specification NullDevice::open(int deviceID) {
-			this->specification.setDeviceID(0);
-			return this->specification;
+		Specification NullDevice::open(shared_ptr<Base::InitialisationSettings> initialisationSettings) {
+			auto settings = this->getTypedSettings<InitialisationSettings>(initialisationSettings);
+
+			this->settings = * settings;
+			Specification specification(this->settings.width, this->settings.height, "NullDevice", "NullDevice");
+			specification.addFeature(Feature::Feature_FreeRun);
+			specification.addPixelMode(PixelMode::Pixel_L8);
+			return specification;
 		}
 		
 		//----------
@@ -43,11 +38,10 @@ namespace ofxMachineVision {
 		//----------
 		void NullDevice::getFrame(shared_ptr<Frame> frame) {
 			auto & pixels = frame->getPixels();
-			if (pixels.getWidth() != this->specification.getSensorWidth() || pixels.getHeight() != this->specification.getSensorHeight()) {
-				pixels.allocate(this->specification.getSensorWidth(), this->specification.getSensorHeight(), OF_PIXELS_MONO);
-				pixels.set(0,0);
-			}
-			ofSleepMillis(this->frameInterval);
+			pixels.allocate(this->settings.width, this->settings.height, OF_PIXELS_MONO);
+			pixels.set(0, 0);
+
+			ofSleepMillis(1e3 / this->settings.frameRate);
 			frame->setFrameIndex(this->frameIndex++);
 			frame->setTimestamp(ofGetElapsedTimeMicros());
 		}

@@ -18,7 +18,7 @@ namespace ofxMachineVision {
         Specification();
 		Specification(int deviceID) { this->deviceID = deviceID;}
         Specification(const Specification &);
-        Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName, string serialNumber = "");
+        Specification(int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber = "");
             
         bool getValid() const { return this->valid; }
 		int getDeviceID() const { return this->deviceID; }
@@ -35,8 +35,8 @@ namespace ofxMachineVision {
         bool supports(const TriggerSignalType &) const;
 		bool supports(const GPOMode &) const;
 
-        int getSensorWidth() const { return this->sensorWidth; }
-        int getSensorHeight() const { return this->sensorHeight; }
+        int getCaptureWidth() const { return this->captureWidth; }
+        int getCaptureHeight() const { return this->captureHeight; }
 
         const string & getManufacturer() const { return this->manufacturer; }
         const string & getModelName() const { return this->modelName; }
@@ -60,8 +60,8 @@ namespace ofxMachineVision {
         TriggerSignalTypeSet triggerSignalTypes;
 		GPOModeSet gpoModes;
 
-        int sensorWidth;
-        int sensorHeight;
+        int captureWidth;
+        int captureHeight;
             
         string manufacturer;
         string modelName;

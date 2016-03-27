@@ -12,17 +12,31 @@ namespace ofxMachineVision {
 		 */
 		class NullDevice : public Blocking {
 		public:
-			NullDevice(int width = 1024, int height = 768, float desiredFramerate = 30);
+			struct InitialisationSettings : Base::InitialisationSettings {
+			public:
+				InitialisationSettings() {
+					add(width.set("Width", 1024));
+					add(height.set("Height", 768));
+					add(frameRate.set("Frame rate", 30.0f));
+				}
+
+				ofParameter<int> width;
+				ofParameter<int> height;
+				ofParameter<float> frameRate;
+			};
+
 			string getTypeName() const override;
-			Specification open(int deviceID) override;
+			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
+				return make_shared<InitialisationSettings>();
+			}
+			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
 			void getFrame(shared_ptr<Frame>) override;
 		protected:
-			Specification specification;
-			int frameInterval;
-			int frameIndex;
+			InitialisationSettings settings;
+			int frameIndex = 0;
 		};
 	}
 }

@@ -17,7 +17,8 @@ namespace ofxMachineVision {
 			Simple();
 			~Simple();
 
-			void open(int deviceID = 0) override;
+			shared_ptr<Device::Base::InitialisationSettings> getDefaultInitialisationSettings();
+			void open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) override;
 			void stopCapture() override;

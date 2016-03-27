@@ -15,7 +15,7 @@ using namespace std;
 
 namespace ofxMachineVision {
 	typedef array<int, 2> Binning;
-	typedef unsigned long long Microseconds;
+	typedef uint64_t Microseconds;
     
 	/**
 	\brief Features which a device may support. These are known after the device is opened

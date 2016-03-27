@@ -21,7 +21,17 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::open(int deviceID) {
+		shared_ptr<Device::Base::InitialisationSettings> Simple::getDefaultInitialisationSettings() {
+			if (!this->getIsDeviceExists()) {
+				return make_shared<Device::Base::InitialisationSettings>();
+			}
+			else {
+				return this->getDevice()->getDefaultSettings();
+			}
+		}
+
+		//----------
+		void Simple::open(shared_ptr<Device::Base::InitialisationSettings> initialisationSettings) {
 			this->close();
 
 			if (!this->getIsDeviceExists()) {
@@ -41,7 +51,7 @@ namespace ofxMachineVision {
 						this->thread->startThread();
 
 						this->thread->performInThread([=] () {
-							this->setSpecification(device->open(deviceID));
+							this->setSpecification(device->open(initialisationSettings));
 						});
 
 						this->thread->setIdleFunction(
@@ -67,7 +77,7 @@ namespace ofxMachineVision {
 						if (!device) {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Updating"));
 						}
-						this->setSpecification(device->open(deviceID));
+						this->setSpecification(device->open(initialisationSettings));
 						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 						break;
@@ -78,7 +88,7 @@ namespace ofxMachineVision {
 						if (!device) {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Callback"));
 						}
-						this->setSpecification(device->open(deviceID));
+						this->setSpecification(device->open(initialisationSettings));
 						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 

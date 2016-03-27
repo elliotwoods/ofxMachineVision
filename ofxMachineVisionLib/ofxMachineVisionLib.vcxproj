@@ -152,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Device\Base.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInput.cpp" />

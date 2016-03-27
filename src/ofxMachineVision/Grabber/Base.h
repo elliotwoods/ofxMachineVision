@@ -10,7 +10,7 @@
 #include "ofxMachineVision/Utils/ActionQueueThread.h"
 #include "ofxMachineVision/Constants.h"
 
-#include "../../../../ofxLiquidEvent/src/ofxLiquidEvent.h"
+#include "ofxLiquidEvent.h"
 
 #define CHECK_OPEN if(!this->getIsDeviceOpen()) { \
 	OFXMV_ERROR << " Method cannot be called whilst device is not open"; \
@@ -40,8 +40,9 @@ namespace ofxMachineVision {
 			void setDevice(DevicePtr);
 			void clearDevice();
 			DevicePtr getDevice() const;
+			string getDeviceTypeName() const;
 
-			virtual void open(int deviceID = 0) = 0;
+			virtual void open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
 			virtual void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) = 0;
@@ -68,8 +69,8 @@ namespace ofxMachineVision {
 			//@{
 			const Specification & getDeviceSpecification() const { return this->specification; }
 			int getDeviceID() const { return this->getDeviceSpecification().getDeviceID(); }
-			int getSensorWidth() const { return this->getDeviceSpecification().getSensorWidth(); }
-			int getSensorHeight() const { return this->getDeviceSpecification().getSensorHeight(); }
+			int getCaptureWidth() const { return this->getDeviceSpecification().getCaptureWidth(); }
+			int getCaptureHeight() const { return this->getDeviceSpecification().getCaptureHeight(); }
 			const string & getManufacturer() const { return this->getDeviceSpecification().getManufacturer(); };
 			const string & getModelName() const { return this->getDeviceSpecification().getModelName(); };
 			//@}

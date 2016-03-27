@@ -1,10 +1,11 @@
 #pragma once
 
-#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Specification.h"
-#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Frame.h"
-#include "../../../addons/ofxMachineVision/src/ofxMachineVision/Constants.h"
+#include "ofxMachineVision/Specification.h"
+#include "ofxMachineVision/Frame.h"
+#include "ofxMachineVision/Constants.h"
 
 #include "ofRectangle.h"
+#include "ofParameter.h"
 
 namespace ofxMachineVision {
 	namespace Device {
@@ -19,9 +20,24 @@ namespace ofxMachineVision {
 		*/
 		class Base {
 		public:
+			struct InitialisationSettings : ofParameterGroup {
+			public:
+				InitialisationSettings() {
+					this->add(this->deviceID.set("Device ID", 0));
+				}
+				InitialisationSettings(int deviceID)
+					: InitialisationSettings() {
+					this->deviceID = deviceID;
+				}
+
+				ofParameter<int> deviceID;
+			};
+
 			virtual ~Base() { }
 			virtual string getTypeName() const = 0;
-			virtual Specification open(int deviceID = 0) = 0;
+
+			virtual shared_ptr<Base::InitialisationSettings> getDefaultSettings() = 0;
+			virtual Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
 			virtual bool startCapture() {
@@ -31,10 +47,10 @@ namespace ofxMachineVision {
 
 			}
 			virtual void singleShot() { }
-				
+			
 			/**
 			\name Optional interfaces
-			You should declare which actions your camara supports in the Specification's Features
+			You should declare which actions your camera supports in the Specification's Features
 			*/
 			//@{
 			virtual void setExposure(Microseconds exposure) { };
@@ -46,6 +62,32 @@ namespace ofxMachineVision {
 			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) { };
 			virtual void setGPOMode(const GPOMode &) { };
 			//@}
+		protected:
+			template<typename SettingsType>
+			/**
+			\name Convert settings to derived settings type
+			*/
+			shared_ptr<SettingsType> getTypedSettings(shared_ptr<Base::InitialisationSettings> baseSettings) {
+				if (!baseSettings) {
+					//no settings
+					return make_shared<SettingsType>();
+				}
+				else {
+					auto settings = dynamic_pointer_cast<SettingsType>(baseSettings);
+					if (settings) {
+						//settings are of correctType
+						return settings;
+					}
+					else {
+						//settings are for another type (e.g. base)
+						settings = make_shared<SettingsType>();
+						*static_pointer_cast<Base::InitialisationSettings>(settings) = *baseSettings;
+						return settings;
+					}
+				}
+			}
+		private:
+			InitialisationSettings initialisationSettings;
 		};
 	}
 

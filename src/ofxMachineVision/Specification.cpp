@@ -3,30 +3,36 @@
 
 namespace ofxMachineVision {
 	//---------
-	Specification::Specification() :
-	valid(false),
-	sensorWidth(0), sensorHeight(0),
-	manufacturer(""), modelName("") {
+	Specification::Specification()
+		: valid(false)
+		, captureWidth(0)
+		, captureHeight(0)
+		, manufacturer("")
+		, modelName("") {
 	}
 
 	//---------
-	Specification::Specification(const Specification & other) :
-	valid(other.getValid()),
-	sensorWidth(other.getSensorWidth()), sensorHeight(other.getSensorHeight()),
-	manufacturer(other.getManufacturer()), modelName(other.getModelName()),
-	features(other.getFeatures()),
-	pixelModes(other.getPixelModes()),
-	triggerModes(other.getTriggerModes()),
-	triggerSignalTypes(other.getTriggerSignalTypes()),
-	gpoModes(other.getGPOModes())
-	{
+	Specification::Specification(const Specification & other)
+		: valid(other.getValid())
+		, captureWidth(other.getCaptureWidth())
+		, captureHeight(other.getCaptureHeight())
+		, manufacturer(other.getManufacturer())
+		, modelName(other.getModelName())
+		, features(other.getFeatures())
+		, pixelModes(other.getPixelModes())
+		, triggerModes(other.getTriggerModes())
+		, triggerSignalTypes(other.getTriggerSignalTypes())
+		, gpoModes(other.getGPOModes()) {
 	}
 
 	//---------
-	Specification::Specification(int sensorWidth, int sensorHeight, string manufacturer, string modelName, string serialNumber) :
-	valid(true),
-	sensorWidth(sensorWidth), sensorHeight(sensorHeight),
-	manufacturer(manufacturer), modelName(modelName), serialNumber(serialNumber) {
+	Specification::Specification(int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber)
+		: valid(true)
+		, captureWidth(captureWidth)
+		, captureHeight(captureHeight)
+		, manufacturer(manufacturer)
+		, modelName(modelName)
+		, serialNumber(serialNumber) {
 	}
 
 	//---------
@@ -63,8 +69,8 @@ namespace ofxMachineVision {
 		ss << "[Model]\t\t\t" << this->getModelName() << endl;
 		ss << "[Serial]\t\t\t" << this->getSerialNumber() << endl;
         
-		ss << "[Sensor width]\t\t" << this->getSensorWidth() << endl;
-		ss << "[Sensor height]\t\t" << this->getSensorHeight() << endl;
+		ss << "[Capture width]\t\t" << this->getCaptureWidth() << endl;
+		ss << "[Capture height]\t\t" << this->getCaptureHeight() << endl;
 
 		ss << "[Features]\t\t";
 		const FeatureSet & features = this->getFeatures();

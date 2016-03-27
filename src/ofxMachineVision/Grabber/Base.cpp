@@ -41,7 +41,7 @@ namespace ofxMachineVision {
 				break; 
 			}
 
-			this->deviceState = (bool) this->baseDevice ? DeviceState::State_Waiting : DeviceState::State_Empty;
+			this->deviceState = (bool) this->baseDevice ? DeviceState::State_Closed : DeviceState::State_Empty;
 		}
 
 		//----------
@@ -52,6 +52,16 @@ namespace ofxMachineVision {
 		//----------
 		DevicePtr Base::getDevice() const {
 			return this->baseDevice;
+		}
+
+		//----------
+		string Base::getDeviceTypeName() const {
+			if (this->baseDevice) {
+				return this->baseDevice->getTypeName();
+			}
+			else {
+				return "uninitialised";
+			}
 		}
 	}
 }
