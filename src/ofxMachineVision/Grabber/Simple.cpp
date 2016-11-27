@@ -31,13 +31,20 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::open(shared_ptr<Device::Base::InitialisationSettings> initialisationSettings) {
+		bool Simple::open(shared_ptr<Device::Base::InitialisationSettings> initialisationSettings) {
 			this->close();
 
 			if (!this->getIsDeviceExists()) {
 				OFXMV_ERROR << "Cannot open device. Grabber has no Device";
-				return;
+				return false;
 			}
+
+			//if no settings are set, then use defaults
+			if (initialisationSettings == nullptr) {
+				initialisationSettings = this->getDevice()->getDefaultSettings();
+			}
+
+			this->getDevice()->initOnMainThread();
 
 			try {
 				switch (this->getDeviceType()) {
@@ -54,20 +61,25 @@ namespace ofxMachineVision {
 							this->setSpecification(device->open(initialisationSettings));
 						});
 
-						this->thread->setIdleFunction(
-							[=] () {
-							if (this->getIsDeviceRunning()) {
-								shared_ptr<Frame> frame(new Frame());
-								device->getFrame(frame);
-								if (!frame->isEmpty()) {
-									this->setFrame(frame);
-									this->notifyNewFrame(frame);
-								}
-							} else {
-								ofSleepMillis(2);
-							}
-						});
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+
+						if (this->getIsDeviceOpen()) {
+							this->thread->setIdleFunction(
+								[=]() {
+								if (this->getIsDeviceRunning()) {
+									shared_ptr<Frame> frame(new Frame());
+									device->getFrame(frame);
+									if (!frame->isEmpty()) {
+										this->setFrame(frame);
+										this->notifyNewFrame(frame);
+									}
+								}
+								else {
+									ofSleepMillis(2);
+								}
+							});
+						}
+						
 						break;
 					}
 						
@@ -118,6 +130,8 @@ namespace ofxMachineVision {
 				OFXMV_ERROR << e.what();
 				this->deviceState = State_Closed;
 			}
+
+			return this->getIsDeviceOpen();
 		}
 
 		//----------

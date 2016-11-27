@@ -1,6 +1,8 @@
 #include "ActionQueueThread.h"
 #include "ofAppRunner.h"
 
+#include "../Constants.h"
+
 namespace ofxMachineVision {
 	namespace Utils {
 		//-----------
@@ -47,14 +49,22 @@ namespace ofxMachineVision {
 					this->lockFunctionQueue.unlock();
 
 					if (action) {
-						action();
+						try {
+							action();
+						}
+						OFXMV_CATCH_ALL_TO_ERROR;
+
 						this->lockFunctionQueue.lock();
-						this->functionQueue.pop();
+						{
+							this->functionQueue.pop();
+						}
 						this->lockFunctionQueue.unlock();
-					} else {
+					}
+					else {
 						break;
 					}
 				}
+
 				if (this->idleFunction) {
 					this->idleFunction();
 				}

@@ -36,6 +36,8 @@ namespace ofxMachineVision {
 			virtual ~Base() { }
 			virtual string getTypeName() const = 0;
 
+			virtual void initOnMainThread() { }
+
 			virtual shared_ptr<Base::InitialisationSettings> getDefaultSettings() = 0;
 			virtual Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;

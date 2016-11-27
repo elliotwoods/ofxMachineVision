@@ -7,7 +7,7 @@ namespace ofxMachineVision {
 		this->lock = new Poco::RWLock();
 		this->frameIndex = 0;
 		this->timestamp = 0;
-		this->empty = false;
+		this->empty = true;
 	}
 
 	//----------

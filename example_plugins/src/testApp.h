@@ -22,5 +22,5 @@ public:
 	void gotMessage(ofMessage msg);
     
 	ofxCvGui::Builder gui;
-	int deviceIndex;
+	ofParameter<int> deviceIndex{ "Device index", 0 };
 };

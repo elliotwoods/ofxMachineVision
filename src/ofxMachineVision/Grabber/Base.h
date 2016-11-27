@@ -42,7 +42,7 @@ namespace ofxMachineVision {
 			DevicePtr getDevice() const;
 			string getDeviceTypeName() const;
 
-			virtual void open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
+			virtual bool open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
 			virtual void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) = 0;
