@@ -11,8 +11,8 @@ namespace ofxMachineVision {
 		typedef std::function<void()> ActionFunction;
 		class ActionQueueThread : public ofThread {
 		public:
-			void setIdleFunction(std::function<void()>);
-			void performInThread(std::function<void ()>, bool blocking = true);
+			void setIdleFunction(ActionFunction);
+			void performInThread(ActionFunction, bool blocking = true);
 			void blockUntilEmpty();
 		protected:
 			void threadedFunction() override;
