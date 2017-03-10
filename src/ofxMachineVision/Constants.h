@@ -10,12 +10,11 @@
 #define OFXMV_WARNING ofLogWarning(string(__func__))
 #define OFXMV_ERROR ofLogError(string(__func__))
 #define OFXMV_FATAL ofLogFatalError(string(__func__))
-
+#define OFXMV_CATCH_ALL_TO_ERROR catch(ofxMachineVision::Exception e) { OFXMV_ERROR << e.what(); } catch(std::exception e) { OFXMV_ERROR << e.what(); }
 using namespace std;
 
 namespace ofxMachineVision {
 	typedef array<int, 2> Binning;
-	typedef uint64_t Microseconds;
     
 	/**
 	\brief Features which a device may support. These are known after the device is opened

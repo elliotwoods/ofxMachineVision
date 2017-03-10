@@ -10,13 +10,30 @@ namespace ofxMachineVision {
 			return "VideoInput";
 		}
 
+		//----------
+		std::vector<Device::Base::ListedDevice> VideoInput::listDevices() const {
+			return vector<ListedDevice>();
+
+			videoInput listDevicesDevice;
+			auto deviceNames = listDevicesDevice.getDeviceList();
+
+			vector<ListedDevice> deviceList(deviceNames.size());
+			for (int i = 0; i < deviceNames.size(); i++) {
+				deviceList[i] = ListedDevice{
+					this->getDefaultSettings(),
+					"DirectShow Device",
+					deviceNames[i]
+				};
+				deviceList[i].initialisationSettings->deviceID = i;
+			}
+			return deviceList;
+		}
+
 		//---------
 		Specification VideoInput::open(shared_ptr<Base::InitialisationSettings> initialisationSettings) {
 			auto settings = this->getTypedSettings<InitialisationSettings>(initialisationSettings);
 
-			if (!this->device) {
-				this->device = make_shared<::videoInput>();
-			}
+			this->device = make_shared<::videoInput>();
 			this->deviceIndex = settings->deviceID;
 
 			this->device->setComMultiThreaded(true);
@@ -50,36 +67,31 @@ namespace ofxMachineVision {
 		
 		//---------
 		bool VideoInput::startCapture() {
-			OFXMV_WARNING << "startCapture is not used with VideoInput.";
+
 			return true;
 		}
 
 		//---------
 		void VideoInput::stopCapture() {
-			OFXMV_WARNING << "stopCapture is not supported by VideoInput.";
+
 		}
 
 		//---------
-		void VideoInput::getFrame(shared_ptr<Frame> frame) {
-			LARGE_INTEGER timestampLong;
+		shared_ptr<Frame> VideoInput::getFrame() {
+			auto frame = FramePool::X().getAvailableAllocatedFrame(this->device->getWidth(this->deviceIndex)
+				, this->device->getHeight(this->deviceIndex)
+				, ofPixelFormat::OF_PIXELS_RGB);
 
-			ofPixels & pixels(frame->getPixels());
-			if (pixels.getWidth() != this->device->getWidth(this->deviceIndex) || pixels.getHeight() != this->device->getHeight(this->deviceIndex)) {
-				pixels.allocate(this->device->getWidth(this->deviceIndex), this->device->getHeight(this->deviceIndex), OF_IMAGE_COLOR);
-			}
+			this->device->getPixels(this->deviceIndex, frame->getPixels().getData(), true, true);
 
-			this->device->getPixels(this->deviceIndex, frame->getPixels(), true, true);
-			QueryPerformanceCounter(&timestampLong);
-
-			this->frameIndex++;
-
-			frame->setTimestamp((Microseconds)chrono::duration_cast<chrono::microseconds>(chrono::high_resolution_clock::now() - this->timerStart).count());
+			frame->setTimestamp(chrono::high_resolution_clock::now() - this->timerStart);
 			frame->setFrameIndex(this->frameIndex);
+			return frame;
 		}
 
 		//---------
-		void VideoInput::setExposure(Microseconds exposure) {
-			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propExposure, (float) exposure / 1000000.0f);
+		void VideoInput::setExposure(chrono::microseconds exposure) {
+			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propExposure, (float) exposure.count() / 1000000.0f);
 		}
 	
 		//---------

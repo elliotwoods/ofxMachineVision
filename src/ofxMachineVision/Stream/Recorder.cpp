@@ -32,7 +32,7 @@ namespace ofxMachineVision {
 				return;
 			}
 
-			this->grabber->onNewFrameReceived.addListener([this] (FrameEventArgs& frame) {
+			this->grabber->onNewFrameReceived.addListener([this] (shared_ptr<Frame> & frame) {
 				this->callbackNewFrame(frame);
 			}, this);
 			this->state = State_Recording;
@@ -62,17 +62,18 @@ namespace ofxMachineVision {
 		}
 		
 		//---------
-		Microseconds Recorder::getFirstTimestamp() const {
+		chrono::nanoseconds Recorder::getFirstTimestamp() const {
 			if (this->empty()) {
-				return 0;
+				return chrono::nanoseconds(0);
 			}
 			return this->begin()->first;
 		}
 
 		//---------
-		Microseconds Recorder::getLastTimestamp() const {
+		chrono::nanoseconds Recorder::getLastTimestamp() const {
 			if (this->empty()) {
-				return 1;
+				//avoid division by 0
+				return chrono::nanoseconds(1);
 			}
 			Recorder::const_iterator it = this->end();
 			it--;
@@ -80,7 +81,7 @@ namespace ofxMachineVision {
 		}
 		
 		//---------
-		Microseconds Recorder::getDuration() const {
+		chrono::nanoseconds Recorder::getDuration() const {
 			return this->getLastTimestamp() - this->getFirstTimestamp();
 		}
 
@@ -103,10 +104,8 @@ namespace ofxMachineVision {
 		}
 
 		//---------
-		void Recorder::callbackNewFrame(FrameEventArgs & frameEventArgs) {
-			Frame & frame = * frameEventArgs.frame;
-			auto addition = std::pair<Microseconds, Frame>(frame.getTimestamp(), Frame(frame));
-			std::map<Microseconds, Frame>::insert(addition);
+		void Recorder::callbackNewFrame(shared_ptr<Frame> & frame) {
+			std::map<chrono::nanoseconds, shared_ptr<Frame>>::emplace(frame->getTimestamp(), frame);
 		}
 	}
 }

@@ -16,9 +16,9 @@ namespace ofxMachineVision {
 		class Blocking : public Base {
 		public:
 			/**
-			Note : Make sure to lock the Frame for writing whilst you write to it.
+			OVerride this function to return new frames. Feel free to throw ofxMachineVision::Exception if something goes wrong
 			*/
-			virtual void getFrame(shared_ptr<Frame>) = 0;
+			virtual shared_ptr<Frame> getFrame() = 0;
 		};
 	}
 }

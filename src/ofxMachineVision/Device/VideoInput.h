@@ -30,16 +30,19 @@ namespace ofxMachineVision {
 			};
 
 			virtual string getTypeName() const override;
-			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
+
+			vector<ListedDevice> listDevices() const override;
+
+			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
 				return make_shared<InitialisationSettings>();
 			}
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
-			void getFrame(shared_ptr<Frame>) override;
+			shared_ptr<Frame> getFrame() override;
 			
-			void setExposure(Microseconds exposure) override;
+			void setExposure(chrono::microseconds exposure) override;
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;

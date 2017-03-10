@@ -37,7 +37,7 @@ namespace ofxMachineVision {
 			State getState() const;
 
 		protected:
-			void callbackFrame(FrameEventArgs &);
+			void callbackFrame(shared_ptr<Frame> &);
 
 			State state;
 			ofxMachineVision::GrabberPtr grabber;

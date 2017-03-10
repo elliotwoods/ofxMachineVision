@@ -7,7 +7,7 @@
 
 namespace ofxMachineVision {
 	namespace Stream {
-		class Recorder : public std::map<Microseconds, Frame> {
+		class Recorder : public std::map<chrono::nanoseconds, shared_ptr<Frame>> {
 		public:
 			enum State {
 				State_NoGrabber,
@@ -31,14 +31,14 @@ namespace ofxMachineVision {
 			const State & getState() const;
 			bool getIsRecording() const;
 
-			Microseconds getFirstTimestamp() const;
-			Microseconds getLastTimestamp() const;
-			Microseconds getDuration() const;
+			chrono::nanoseconds getFirstTimestamp() const;
+			chrono::nanoseconds getLastTimestamp() const;
+			chrono::nanoseconds getDuration() const;
 
 			static string toString(const State &);
 
 		protected:
-			void callbackNewFrame(FrameEventArgs &);
+			void callbackNewFrame(shared_ptr<Frame> &);
 
 			State state;
 			ofxMachineVision::Grabber::Base * grabber;

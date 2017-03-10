@@ -17,6 +17,9 @@ Awaiting:
 */
 
 #include "ofxMachineVision/Constants.h"
+#include "ofxMachineVision/Frame.h"
+#include "ofxMachineVision/Utils/FramePool.h"
+
 #include "ofxMachineVision/Device/Blocking.h"
 #include "ofxMachineVision/Device/Updating.h"
 #include "ofxMachineVision/Grabber/Simple.h"
@@ -25,7 +28,9 @@ Awaiting:
 
 #include "ofxMachineVision/Device/VideoInput.h"
 #include "ofxMachineVision/Device/OSXUVC.h"
+#include "ofxMachineVision/Device/VideoPlayer.h"
 #include "ofxMachineVision/Device/NullDevice.h"
+
 #include "ofxMachineVision/Device/FactoryRegister.h"
 
 #include "ofConstants.h"
@@ -53,6 +58,6 @@ namespace ofxMachineVision {
 
 	template<typename DeviceType>
 	void registerDevice() {
-		DeviceType::FactoryRegister::X().template registerDevice<DeviceType>();
+		Device::FactoryRegister::X().add<DeviceType>();
 	}
 }

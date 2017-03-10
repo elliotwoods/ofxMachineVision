@@ -1,25 +1,27 @@
 #pragma once
 
 #include "ofThread.h"
-#include "Poco/Any.h"
-#include <queue>
+#include "ofThreadChannel.h"
 
 using namespace std;
 
 namespace ofxMachineVision {
 	namespace Utils {
 		typedef std::function<void()> ActionFunction;
-		class ActionQueueThread : public ofThread {
-		public:
-			void setIdleFunction(std::function<void()>);
-			void performInThread(std::function<void ()>, bool blocking = true);
-			void blockUntilEmpty();
-		protected:
-			void threadedFunction() override;
-			std::function<void()> idleFunction;
 
-			ofMutex lockFunctionQueue;
-			queue<ActionFunction> functionQueue;
+		class ActionQueueThread {
+		public:
+			ActionQueueThread();
+			virtual ~ActionQueueThread();
+
+			void setIdleFunction(ActionFunction);
+			void performInThread(ActionFunction &&, bool blocking);
+			void blockUntilQueueEmpty();
+		protected:
+			std::function<void()> idleFunction;
+			ofThreadChannel<ActionFunction> actionQueue;
+			std::thread thread;
+			bool needsCloseThread = false;
 		};
 	}
 }

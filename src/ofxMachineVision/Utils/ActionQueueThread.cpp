@@ -1,63 +1,73 @@
 #include "ActionQueueThread.h"
 #include "ofAppRunner.h"
 
+#include "../Constants.h"
+
 namespace ofxMachineVision {
 	namespace Utils {
+		//----------
+		ActionQueueThread::ActionQueueThread() {
+			this->thread = std::thread([this]() {
+				while (!this->needsCloseThread) {
+					ActionFunction actionFunction;
+					while (actionQueue.tryReceive(actionFunction)) {
+						try {
+							actionFunction();
+						}
+						OFXMV_CATCH_ALL_TO_ERROR;
+					}
+
+					if (this->idleFunction) {
+						try {
+							this->idleFunction();
+						}
+						OFXMV_CATCH_ALL_TO_ERROR;
+					}
+					else {
+						//no idle function, we can wait
+						this_thread::sleep_for(chrono::milliseconds(1));
+					}
+				}
+			});
+		}
+
+		//----------
+		ActionQueueThread::~ActionQueueThread() {
+			this->needsCloseThread = true;
+			this->thread.join();
+		}
+
 		//-----------
-		void ActionQueueThread::setIdleFunction(std::function<void()> function) {
+		void ActionQueueThread::setIdleFunction(ActionFunction function) {
 			this->idleFunction = function;
 		}
 
 		//-----------
-		void ActionQueueThread::performInThread(std::function<void ()> action, bool blocking) {
-			if (!this->isThreadRunning()) {
-				ofLogWarning("ofxMachineVision") << "Cannot add items to ActionQueueThread whilst it is closed / closing";
-				return;
-			}
-
-			this->lockFunctionQueue.lock();
-			functionQueue.push(action);
-			this->lockFunctionQueue.unlock();
-
+		void ActionQueueThread::performInThread(ActionFunction && action, bool blocking) {
 			if (blocking) {
-				this->blockUntilEmpty();
+				//wrap the action in another action which will respond when complete
+				ofThreadChannel<int> responder;
+				ActionFunction wrappedAction = [action, &responder]() {
+					action();
+					responder.send(NULL);
+				};
+				
+				//send the wrappedAction to the thread
+				this->actionQueue.send(move(wrappedAction));
+				
+				//block until response arrives
+				int response;
+				responder.receive(response);
+			}
+			else {
+				this->actionQueue.send(move(action));
 			}
 		}
 
 		//----------
-		void ActionQueueThread::blockUntilEmpty() {
-			bool empty = false;
-			while (!empty) {
-				ofSleepMillis(1);
-				this->lockFunctionQueue.lock();
-				empty = this->functionQueue.empty();
-				this->lockFunctionQueue.unlock();
-			}
-		}
-
-		//----------
-		void ActionQueueThread::threadedFunction() {
-			while(this->isThreadRunning()) {
-				while (true) {
-					ActionFunction action;
-					this->lockFunctionQueue.lock();
-					if (!this->functionQueue.empty()) {
-						action = this->functionQueue.front();
-					}
-					this->lockFunctionQueue.unlock();
-
-					if (action) {
-						action();
-						this->lockFunctionQueue.lock();
-						this->functionQueue.pop();
-						this->lockFunctionQueue.unlock();
-					} else {
-						break;
-					}
-				}
-				if (this->idleFunction) {
-					this->idleFunction();
-				}
+		void ActionQueueThread::blockUntilQueueEmpty() {
+			while (!this->actionQueue.empty()) {
+				this_thread::sleep_for(chrono::milliseconds(1));
 			}
 		}
 	}

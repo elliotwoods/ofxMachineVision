@@ -1,61 +1,47 @@
 #pragma once
 
-#include "Poco/RWLock.h"
 #include "ofPixels.h"
 #include "ofThread.h"
 
 #include "ofxMachineVision/Constants.h"
 
+#include <shared_mutex>
+
 namespace ofxMachineVision {
 	/**
-	\brief An instance of ofPixels with some other metadata and a thread lock.
+	The Frame class is a managed shipment of pixels. Notes:
+	* When you own a Frame, you 
 	*/
 	class Frame {
 	public:
-		Frame();
-		Frame(const Frame &);
-		~Frame();
+		class Storage {
+		public:
+			Storage();
+		protected:
+			ofPixels pixels;
 
-		shared_ptr<Frame> clone();
+			friend class FramePool;
+			friend class Frame;
+		};
 
-		bool lockForReading();
-		bool lockForWriting();
-		void unlock();
+		Frame(Storage &);
+		virtual ~Frame();
 
-		ofPixels & getPixels() { return this->pixels; }
-		const ofPixels & getPixels() const { return this->pixels; }
+		const ofPixels & getPixels() const { return this->storage.pixels; }
+		ofPixels & getPixels() { return this->storage.pixels; }
 
-		/** Set the frame timestamp
-		\param timestamp Timestamp of frames in microseconds
-		*/
-		void setTimestamp(Microseconds timestamp) { this->timestamp = timestamp; }
-		Microseconds getTimestamp() const { return this->timestamp; }
+		chrono::nanoseconds getTimestamp() const { return this->timestamp; }
+		void setTimestamp(chrono::nanoseconds value) { this->timestamp = value; }
 
-		/** Set the frame index
-		\param index The index of the frame (can be reset in some camera API's on any parameter change).
-		*/
-		void setFrameIndex(long frameIndex) { this->frameIndex = frameIndex; }
-		long getFrameIndex() const { return this->frameIndex; }
-
-		bool isEmpty() const { return this->empty; }
-		void setEmpty(bool empty) { this->empty = empty; }
+		uint64_t getFrameIndex() const { return this->frameIndex; }
+		void setFrameIndex(uint64_t value) { this->frameIndex = value;  }
 
 		bool operator<(const Frame&) const;
-
-		///Copy operator
-		void operator=(Frame &);
-
 	protected:
-		bool empty;
-		Poco::RWLock * lock;
-		ofPixels pixels;
-		Microseconds timestamp;
-		long frameIndex;
-	};
+		chrono::nanoseconds timestamp;
+		uint64_t frameIndex = 0;
+		Storage & storage;
 
-	class FrameEventArgs {
-	public:
-		FrameEventArgs(const shared_ptr<Frame> &);
-		shared_ptr<Frame> frame;
+		friend class FramePool;
 	};
 }

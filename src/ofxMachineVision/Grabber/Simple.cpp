@@ -11,8 +11,9 @@ namespace ofxMachineVision {
 			this->currentFrameNew = false;
 
 			this->fps = 0.0f;
-			this->lastTimestamp = 0;
+			this->lastTimestamp = chrono::nanoseconds(0);
 			this->lastFrameIndex = 0;
+			this->clearCachedFrame();
 		}
 
 		//----------
@@ -31,13 +32,22 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::open(shared_ptr<Device::Base::InitialisationSettings> initialisationSettings) {
+		bool Simple::open(shared_ptr<Device::Base::InitialisationSettings> initialisationSettings) {
 			this->close();
 
 			if (!this->getIsDeviceExists()) {
 				OFXMV_ERROR << "Cannot open device. Grabber has no Device";
-				return;
+				return false;
 			}
+
+			//if no settings are set, then use defaults
+			if (initialisationSettings == nullptr) {
+				initialisationSettings = this->getDevice()->getDefaultSettings();
+			}
+
+			this->getDevice()->initOnMainThread();
+
+			this->clearCachedFrame();
 
 			try {
 				switch (this->getDeviceType()) {
@@ -47,27 +57,55 @@ namespace ofxMachineVision {
 						if (!device) {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Blocking"));
 						}
-						this->setFrame(shared_ptr<Frame>(new Frame()));
-						this->thread->startThread();
 
-						this->thread->performInThread([=] () {
-							this->setSpecification(device->open(initialisationSettings));
-						});
+						//start up the thread
+						this->thread = make_unique<Utils::ActionQueueThread>();
 
+						//open the device in the thread
+						this->thread->performInThread([this, device, initialisationSettings] () {
+							try {
+								this->setSpecification(device->open(initialisationSettings));
+							}
+							catch (ofxMachineVision::Exception e) {
+								ofLogError("ofxMachineVision") << "Couldn't open device : " << e.what();
+								this->clearDevice();
+							}
+							catch (const std::exception & e) {
+								ofLogError("ofxMachineVision") << "Couldn't open device : " << e.what();
+								this->clearDevice();
+							}
+						}, true);
+
+						//set our device state if the device was opened
+						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						if (!this->getIsDeviceOpen()) {
+							throw(ofxMachineVision::Exception("Failed to open device"));
+						}
+
+						//set the idle function to capture frames
 						this->thread->setIdleFunction(
-							[=] () {
+							[=]() {
+							//--
+							//Continuous capture function
+							//--
+							//
 							if (this->getIsDeviceRunning()) {
-								shared_ptr<Frame> frame(new Frame());
-								device->getFrame(frame);
-								if (!frame->isEmpty()) {
-									this->setFrame(frame);
-									this->notifyNewFrame(frame);
+								try {
+									auto frame = device->getFrame();
+									if (frame) {
+										this->setFrame(frame);
+										this->notifyNewFrame(frame);
+									}
 								}
-							} else {
+								OFXMV_CATCH_ALL_TO_ERROR;
+							}
+							else {
 								ofSleepMillis(2);
 							}
+							//
+							//--
 						});
-						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						
 						break;
 					}
 						
@@ -78,7 +116,6 @@ namespace ofxMachineVision {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Updating"));
 						}
 						this->setSpecification(device->open(initialisationSettings));
-						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 						break;
 					}
@@ -89,20 +126,15 @@ namespace ofxMachineVision {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Callback"));
 						}
 						this->setSpecification(device->open(initialisationSettings));
-						this->setFrame(shared_ptr<Frame>(new Frame()));
 						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
 
 						//callback on frames received
-						device->onNewFrame += [this](shared_ptr<Frame> & incomingFrame) {
-							//copy the incoming frame
-							auto frameCopy = make_shared<Frame>();
-							*frameCopy = *incomingFrame; //<- copy operator
-
-							//fill our local copy
-							this->setFrame(frameCopy);
+						device->onNewFrame += [this](shared_ptr<Frame> & frame) {
+							//fill our local pointer
+							this->setFrame(frame);
 
 							//alert the grabber's listeners
-							this->notifyNewFrame(frameCopy);
+							this->notifyNewFrame(frame);
 						};
 						break;
 					}
@@ -118,6 +150,8 @@ namespace ofxMachineVision {
 				OFXMV_ERROR << e.what();
 				this->deviceState = State_Closed;
 			}
+
+			return this->getIsDeviceOpen();
 		}
 
 		//----------
@@ -127,14 +161,11 @@ namespace ofxMachineVision {
 				
 				this->callInRightThread([this]() {
 					this->getDevice()->close();
-				});
+				}, true);
 
 				switch (this->getDeviceType()) {
 				case Device::Type_Blocking:
-					{
-						this->thread->stopThread();
-						this->thread->waitForThread(true);
-					}
+					this->thread.reset();
 					break;
 				case Device::Type_Updating:
 				case Device::Type_Callback:
@@ -157,7 +188,7 @@ namespace ofxMachineVision {
 			this->callInRightThread([=] () {
 				this->getDevice()->startCapture();
 				this->deviceState = State_Running;
-			});
+			}, true);
 		}
 
 		//----------
@@ -169,7 +200,7 @@ namespace ofxMachineVision {
 				this->callInRightThread([=]() {
 					this->getDevice()->stopCapture();
 					this->deviceState = State_Waiting;
-				});
+				}, true);
 			}
 		}
 
@@ -200,9 +231,10 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		shared_ptr<Frame> Simple::getFreshFrame(bool giveCopy, float timeout) {
-			shared_ptr<Frame> freshFrame;
-			bool frameIsCopy = false; // flag which denotes whether freshFrame is not owned by anybody else (i.e. needs lock)
+		shared_ptr<Frame> Simple::getFreshFrame(chrono::microseconds timeout) {
+			shared_ptr<Frame> frame;
+
+			auto startTime = chrono::system_clock::now();
 
 			if (this->specification.supports(Feature::Feature_OneShot)) {
 				
@@ -212,15 +244,14 @@ namespace ofxMachineVision {
 				// Trigger a capture, use our local 'update / isFrameNew' pattern
 				
 				this->singleShot();
-				auto startTime = ofGetElapsedTimef();
 				while (!this->isFrameNew()) {
-					if (ofGetElapsedTimef() - startTime > timeout) {
+					if (chrono::system_clock::now() - startTime > timeout) {
 						throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
 					}
 					this->update();
 					ofSleepMillis(1);
 				}
-				freshFrame = this->getFrame();
+				frame = this->getFrame();
 
 			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
 				
@@ -235,12 +266,14 @@ namespace ofxMachineVision {
 					// --
 					// Blocking
 					// --
-					freshFrame = make_shared<Frame>();
+					//
+					//perform a blocking capture in the device thread
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
-					this->thread->performInThread([device, freshFrame]() {
-						device->getFrame(freshFrame);
-					});
-					frameIsCopy = true;
+					this->thread->performInThread([device, &frame]() {
+						frame = device->getFrame();
+					}, true);
+					//
+					// --
 					break;
 				}
 				case Device::Type_Updating:
@@ -248,17 +281,23 @@ namespace ofxMachineVision {
 					// --
 					// Updating
 					// --
+					//
+					//keep updating until we get another frame
 					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 					device->updateIsFrameNew();
 					while (true) {
 						device->updateIsFrameNew();
 						if (device->isFrameNew()) {
-							freshFrame = device->getFrame();
-							frameIsCopy = false;
+							frame = device->getFrame();
 							break;
+						}
+						if (chrono::system_clock::now() - startTime > timeout) {
+							throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
 						}
 						ofSleepMillis(1);
 					}
+					//
+					// --
 					break;
 				}
 				case Device::Type_Callback:
@@ -266,31 +305,32 @@ namespace ofxMachineVision {
 					// --
 					// Callback
 					// --
+					//
 					// Method : Wait for a new callback to come through from the Device
 					this->newFrameWaiting = false;
 					while (true) {
 						if (this->newFrameWaiting) {
-							freshFrame = this->frame;
-							frameIsCopy = false;
+							frame = this->frame;
 							break;
+						}
+						if (chrono::system_clock::now() - startTime > timeout) {
+							throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
 						}
 						ofSleepMillis(1);
 					}
+					//
+					// --
 					break;
 				}
 				case Device::Type_NotImplemented:
-					throw(ofxMachineVision::Exception("Single Shot not implemented for this device type"));
+					throw(ofxMachineVision::Exception("getFreshFrame not implemented for this device type"));
 					break;
 				}
 			} else {
 				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));
 			}
 
-			if (giveCopy && !frameIsCopy) {
-				return freshFrame->clone();
-			} else {
-				return freshFrame;
-			}
+			return frame;
 		}
 
 		//----------
@@ -325,9 +365,7 @@ namespace ofxMachineVision {
 			if (this->isFrameNew()) {
 				//update our local pixels cache
 				auto frame = this->getFrame();
-				frame->lockForReading();
 				this->pixels = frame->getPixels();
-				frame->unlock();
 
 				if (this->useTexture) {
 					//if we have no pixels, clear the texture
@@ -409,13 +447,13 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::setExposure(Microseconds exposure) {
+		void Simple::setExposure(chrono::microseconds exposure) {
 			CHECK_OPEN
 			REQUIRES(Feature_Exposure)
 			
 			this->callInRightThread([=] () {
 				this->getDevice()->setExposure(exposure);
-			});
+			}, false);
 		}
 		
 		//----------
@@ -425,7 +463,7 @@ namespace ofxMachineVision {
 
 			this->callInRightThread([=] () {
 				this->getDevice()->setGain(percent);
-			});
+			}, false);
 		}
 
 		//----------
@@ -435,7 +473,7 @@ namespace ofxMachineVision {
 			
 			this->callInRightThread([=] () {
 				this->getDevice()->setFocus(percent);
-			});
+			}, false);
 		}
 
 		//----------
@@ -445,7 +483,7 @@ namespace ofxMachineVision {
 			
 			this->callInRightThread([=] () {
 				this->getDevice()->setSharpness(percent);
-			});
+			}, false);
 		}
 
 		//----------
@@ -455,7 +493,7 @@ namespace ofxMachineVision {
 			
 			this->callInRightThread([=] () {
 				this->getDevice()->setBinning(binningX, binningY);
-			});
+			}, false);
 		}
 
 		//----------
@@ -465,7 +503,7 @@ namespace ofxMachineVision {
 
 			this->callInRightThread([=] () {
 				this->getDevice()->setROI(roi);
-			});
+			}, false);
 		}
 
 		//----------
@@ -477,7 +515,7 @@ namespace ofxMachineVision {
 
 			this->callInRightThread([=] () {
 				this->getDevice()->setTriggerMode(triggerMode, triggerSignalType);
-			});
+			}, false);
 		}
 
 		//----------
@@ -488,37 +526,38 @@ namespace ofxMachineVision {
 
 			this->callInRightThread([=] () {
 				this->getDevice()->setGPOMode(gpoMode);
-			});
+			}, false);
 		}
 
 		//----------
 		shared_ptr<Frame> Simple::getFrame() const {
-			this->framePointerLock.lock();
-			auto frame = this->frame;
-			this->framePointerLock.unlock();
+			this->framePointerMutex.lock();
+			{
+				auto frame = this->frame;
+			}
+			this->framePointerMutex.unlock();
 			return frame;
 		}
 
 		//----------
-		void Simple::setFrame(shared_ptr<Frame> frame) {
-			this->framePointerLock.lock();
-			this->frame = frame;
-			this->framePointerLock.unlock();
-		}
-
-		//----------
-		void Simple::callInRightThread(std::function<void()> function) {
+		void Simple::callInRightThread(std::function<void()> function, bool blocking) {
 			switch (this->getDeviceType()) {
 			case Device::Type_Blocking:
-				this->thread->performInThread(function);
+				this->thread->performInThread(move(function), blocking);
 				break;
 			case Device::Type_Updating:
-				function();
+				try {
+					function();
+				}
+				OFXMV_CATCH_ALL_TO_ERROR
 				break;
 			case Device::Type_Callback:
-				function();
+				try {
+					function();
+				}
+				OFXMV_CATCH_ALL_TO_ERROR
 				break;
-			case Device::Type_NotImplemented:
+			default:
 				break;
 			}
 		}
@@ -529,9 +568,11 @@ namespace ofxMachineVision {
 				return;
 			}
 
-			float interval = (frame->getTimestamp() - this->lastTimestamp) / 1e6;
+			chrono::duration<float> interval = frame->getTimestamp() - this->lastTimestamp;
 
-			float newfps = (1.0f / interval);
+			float newfps = (1.0f / interval.count());
+
+			//damp the fps to make it more readable
 			if (this->fps == this->fps && abs(log(this->fps) - log(newfps)) < 10) {
 				this->fps = 0.9 * fps + 0.1f * newfps;
 			} else {
@@ -542,8 +583,22 @@ namespace ofxMachineVision {
 			this->lastTimestamp = frame->getTimestamp();
 			this->lastFrameIndex = frame->getFrameIndex();
 
-			FrameEventArgs frameEvent(this->getFrame());
-			this->onNewFrameReceived(frameEvent);
+			this->onNewFrameReceived(this->getFrame());
+		}
+
+
+		//----------
+		void Simple::setFrame(shared_ptr<Frame> frame) {
+			this->framePointerMutex.lock();
+			{
+				this->frame = frame;
+			}
+			this->framePointerMutex.unlock();
+		}
+
+		//----------
+		void Simple::clearCachedFrame() {
+			this->setFrame(FramePool::X().getCleanFrame());
 		}
 	}
 }

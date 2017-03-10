@@ -18,7 +18,7 @@ namespace ofxMachineVision {
 			~Simple();
 
 			shared_ptr<Device::Base::InitialisationSettings> getDefaultInitialisationSettings();
-			void open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) override;
+			bool open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) override;
 			void stopCapture() override;
@@ -26,14 +26,14 @@ namespace ofxMachineVision {
 
 			bool isFrameNew() const { return this->currentFrameNew; }
 			float getFps() const { return this->fps; }
-			Microseconds getLastTimestamp() const { return this->lastTimestamp; }
+			chrono::nanoseconds getLastTimestamp() const { return this->lastTimestamp; }
 			long getLastFrameIndex() const { return this->lastFrameIndex; }
 
 			///Get a frame from the grabber and (attempt to) ensure that it was captured after the time of the function call
 			/// Notes :
 			///		* This function (by default) gives you a copy of the frame, so you don't need to worry about locking
 			///		* If you want to ensure that this fresh frame is available from the other functions of this class (e.g. getPixels()), you should call update() after getFreshFrame()
-			shared_ptr<Frame> getFreshFrame(bool giveCopy = true, float timeoutSeconds = 5.0f);
+			shared_ptr<Frame> getFreshFrame(chrono::microseconds timeout = chrono::seconds(5));
 
 			/**
 			 \name ofBaseUpdates
@@ -82,7 +82,7 @@ namespace ofxMachineVision {
 			\name Capture properties
 			*/
 			//@{
-			void setExposure(Microseconds exposure) override;
+			void setExposure(chrono::microseconds exposure) override;
 			void setGain(float percent) override;
 			void setFocus(float percent) override;
 			void setSharpness(float percent) override;
@@ -105,14 +105,16 @@ namespace ofxMachineVision {
 			*/
 			//@{
 			shared_ptr<Frame> getFrame() const;
-			void setFrame(shared_ptr<Frame>);
 			//@}
 		protected:
-			void callInRightThread(std::function<void()>);
+			void callInRightThread(std::function<void()>, bool blocking);
 			void notifyNewFrame(shared_ptr<Frame>);
 
+			void setFrame(shared_ptr<Frame>);
+			void clearCachedFrame();
+
+			mutable ofMutex framePointerMutex;
 			shared_ptr<Frame> frame;
-			mutable ofMutex framePointerLock;
 
 			ofPixels pixels; // every app frame we cache a set of pixels which we can use for simple access. if getPixels() returned from frame, then there would be locking issues.
 			ofTexture texture;
@@ -122,7 +124,7 @@ namespace ofxMachineVision {
 			bool currentFrameNew;
 
 			float fps;
-			Microseconds lastTimestamp;
+			chrono::nanoseconds lastTimestamp;
 			long lastFrameIndex;
 		};
 	}

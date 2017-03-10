@@ -22,6 +22,7 @@ namespace ofxMachineVision {
 		
 		//----------
 		bool NullDevice::startCapture() {
+			this->startTime = chrono::high_resolution_clock::now();
 			return true;
 		}
 		
@@ -36,14 +37,15 @@ namespace ofxMachineVision {
 		}
 		
 		//----------
-		void NullDevice::getFrame(shared_ptr<Frame> frame) {
-			auto & pixels = frame->getPixels();
-			pixels.allocate(this->settings.width, this->settings.height, OF_PIXELS_MONO);
-			pixels.set(0, 0);
-
+		shared_ptr<Frame> NullDevice::getFrame() {
 			ofSleepMillis(1e3 / this->settings.frameRate);
+
+			auto frame = FramePool::X().getAvailableAllocatedFrame(this->settings.width, this->settings.height, OF_PIXELS_MONO);
+			frame->getPixels().set(0, 0);
 			frame->setFrameIndex(this->frameIndex++);
-			frame->setTimestamp(ofGetElapsedTimeMicros());
+			frame->setTimestamp(chrono::high_resolution_clock::now() - this->startTime);
+
+			return frame;
 		}
 	}
 }

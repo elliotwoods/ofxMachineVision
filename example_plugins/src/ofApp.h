@@ -4,7 +4,7 @@
 #include "ofxMachineVision.h"
 #include "ofxCvGui.h"
 
-class testApp : public ofBaseApp{
+class ofApp : public ofBaseApp{
 
 public:
 	void setup();
@@ -22,5 +22,5 @@ public:
 	void gotMessage(ofMessage msg);
     
 	ofxCvGui::Builder gui;
-	int deviceIndex;
+	ofParameter<int> deviceIndex{ "Device index", 0 };
 };

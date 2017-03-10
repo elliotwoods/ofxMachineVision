@@ -42,7 +42,7 @@ namespace ofxMachineVision {
 			DevicePtr getDevice() const;
 			string getDeviceTypeName() const;
 
-			virtual void open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
+			virtual bool open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
 			virtual void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) = 0;
@@ -52,7 +52,7 @@ namespace ofxMachineVision {
 			\name Capture properties
 			*/
 			//@{
-			virtual void setExposure(Microseconds exposure) = 0;
+			virtual void setExposure(chrono::microseconds exposure) = 0;
 			virtual void setGain(float percent) = 0;
 			virtual void setFocus(float percent) = 0;
 			virtual void setSharpness(float percent) = 0;
@@ -81,14 +81,14 @@ namespace ofxMachineVision {
 			bool getIsDeviceOpen() const { return this->getDeviceState() & State_OpenBit; }
 			bool getIsDeviceRunning() const { return this->getDeviceState() & State_RunningBit; }
 
-			ofxLiquidEvent<FrameEventArgs> onNewFrameReceived;
+			ofxLiquidEvent<shared_ptr<Frame>> onNewFrameReceived;
 		protected:
 			void setSpecification(const Specification & specification) { this->specification = specification; }
 
 			Specification specification;
 			DeviceState deviceState;
 
-			shared_ptr<ofxMachineVision::Utils::ActionQueueThread> thread;
+			unique_ptr<Utils::ActionQueueThread> thread;
 		private:
 			DevicePtr baseDevice; // why is this private and not protected?
 			Device::Type deviceType;

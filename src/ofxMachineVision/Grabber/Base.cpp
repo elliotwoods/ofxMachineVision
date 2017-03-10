@@ -10,15 +10,6 @@ namespace ofxMachineVision {
 		//----------
 		Base::~Base() {
 			this->deviceState = State_Deleting;
-			switch(this->deviceType) {
-				case Device::Type_Blocking:
-					this->thread->stopThread();
-					this->thread->waitForThread();
-				case Device::Type_Updating:
-					break;
-				case Device::Type_NotImplemented:
-					break;
-			}
 			this->baseDevice.reset();
 			this->deviceState = State_Empty;
 		}
@@ -26,22 +17,29 @@ namespace ofxMachineVision {
 		//----------
 		void Base::setDevice(DevicePtr device) {
 			this->close();
-			this->baseDevice = device;
+			if (device) {
+				this->baseDevice = device;
+				this->deviceType = getType(device);
 
-			this->deviceType = getType(device);
+				//open a thread for the device if required
+				switch (this->deviceType) {
+				case Device::Type_Blocking: {
+					this->thread = make_unique<Utils::ActionQueueThread>();
+					break;
+				}
+				default:
+					if (this->thread) {
+						this->thread.reset();
+					}
+					break;
+				}
 
-			//open a thread for the device if required
-			switch (this->deviceType) {
-			case Device::Type_Blocking: {
-				this->thread = shared_ptr<Utils::ActionQueueThread>(new Utils::ActionQueueThread());
-				break;
+				this->deviceState = DeviceState::State_Closed;
 			}
-			default:
-				this->thread.reset();
-				break; 
+			else {
+				this->deviceState = DeviceState::State_Empty;
 			}
-
-			this->deviceState = (bool) this->baseDevice ? DeviceState::State_Closed : DeviceState::State_Empty;
+			
 		}
 
 		//----------

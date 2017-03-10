@@ -75,6 +75,15 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\NullDevice.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\VideoPlayer.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Parameter.h">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Utils\FramePool.h">
+      <Filter>src\ofxMachineVision\Utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
@@ -112,6 +121,15 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Device\Base.cpp">
       <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\VideoPlayer.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Parameter.cpp">
+      <Filter>src\ofxMachineVision</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Utils\FramePool.cpp">
+      <Filter>src\ofxMachineVision\Utils</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

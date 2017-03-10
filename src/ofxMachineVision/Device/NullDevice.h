@@ -26,17 +26,18 @@ namespace ofxMachineVision {
 			};
 
 			string getTypeName() const override;
-			shared_ptr<Base::InitialisationSettings> getDefaultSettings() override {
+			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
 				return make_shared<InitialisationSettings>();
 			}
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
 			bool startCapture() override;
 			void stopCapture() override;
-			void getFrame(shared_ptr<Frame>) override;
+			shared_ptr<Frame> getFrame() override;
 		protected:
 			InitialisationSettings settings;
 			int frameIndex = 0;
+			chrono::high_resolution_clock::time_point startTime;
 		};
 	}
 }

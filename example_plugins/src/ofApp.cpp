@@ -1,9 +1,9 @@
-#include "testApp.h"
+#include "ofApp.h"
 
 using namespace ofxCvGui;
 
 //--------------------------------------------------------------
-void testApp::setup(){
+void ofApp::setup(){
 	/*
 	Notes:
 
@@ -15,79 +15,80 @@ void testApp::setup(){
 	this->deviceIndex = 0;
 
 	this->gui.init();
-	auto selectionPanel = this->gui.addScroll();
+	auto selectionPanel = this->gui.addWidgets();
 
-	selectionPanel->add(Widgets::Title::make("Open a device"));
+	selectionPanel->addTitle("Open a device");
 
-	selectionPanel->add(Widgets::EditableValue<int>::make("Device index", this->deviceIndex));
+	selectionPanel->addEditableValue<int>(this->deviceIndex);
 	for (auto deviceFactory : ofxMachineVision::Device::FactoryRegister::X()) {
-		selectionPanel->add(Widgets::Button::make(deviceFactory.second->getModuleTypeName(), [this, deviceFactory]() {
+		selectionPanel->addButton(deviceFactory.second->getModuleTypeName(), [this, deviceFactory]() {
 			auto device = deviceFactory.second->makeUntyped();
 			auto grabber = make_shared<ofxMachineVision::Grabber::Simple>();
-			
-			grabber->setDevice(device);
-			grabber->open();
-			grabber->startCapture();
 
-			auto panel = this->gui.makePanel(*grabber, deviceFactory.second->getModuleTypeName());
-			panel->onUpdate += [grabber](ofxCvGui::UpdateArguments &) {
-				grabber->update();
-			};
-			this->gui.add(panel);
-		}));
+			grabber->setDevice(device);
+			if (grabber->open()) {
+				grabber->startCapture();
+
+				auto panel = ofxCvGui::Panels::makeBaseDraws(*grabber, deviceFactory.second->getModuleTypeName());
+				panel->onUpdate += [grabber](ofxCvGui::UpdateArguments &) {
+					grabber->update();
+				};
+				this->gui.add(panel);
+			}
+		});
 	}
 }
 
 //--------------------------------------------------------------
-void testApp::update(){
+void ofApp::update(){
 
 }
 
 //--------------------------------------------------------------
-void testApp::draw(){
+void ofApp::draw(){
 
 }
 
 //--------------------------------------------------------------
-void testApp::keyPressed(int key){
+void ofApp::keyPressed(int key){
 }
 
 //--------------------------------------------------------------
-void testApp::keyReleased(int key){
-
-}
-
-//--------------------------------------------------------------
-void testApp::mouseMoved(int x, int y ){
+void ofApp::keyReleased(int key){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseDragged(int x, int y, int button){
+void ofApp::mouseMoved(int x, int y ){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mousePressed(int x, int y, int button){
+void ofApp::mouseDragged(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::mouseReleased(int x, int y, int button){
+void ofApp::mousePressed(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::windowResized(int w, int h){
+void ofApp::mouseReleased(int x, int y, int button){
 
 }
 
 //--------------------------------------------------------------
-void testApp::gotMessage(ofMessage msg){
+void ofApp::windowResized(int w, int h){
 
 }
 
 //--------------------------------------------------------------
-void testApp::dragEvent(ofDragInfo dragInfo){ 
+void ofApp::gotMessage(ofMessage msg){
+
+}
+
+//--------------------------------------------------------------
+void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }

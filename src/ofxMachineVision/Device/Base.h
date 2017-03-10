@@ -2,6 +2,8 @@
 
 #include "ofxMachineVision/Specification.h"
 #include "ofxMachineVision/Frame.h"
+#include "ofxMachineVision/Parameter.h"
+#include "ofxMachineVision/Utils/FramePool.h"
 #include "ofxMachineVision/Constants.h"
 
 #include "ofRectangle.h"
@@ -33,19 +35,29 @@ namespace ofxMachineVision {
 				ofParameter<int> deviceID;
 			};
 
+			struct ListedDevice {
+				shared_ptr<InitialisationSettings> initialisationSettings;
+				string manufacturer;
+				string model;
+			};
+
 			virtual ~Base() { }
 			virtual string getTypeName() const = 0;
 
-			virtual shared_ptr<Base::InitialisationSettings> getDefaultSettings() = 0;
+			virtual void initOnMainThread() { }
+
+			virtual vector<ListedDevice> listDevices() const {
+				return vector<ListedDevice>();
+			}
+
+			virtual shared_ptr<Base::InitialisationSettings> getDefaultSettings() const = 0;
 			virtual Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
 			virtual bool startCapture() {
 				return false;
 			};
-			virtual void stopCapture() {
-
-			}
+			virtual void stopCapture() { }
 			virtual void singleShot() { }
 			
 			/**
@@ -53,7 +65,7 @@ namespace ofxMachineVision {
 			You should declare which actions your camera supports in the Specification's Features
 			*/
 			//@{
-			virtual void setExposure(Microseconds exposure) { };
+			virtual void setExposure(chrono::microseconds exposure) { };
 			virtual void setGain(float percent) { };
 			virtual void setFocus(float percent) { };
 			virtual void setSharpness(float percent) { };
@@ -86,6 +98,8 @@ namespace ofxMachineVision {
 					}
 				}
 			}
+
+			vector<shared_ptr<AbstractParameter>> parameters;
 		private:
 			InitialisationSettings initialisationSettings;
 		};

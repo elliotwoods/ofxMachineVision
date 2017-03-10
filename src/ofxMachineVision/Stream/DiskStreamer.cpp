@@ -24,8 +24,8 @@ namespace ofxMachineVision {
 			this->grabber = grabber;
 			if (grabber != ofxMachineVision::GrabberPtr()) {
 				this->state = Waiting;
-				this->grabber->onNewFrameReceived.addListener([this] (FrameEventArgs& args) {
-					this->callbackFrame(args);
+				this->grabber->onNewFrameReceived.addListener([this] (shared_ptr<Frame> & frame) {
+					this->callbackFrame(frame);
 				}, this);
 			} else {
 				this->state = NoGrabber;
@@ -98,13 +98,13 @@ namespace ofxMachineVision {
 		}
 
 		//---------
-		void DiskStreamer::callbackFrame(FrameEventArgs & args) {
+		void DiskStreamer::callbackFrame(shared_ptr<Frame> & frame) {
 			if (this->state == Streaming) {
 				stringstream filename;
-				filename << outputFolder.string() << args.frame->getTimestamp() << ".raw";
-				int size = args.frame->getPixels().size();
+				filename << outputFolder.string() << frame->getTimestamp().count() << ".raw";
+				int size = frame->getPixels().size();
 				ofstream file(filename.str(), ios::out | ios::binary);
-				file.write((char*) args.frame->getPixels().getPixels(), size);
+				file.write((char*) frame->getPixels().getPixels(), size);
 				file.close();
 			}
 		}

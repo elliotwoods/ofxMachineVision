@@ -16,17 +16,12 @@ namespace ofxMachineVision {
 		*/
 		class Callback : public Base {
 		public:
-			Callback() {
-				this->incomingFrame = make_shared<Frame>();
-			}
+			Callback() { }
 
 			/**
-			Note : Make sure to lock the Frame for writing whilst you write to it.
+			Please lock, allocate, fill, unlock, deliver to onNewFrame each frame you receive from driver callback
 			*/
 			ofxLiquidEvent<shared_ptr<Frame>> onNewFrame;
-
-			///Frame allocated, locked and filled by the callback function
-			shared_ptr<Frame> incomingFrame;
 		};
 	}
 }
