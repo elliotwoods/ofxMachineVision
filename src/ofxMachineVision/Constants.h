@@ -114,7 +114,7 @@ namespace ofxMachineVision {
 	@name Static helpers
 	*/
 	//@{
-	static string toString(const Feature & deviceFeature) {
+	const static string toString(const Feature & deviceFeature) {
 		switch (deviceFeature) {
 			case Feature_ROI:
 				return "ROI";
@@ -145,7 +145,7 @@ namespace ofxMachineVision {
 		}
 	}
 
-	static string toString(const PixelMode & pixelMode) {
+	const static string toString(const PixelMode & pixelMode) {
 		switch (pixelMode) {
 			case Pixel_Unallocated:
 				return "Unallocated";
@@ -164,7 +164,7 @@ namespace ofxMachineVision {
 		}
 	}
 
-	static string toString(const TriggerMode & triggerMode) {
+	const static string toString(const TriggerMode & triggerMode) {
 		switch (triggerMode) {
 			case Trigger_Device:
 				return "Device";
@@ -179,7 +179,7 @@ namespace ofxMachineVision {
 		}
 	}
 
-	static string toString(const TriggerSignalType & triggerSignalType) {
+	const static string toString(const TriggerSignalType & triggerSignalType) {
 		switch (triggerSignalType) {
 			case TriggerSignal_Default:
 				return "Default";
@@ -196,7 +196,7 @@ namespace ofxMachineVision {
 		}
 	}
 
-	static string toString(const GPOMode & gpoMode) {
+	const static string toString(const GPOMode & gpoMode) {
 		switch (gpoMode) {
 		case GPOMode_On:
 			return "On";
@@ -215,7 +215,7 @@ namespace ofxMachineVision {
 		}
 	}
 
-	static string toString(const DeviceState & deviceState) {
+	const static string toString(const DeviceState & deviceState) {
 		switch (deviceState) {
 		case State_Closed:
 			return "Closed";
@@ -230,7 +230,7 @@ namespace ofxMachineVision {
 		}
 	}
     
-	static bool isColor(const PixelMode & pixelMode) {
+	const static bool isColor(const PixelMode & pixelMode) {
 		switch (pixelMode) {
 			case Pixel_Unallocated:
 			case Pixel_L8:
