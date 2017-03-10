@@ -68,7 +68,7 @@ namespace ofxMachineVision {
 				pixels.allocate(this->device->getWidth(this->deviceIndex), this->device->getHeight(this->deviceIndex), OF_IMAGE_COLOR);
 			}
 
-			this->device->getPixels(this->deviceIndex, frame->getPixels(), true, true);
+			this->device->getPixels(this->deviceIndex, frame->getPixels().getData(), true, true);
 			QueryPerformanceCounter(&timestampLong);
 
 			this->frameIndex++;
