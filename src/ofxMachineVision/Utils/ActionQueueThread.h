@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ofThread.h"
+//#include "ofThread.h"
 #include "ofThreadChannel.h"
 
 using namespace std;
