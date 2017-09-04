@@ -18,7 +18,7 @@ namespace ofxMachineVision {
 		, captureHeight(other.getCaptureHeight())
 		, manufacturer(other.getManufacturer())
 		, modelName(other.getModelName())
-		, features(other.getFeatures())
+		, captureSequenceType(other.getCaptureSequenceType())
 		, pixelModes(other.getPixelModes())
 		, triggerModes(other.getTriggerModes())
 		, triggerSignalTypes(other.getTriggerSignalTypes())
@@ -26,18 +26,14 @@ namespace ofxMachineVision {
 	}
 
 	//---------
-	Specification::Specification(int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber)
+	Specification::Specification(CaptureSequenceType captureSequenceType, int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber)
 		: valid(true)
+		, captureSequenceType(captureSequenceType)
 		, captureWidth(captureWidth)
 		, captureHeight(captureHeight)
 		, manufacturer(manufacturer)
 		, modelName(modelName)
 		, serialNumber(serialNumber) {
-	}
-
-	//---------
-	bool Specification::supports(const Feature & feature) const {
-		return this->features.count(feature) > 0;
 	}
 
 	//---------
@@ -60,6 +56,11 @@ namespace ofxMachineVision {
 		return this->gpoModes.count(gpoMode) > 0;
 	}
 
+	//----------
+	bool Specification::supports(const CaptureSequenceType & captureSequenceType) const {
+		return this->captureSequenceType == captureSequenceType;
+	}
+
 	//---------
 	string Specification::toString() const {
 		stringstream ss;
@@ -72,13 +73,8 @@ namespace ofxMachineVision {
 		ss << "[Capture width]\t\t" << this->getCaptureWidth() << endl;
 		ss << "[Capture height]\t\t" << this->getCaptureHeight() << endl;
 
-		ss << "[Features]\t\t";
-		const FeatureSet & features = this->getFeatures();
-		for(FeatureSet::const_iterator it = features.begin(); it != features.end(); it++) {
-			if (it != features.begin())
-				ss << endl << "\t\t\t";
-			ss << ofxMachineVision::toString(*it);
-		}
+		ss << "[Capture sequence type]\t\t";
+		ss << ofxMachineVision::toString(this->getCaptureSequenceType()) << endl;
 		ss << endl;
         
 		ss << "[Pixel modes]\t\t";
@@ -120,11 +116,6 @@ namespace ofxMachineVision {
 		ss << "//--" << endl;
         
 		return ss.str();
-	}
-
-	//---------
-	void Specification::addFeature(const Feature & feature) {
-		this->features.insert(feature);
 	}
 
 	//---------

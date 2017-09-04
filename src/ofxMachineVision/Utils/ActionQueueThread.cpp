@@ -43,24 +43,30 @@ namespace ofxMachineVision {
 		}
 
 		//-----------
-		void ActionQueueThread::performInThread(ActionFunction && action, bool blocking) {
+		bool ActionQueueThread::performInThread(ActionFunction && action, bool blocking) {
 			if (blocking) {
 				//wrap the action in another action which will respond when complete
-				ofThreadChannel<int> responder;
+				ofThreadChannel<bool> responder;
 				ActionFunction wrappedAction = [action, &responder]() {
-					action();
-					responder.send(NULL);
+					try {
+						action();
+						responder.send(true);
+					}
+					OFXMV_CATCH_ALL_TO_ERROR;
+					responder.send(false);
 				};
 				
 				//send the wrappedAction to the thread
 				this->actionQueue.send(move(wrappedAction));
 				
 				//block until response arrives
-				int response;
-				responder.receive(response);
+				bool success;
+				responder.receive(success);
+				return success;
 			}
 			else {
 				this->actionQueue.send(move(action));
+				return true;
 			}
 		}
 

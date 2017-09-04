@@ -51,7 +51,7 @@ namespace ofxMachineVision {
 
 			try {
 				switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
+				case Device::Type::Blocking:
 					{
 						auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
 						if (!device) {
@@ -77,7 +77,7 @@ namespace ofxMachineVision {
 						}, true);
 
 						//set our device state if the device was opened
-						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						this->deviceState = this->getDeviceSpecification().getValid() ? DeviceState::Waiting : DeviceState::Closed;
 						if (!this->getIsDeviceOpen()) {
 							throw(ofxMachineVision::Exception("Failed to open device"));
 						}
@@ -104,29 +104,31 @@ namespace ofxMachineVision {
 							}
 							//
 							//--
+
+							//note : we don't do anything here for one-shot cameras
 						});
-						
+
 						break;
 					}
 						
-				case Device::Type_Updating:
+				case Device::Type::Updating:
 					{
 						auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 						if (!device) {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Updating"));
 						}
 						this->setSpecification(device->open(initialisationSettings));
-						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						this->deviceState = this->getDeviceSpecification().getValid() ? DeviceState::Waiting : DeviceState::Closed;
 						break;
 					}
-				case Device::Type_Callback:
+				case Device::Type::Callback:
 					{
 						auto device = dynamic_pointer_cast<Device::Callback>(this->getDevice());
 						if (!device) {
 							throw(ofxMachineVision::Exception("Type mismatch with Device::Callback"));
 						}
 						this->setSpecification(device->open(initialisationSettings));
-						this->deviceState = this->getDeviceSpecification().getValid() ? State_Waiting : State_Closed;
+						this->deviceState = this->getDeviceSpecification().getValid() ? DeviceState::Waiting : DeviceState::Closed;
 
 						//callback on frames received
 						device->onNewFrame += [this](shared_ptr<Frame> & frame) {
@@ -141,14 +143,16 @@ namespace ofxMachineVision {
 				default:
 					throw Exception("Device not implemented");
 				}
+
+				this->lastInitialisationSettingsUsed = initialisationSettings;
 			}
 			catch (ofxMachineVision::Exception e) {
 				OFXMV_ERROR << e.what();
-				this->deviceState = State_Closed;
+				this->deviceState = DeviceState::Closed;
 			}
 			catch (std::exception e) {
 				OFXMV_ERROR << e.what();
-				this->deviceState = State_Closed;
+				this->deviceState = DeviceState::Closed;
 			}
 
 			return this->getIsDeviceOpen();
@@ -156,78 +160,92 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::close() {
+			this->stopCapture();
+
 			if (this->getIsDeviceOpen()) {
-				this->stopCapture();
-				
 				this->callInRightThread([this]() {
 					this->getDevice()->close();
 				}, true);
 
 				switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
+				case Device::Type::Blocking:
 					this->thread.reset();
 					break;
-				case Device::Type_Updating:
-				case Device::Type_Callback:
-				case Device::Type_NotImplemented:
+				case Device::Type::Updating:
+				case Device::Type::Callback:
+				case Device::Type::NotImplemented:
 				default:
 					break;
 				}
 				
-				this->deviceState = State_Closed;
+				this->deviceState = DeviceState::Closed;
 			}
 		}
 
 		//----------
-		void Simple::startCapture(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
-			CHECK_OPEN
-			REQUIRES(Feature::Feature_FreeRun)
+		void Simple::startCapture() {
+			CHECK_OPEN;
+			REQUIRES(CaptureSequenceType::Continuous);
 
-			this->setTriggerMode(triggerMode, triggerSignalType);
-		
 			this->callInRightThread([=] () {
 				this->getDevice()->startCapture();
-				this->deviceState = State_Running;
+				this->deviceState = DeviceState::Running;
 			}, true);
 		}
 
 		//----------
 		void Simple::stopCapture() {
-			CHECK_OPEN
-			REQUIRES(Feature::Feature_FreeRun)
+			CHECK_OPEN;
+			REQUIRES(CaptureSequenceType::Continuous);
 
 			if (this->getIsDeviceRunning()) {
 				this->callInRightThread([=]() {
 					this->getDevice()->stopCapture();
-					this->deviceState = State_Waiting;
+					this->deviceState = DeviceState::Waiting;
 				}, true);
 			}
 		}
 
 		//----------
 		void Simple::singleShot() {
-			CHECK_OPEN
-			REQUIRES(Feature::Feature_OneShot);
+			CHECK_OPEN;
+			REQUIRES(CaptureSequenceType::OneShot);
 			switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
+				case Device::Type::Blocking:
 				{
 					auto device = dynamic_pointer_cast<Device::Blocking>(this->getDevice());
-					this->thread->performInThread([device]() {
-						device->singleShot();
+
+					shared_ptr<ofxMachineVision::Frame> frame;
+
+					this->thread->performInThread([device, & frame]() {
+						frame = device->getFrame();
 					}, true);
+
+					if (frame) {
+						this->setFrame(frame);
+						this->notifyNewFrame(frame);
+					}
+
 					break;
 				}
-				case Device::Type_Updating:
-				case Device::Type_Callback:
+				case Device::Type::Updating:
+				case Device::Type::Callback:
 				{
 					this->getDevice()->singleShot();
 					break;
 				}
-				case Device::Type_NotImplemented:
+				case Device::Type::NotImplemented:
 				{
 					break;
 				}
 			}
+		}
+
+		//----------
+		void Simple::reopen() {
+			auto wasDeviceRunning = this->getIsDeviceRunning();
+			this->close();
+			this->open(lastInitialisationSettingsUsed); // open handles the case where this is empty by using default settings
 		}
 
 		//----------
@@ -236,7 +254,7 @@ namespace ofxMachineVision {
 
 			auto startTime = chrono::system_clock::now();
 
-			if (this->specification.supports(Feature::Feature_OneShot)) {
+			if (this->specification.getCaptureSequenceType() == CaptureSequenceType::OneShot) {
 				
 				// --
 				// One Shot
@@ -244,6 +262,7 @@ namespace ofxMachineVision {
 				// Trigger a capture, use our local 'update / isFrameNew' pattern
 				
 				this->singleShot();
+				this->update(); //clear any existing new frame marked this frame
 				while (!this->isFrameNew()) {
 					if (chrono::system_clock::now() - startTime > timeout) {
 						throw(ofxMachineVision::Exception("Timeout on getFreshFrame"));
@@ -253,7 +272,7 @@ namespace ofxMachineVision {
 				}
 				frame = this->getFrame();
 
-			} else if (this->specification.supports(Feature::Feature_FreeRun)) {
+			} else if (this->specification.getCaptureSequenceType() == CaptureSequenceType::Continuous) {
 				
 				// --
 				// Free Run
@@ -261,7 +280,7 @@ namespace ofxMachineVision {
 				// Varies by device type
 
 				switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
+				case Device::Type::Blocking:
 				{
 					// --
 					// Blocking
@@ -276,7 +295,7 @@ namespace ofxMachineVision {
 					// --
 					break;
 				}
-				case Device::Type_Updating:
+				case Device::Type::Updating:
 				{
 					// --
 					// Updating
@@ -300,7 +319,7 @@ namespace ofxMachineVision {
 					// --
 					break;
 				}
-				case Device::Type_Callback:
+				case Device::Type::Callback:
 				{
 					// --
 					// Callback
@@ -322,7 +341,7 @@ namespace ofxMachineVision {
 					// --
 					break;
 				}
-				case Device::Type_NotImplemented:
+				case Device::Type::NotImplemented:
 					throw(ofxMachineVision::Exception("getFreshFrame not implemented for this device type"));
 					break;
 				}
@@ -330,6 +349,9 @@ namespace ofxMachineVision {
 				throw(ofxMachineVision::Exception("Your camera Device does not support capture (FreeRun or OneShot)"));
 			}
 
+			if (frame) {
+				this->notifyNewFrame(frame);
+			}
 			return frame;
 		}
 
@@ -338,12 +360,12 @@ namespace ofxMachineVision {
 			CHECK_OPEN_SILENT
 			
 			switch (this->getDeviceType()) {
-				case Device::Type_Blocking:
-				case Device::Type_Callback:
+				case Device::Type::Blocking:
+				case Device::Type::Callback:
 					currentFrameNew = this->newFrameWaiting;
 					this->newFrameWaiting = false;
 					break;
-				case Device::Type_Updating:
+				case Device::Type::Updating:
 				{
 					auto device = dynamic_pointer_cast<Device::Updating>(this->getDevice());
 					if (device) {
@@ -351,13 +373,15 @@ namespace ofxMachineVision {
 						this->currentFrameNew = device->isFrameNew();
 						if (this->currentFrameNew) {
 							auto frame = device->getFrame();
-							this->setFrame(frame);
-							this->notifyNewFrame(frame);
+							if (frame) {
+								this->setFrame(frame);
+								this->notifyNewFrame(frame);
+							}
 						}
 					}
 					break;
 				}
-				case Device::Type_NotImplemented:
+				case Device::Type::NotImplemented:
 					throw(ofxMachineVision::Exception("Simple::update is not implemented for your camera type"));
 					break;
 			}
@@ -447,86 +471,29 @@ namespace ofxMachineVision {
 		}
 
 		//----------
-		void Simple::setExposure(chrono::microseconds exposure) {
-			CHECK_OPEN
-			REQUIRES(Feature_Exposure)
-			
-			this->callInRightThread([=] () {
-				this->getDevice()->setExposure(exposure);
-			}, false);
-		}
-		
-		//----------
-		void Simple::setGain(float percent) {
-			CHECK_OPEN
-			REQUIRES(Feature_Gain)
-
-			this->callInRightThread([=] () {
-				this->getDevice()->setGain(percent);
-			}, false);
+		const vector<shared_ptr<AbstractParameter>> Simple::getDeviceParameters() const {
+			auto device = this->getDevice();
+			if (device) {
+				return device->getParameters();
+			}
+			else {
+				return vector<shared_ptr<AbstractParameter>>();
+			}
 		}
 
 		//----------
-		void Simple::setFocus(float percent) {
-			CHECK_OPEN
-			REQUIRES(Feature_Focus)
-			
-			this->callInRightThread([=] () {
-				this->getDevice()->setFocus(percent);
-			}, false);
+		void Simple::syncToDevice(AbstractParameter & parameter) {
+			this->callInRightThread([&parameter]() {
+				parameter.syncToDevice();
+				parameter.syncFromDevice();
+			}, true);
 		}
 
 		//----------
-		void Simple::setSharpness(float percent) {
-			CHECK_OPEN
-			REQUIRES(Feature_Sharpness)
-			
-			this->callInRightThread([=] () {
-				this->getDevice()->setSharpness(percent);
-			}, false);
-		}
-
-		//----------
-		void Simple::setBinning(int binningX, int binningY) {
-			CHECK_OPEN
-			REQUIRES(Feature_Binning)
-			
-			this->callInRightThread([=] () {
-				this->getDevice()->setBinning(binningX, binningY);
-			}, false);
-		}
-
-		//----------
-		void Simple::setROI(const ofRectangle & roi) {
-			CHECK_OPEN
-			REQUIRES(Feature_ROI);
-
-			this->callInRightThread([=] () {
-				this->getDevice()->setROI(roi);
-			}, false);
-		}
-
-		//----------
-		void Simple::setTriggerMode(const TriggerMode & triggerMode, const TriggerSignalType & triggerSignalType) {
-			CHECK_OPEN
-			REQUIRES(Feature_Triggering)
-			REQUIRES(triggerMode);
-			REQUIRES(triggerSignalType);
-
-			this->callInRightThread([=] () {
-				this->getDevice()->setTriggerMode(triggerMode, triggerSignalType);
-			}, false);
-		}
-
-		//----------
-		void Simple::setGPOMode(const GPOMode & gpoMode) {
-			CHECK_OPEN
-			REQUIRES(Feature_GPO);
-			REQUIRES(gpoMode);
-
-			this->callInRightThread([=] () {
-				this->getDevice()->setGPOMode(gpoMode);
-			}, false);
+		void Simple::syncFromDevice(AbstractParameter & parameter) {
+			this->callInRightThread([&parameter]() {
+				parameter.syncFromDevice();
+			}, true);
 		}
 
 		//----------
@@ -542,16 +509,16 @@ namespace ofxMachineVision {
 		//----------
 		void Simple::callInRightThread(std::function<void()> function, bool blocking) {
 			switch (this->getDeviceType()) {
-			case Device::Type_Blocking:
+			case Device::Type::Blocking:
 				this->thread->performInThread(move(function), blocking);
 				break;
-			case Device::Type_Updating:
+			case Device::Type::Updating:
 				try {
 					function();
 				}
 				OFXMV_CATCH_ALL_TO_ERROR
 				break;
-			case Device::Type_Callback:
+			case Device::Type::Callback:
 				try {
 					function();
 				}
@@ -564,7 +531,7 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::notifyNewFrame(shared_ptr<Frame> frame) {
-			if (this->getDeviceState() == State_Deleting) {
+			if (this->getDeviceState() == DeviceState::Deleting) {
 				return;
 			}
 

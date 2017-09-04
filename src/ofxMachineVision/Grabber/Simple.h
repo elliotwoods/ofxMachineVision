@@ -20,9 +20,11 @@ namespace ofxMachineVision {
 			shared_ptr<Device::Base::InitialisationSettings> getDefaultInitialisationSettings();
 			bool open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) override;
 			void close() override;
-			void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) override;
+			void startCapture() override;
 			void stopCapture() override;
 			void singleShot();
+
+			void reopen(); // also restarts capture if currently alive
 
 			bool isFrameNew() const { return this->currentFrameNew; }
 			float getFps() const { return this->fps; }
@@ -33,7 +35,7 @@ namespace ofxMachineVision {
 			/// Notes :
 			///		* This function (by default) gives you a copy of the frame, so you don't need to worry about locking
 			///		* If you want to ensure that this fresh frame is available from the other functions of this class (e.g. getPixels()), you should call update() after getFreshFrame()
-			shared_ptr<Frame> getFreshFrame(chrono::microseconds timeout = chrono::seconds(5));
+			shared_ptr<Frame> getFreshFrame(chrono::microseconds timeout = chrono::seconds(20));
 
 			/**
 			 \name ofBaseUpdates
@@ -79,17 +81,63 @@ namespace ofxMachineVision {
 			//@}
 
 			/**
-			\name Capture properties
+			\name Device parameters
 			*/
 			//@{
-			void setExposure(chrono::microseconds exposure) override;
-			void setGain(float percent) override;
-			void setFocus(float percent) override;
-			void setSharpness(float percent) override;
-			void setBinning(int binningX = 1, int binningY = 1) override;
-			void setROI(const ofRectangle &) override;
-			void setTriggerMode(const TriggerMode &, const TriggerSignalType &) override;
-			void setGPOMode(const GPOMode &) override;
+			void setExposure(float percent) { this->setParameterByRatio("Exposure", percent); }
+			void setGain(float percent) { this->setParameterByRatio("Gain", percent); }
+			void setFocus(float percent) { this->setParameterByRatio("Focus", percent); }
+			void setSharpness(float percent) { this->setParameterByRatio("Sharpness", percent); }
+			void setBinning(const Binning & binning) { this->setParameter("Binning", binning); }
+			void setROI(const ofRectangle & roi) { this->setParameter("ROI", roi); };
+
+			const vector<shared_ptr<AbstractParameter>> getDeviceParameters() const;
+
+			template<class TypeName>
+			void setParameter(string parameterName, TypeName value) {
+				//remove capitalization
+				parameterName = ofToLower(parameterName);
+
+				//search for matching parameter
+				const auto & parameters = this->getDevice()->getParameters();
+				for (auto & parameter : parameters) {
+					//check if names match
+					if (ofIsStringInString(ofToLower(parameter->getParameter().getName()), parameterName)) {
+						//check if it's right type
+						auto typedOfParameter = dynamic_cast<ofParameter<TypeName> *>(& parameter->getParameter());
+						if (typedOfParameter) {
+							//it's the right name and type
+							typedOfParameter->set(value);
+							this->syncToDevice(* parameter);
+							return;
+						}
+					}
+				}
+			}
+
+			void setParameterByRatio(string parameterName, float percent) {
+				//remove capitalization
+				parameterName = ofToLower(parameterName);
+
+				//search for matching parameter
+				const auto & parameters = this->getDevice()->getParameters();
+				for (auto & parameter : parameters) {
+					//check if names match
+					if (ofIsStringInString(ofToLower(parameter->getParameter().getName()), parameterName)) {
+						//check if it's right type
+						auto typedOfParameter = dynamic_cast<ofParameter<float> *>(& parameter->getParameter());
+						if (typedOfParameter) {
+							//it's the right name and type
+							typedOfParameter->set(ofMap(percent, 0, 1, typedOfParameter->getMin(), typedOfParameter->getMax(), true));
+							this->syncToDevice(* parameter);
+							return;
+						}
+					}
+				}
+			}
+
+			void syncToDevice(AbstractParameter &) override;
+			void syncFromDevice(AbstractParameter &) override;
 			//@}
 
 			/**
@@ -126,6 +174,8 @@ namespace ofxMachineVision {
 			float fps;
 			chrono::nanoseconds lastTimestamp;
 			long lastFrameIndex;
+
+			shared_ptr<Device::Base::InitialisationSettings> lastInitialisationSettingsUsed;
 		};
 	}
 };

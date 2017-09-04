@@ -43,20 +43,21 @@ namespace ofxMachineVision {
 			this->device->setVideoSettingFilter(this->deviceIndex, this->device->propSharpness, 0);
 			this->resetTimestamp();
 
-			Specification specification(settings->width, settings->height, "videoInput", this->device->getDeviceName(this->deviceIndex));
+			Specification specification(CaptureSequenceType::Continuous
+				, settings->width
+				, settings->height
+				, "videoInput"
+				, this->device->getDeviceName(this->deviceIndex));
 			
-			specification.addFeature(Feature::Feature_DeviceID);
-			specification.addFeature(Feature::Feature_Exposure);
-			specification.addFeature(Feature::Feature_FreeRun);
-			specification.addFeature(Feature::Feature_Gain);
-			specification.addFeature(Feature::Feature_Focus);
-			specification.addFeature(Feature::Feature_Sharpness);
-			
-			specification.addPixelMode(PixelMode::Pixel_RGB8);
+			specification.addPixelMode(PixelMode::RGB8);
+
+			this->setupFloatParameter("Exposure", this->device->propExposure);
+			this->setupFloatParameter("Gain", this->device->propGain);
+			this->setupFloatParameter("Focus", this->device->propFocus);
+			this->setupFloatParameter("Sharpness", this->device->propSharpness);
 
 			this->frameIndex = 0;
 
-			OFXMV_WARNING << "VideoInput. implements Exposure as a normalised range 0...1000. I.e. ignoring the unit us.";
 			return specification;
 		}
 
@@ -90,27 +91,6 @@ namespace ofxMachineVision {
 		}
 
 		//---------
-		void VideoInput::setExposure(chrono::microseconds exposure) {
-			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propExposure, (float) exposure.count() / 1000000.0f);
-		}
-	
-		//---------
-		void VideoInput::setGain(float percent) {
-			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propGain, percent);
-		}
-
-		//---------
-		void VideoInput::setFocus(float percent) {
-			this->device->setVideoSettingCameraPct(this->deviceIndex, this->device->propFocus, percent);
-		}
-
-		//---------
-		void VideoInput::setSharpness(float percent) {
-			OFXMV_ERROR << "Error with setting sharpness, videoInput seems to be incompatible with this property right now";
-			//this->device->setVideoSettingCameraPct(this->deviceID, this->device->propSharpness, percent);
-		}
-
-		//---------
 		void VideoInput::showSettings() {
 			this->device->showSettingsWindow(this->deviceIndex);
 		}
@@ -118,6 +98,65 @@ namespace ofxMachineVision {
 		//---------
 		void VideoInput::resetTimestamp() {
 			this->timerStart = chrono::high_resolution_clock::now();
+		}
+
+		//----------
+		void VideoInput::setupFloatParameter(string name, long propertyCode) {
+			//get the initial settings
+			long min, max, step, value, flags, defaultValue;
+			this->device->getVideoSettingCamera(this->deviceIndex
+				, propertyCode
+				, min
+				, max
+				, step
+				, value
+				, flags
+				, defaultValue);
+
+			//construct the parameter
+			auto parameter = make_shared<Parameter<float>>(ofParameter<float>{name
+				, (float)value
+				, (float)min
+				, (float)max});
+
+			parameter->getDeviceValueFunction = [this, propertyCode]() {
+				long min, max, step, value, flags, defaultValue;
+
+				this->device->getVideoSettingCamera(this->deviceIndex
+					, propertyCode
+					, min
+					, max
+					, step
+					, value
+					, flags
+					, defaultValue);
+
+				return (float)value;
+			};
+
+			parameter->getDeviceValueRangeFunction = [this, propertyCode](float & min, float & max) {
+				long longMin, longMax, step, value, flags, defaultValue;
+
+				this->device->getVideoSettingCamera(this->deviceIndex
+					, propertyCode
+					, longMin
+					, longMax
+					, step
+					, value
+					, flags
+					, defaultValue);
+
+				min = (float)longMin;
+				max = (float)longMax;
+			};
+
+			parameter->setDeviceValueFunction = [this, propertyCode](const float & value) {
+				this->device->setVideoSettingCamera(this->deviceIndex
+					, propertyCode
+					, value);
+			};
+
+			this->parameters.emplace_back(move(parameter));
 		}
 	}
 }

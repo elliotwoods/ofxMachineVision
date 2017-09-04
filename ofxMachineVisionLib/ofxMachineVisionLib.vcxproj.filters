@@ -84,6 +84,9 @@
     <ClInclude Include="..\src\ofxMachineVision\Utils\FramePool.h">
       <Filter>src\ofxMachineVision\Utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\StillImages.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
@@ -130,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Utils\FramePool.cpp">
       <Filter>src\ofxMachineVision\Utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\StillImages.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -42,17 +42,12 @@ namespace ofxMachineVision {
 			void stopCapture() override;
 			shared_ptr<Frame> getFrame() override;
 			
-			void setExposure(chrono::microseconds exposure) override;
-			void setGain(float percent) override;
-			void setFocus(float percent) override;
-			void setSharpness(float percent) override;
-			
 			//--
 			void showSettings();
 			void resetTimestamp();
 		protected:
+			void setupFloatParameter(string name, long propertyCode);
 			shared_ptr<::videoInput> device; // since we may allocate this Device class to find its name, let's use pointer here
-
 
 			chrono::high_resolution_clock::time_point timerStart;
 			int frameIndex;

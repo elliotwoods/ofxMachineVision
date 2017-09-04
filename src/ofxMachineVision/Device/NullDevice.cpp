@@ -14,9 +14,12 @@ namespace ofxMachineVision {
 			auto settings = this->getTypedSettings<InitialisationSettings>(initialisationSettings);
 
 			this->settings = * settings;
-			Specification specification(this->settings.width, this->settings.height, "NullDevice", "NullDevice");
-			specification.addFeature(Feature::Feature_FreeRun);
-			specification.addPixelMode(PixelMode::Pixel_L8);
+			Specification specification(CaptureSequenceType::Continuous
+				, this->settings.width
+				, this->settings.height
+				, "NullDevice"
+				, "NullDevice");
+			specification.addPixelMode(PixelMode::L8);
 			return specification;
 		}
 		
