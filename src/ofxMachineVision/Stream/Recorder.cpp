@@ -4,15 +4,15 @@ namespace ofxMachineVision {
 	namespace Stream {
 		//---------
 		Recorder::Recorder() {
-			this->state = State_NoGrabber;
+			this->state = State::NoGrabber;
 			this->grabber = nullptr;
 		}
 
 		//---------
 		void Recorder::setGrabber(ofxMachineVision::Grabber::Base & grabber) {
-			if (this->getState() == State_NoGrabber || this->getState() == State_Ready) {
+			if (this->getState() == State::NoGrabber || this->getState() == State::Ready) {
 				this->grabber = & grabber;
-				this->state = State_Ready;
+				this->state = State::Ready;
 			} else {
 				OFXMV_ERROR << "Cannot set grabber, recorder currently in use.";
 			}
@@ -22,27 +22,27 @@ namespace ofxMachineVision {
 		void Recorder::start() {
 			this->stop();
 
-			if (this->getState() != State_Ready) {
+			if (this->getState() != State::Ready) {
 				OFXMV_ERROR << "Cannot start recorder, recorder is not ready to start.";
 				return;
 			}
 			if (!this->grabber->getIsDeviceOpen()) {
 				OFXMV_ERROR << "Cannot start recorder, grabber is not open.";
-				this->state = State_GrabberNotReady;
+				this->state = State::GrabberNotReady;
 				return;
 			}
 
 			this->grabber->onNewFrameReceived.addListener([this] (shared_ptr<Frame> & frame) {
 				this->callbackNewFrame(frame);
 			}, this);
-			this->state = State_Recording;
+			this->state = State::Recording;
 		}
 
 		//---------
 		void Recorder::stop() {
 			if (this->getIsRecording()) {
 				this->grabber->onNewFrameReceived.removeListeners(this);
-				this->state = State_Ready;
+				this->state = State::Ready;
 			}
 		}
 
@@ -58,7 +58,7 @@ namespace ofxMachineVision {
 
 		//---------
 		bool Recorder::getIsRecording() const {
-			return this->getState() == State_Recording;
+			return this->getState() == State::Recording;
 		}
 		
 		//---------
@@ -88,17 +88,17 @@ namespace ofxMachineVision {
 		//---------
 		string Recorder::toString(const State & state) {
 			switch(state) {
-			case State_NoGrabber:
+			case State::NoGrabber:
 				return "No grabber";
-			case State_GrabberNotReady:
+			case State::GrabberNotReady:
 				return "Grabber not ready";
-			case State_Ready:
+			case State::Ready:
 				return "Ready";
-			case State_Recording:
+			case State::Recording:
 				return "Recording";
-			case State_Saving:
+			case State::Saving:
 				return "Saving";
-			case State_Loading:
+			case State::Loading:
 				return "Loading";
 			}
 		}

@@ -9,7 +9,6 @@ using namespace std;
 namespace ofxMachineVision {
 	class Specification {
     public:    
-        typedef std::set<Feature> FeatureSet;
         typedef std::set<PixelMode> PixelModeSet;
         typedef std::set<TriggerMode> TriggerModeSet;
         typedef std::set<TriggerSignalType> TriggerSignalTypeSet;
@@ -18,19 +17,19 @@ namespace ofxMachineVision {
         Specification();
 		Specification(int deviceID) { this->deviceID = deviceID;}
         Specification(const Specification &);
-        Specification(int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber = "");
+        Specification(CaptureSequenceType, int captureWidth, int captureHeight, string manufacturer, string modelName, string serialNumber = "");
             
         bool getValid() const { return this->valid; }
 		int getDeviceID() const { return this->deviceID; }
 			
-        const FeatureSet & getFeatures() const { return this->features; }
-        const PixelModeSet & getPixelModes() const { return this->pixelModes; }
+		const CaptureSequenceType & getCaptureSequenceType() const { return this->captureSequenceType; }
+		const PixelModeSet & getPixelModes() const { return this->pixelModes; }
         const TriggerModeSet & getTriggerModes() const { return this->triggerModes; }
         const TriggerSignalTypeSet & getTriggerSignalTypes() const { return this->triggerSignalTypes; }
 		const GPOModeSet & getGPOModes() const { return this->gpoModes; }
 
-        bool supports(const Feature &) const;
-        bool supports(const PixelMode &) const;
+		bool supports(const CaptureSequenceType &) const;
+		bool supports(const PixelMode &) const;
         bool supports(const TriggerMode &) const;
         bool supports(const TriggerSignalType &) const;
 		bool supports(const GPOMode &) const;
@@ -46,7 +45,6 @@ namespace ofxMachineVision {
 		friend ostream& operator<<(ostream&, const Specification&);
 
 		void setDeviceID(int deviceID) { this->deviceID = deviceID; }
-        void addFeature(const Feature &);
         void addPixelMode(const PixelMode &);
         void addTriggerMode(const TriggerMode &);
         void addTriggerSignalType(const TriggerSignalType &);
@@ -54,7 +52,8 @@ namespace ofxMachineVision {
 
     protected:
         bool valid;
-        FeatureSet features;
+
+		CaptureSequenceType captureSequenceType;
         PixelModeSet pixelModes;
         TriggerModeSet triggerModes;
         TriggerSignalTypeSet triggerSignalTypes;

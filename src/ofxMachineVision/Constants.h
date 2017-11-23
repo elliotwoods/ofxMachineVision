@@ -15,68 +15,58 @@ using namespace std;
 
 namespace ofxMachineVision {
 	typedef array<int, 2> Binning;
-    
-	/**
-	\brief Features which a device may support. These are known after the device is opened
-	*/
-	enum Feature {
-        Feature_ROI,
-        Feature_Binning,
-        Feature_PixelClock,
-        Feature_Triggering,
-		Feature_GPO,
-        Feature_FreeRun,
-        Feature_OneShot,
-        Feature_Exposure,
-        Feature_Gain,
-		Feature_Focus,
-		Feature_Sharpness,
-		Feature_DeviceID
-    };
-        
+
 	/**
 	\brief Data mode of camera pixels
 	*/
-    enum PixelMode {
-        Pixel_Unallocated,
-        Pixel_L8,
-        Pixel_L12,
-        Pixel_L16,
-        Pixel_RGB8,
-        Pixel_BAYER8
+	enum class CaptureSequenceType {
+		Continuous,
+		OneShot
+	};
+
+	/**
+	\brief Data mode of camera pixels
+	*/
+	enum class PixelMode {
+        Unallocated,
+        L8,
+        L12,
+        L16,
+        RGB8,
+        BAYER8
     };
         
 	/**
 	\brief Trigger mode of device. Device is the default (i.e. as fast as possible). GPIO1,2 denote external hardware triggers.
 	*/
-    enum TriggerMode {
-        Trigger_Device,
-        Trigger_Software,
-        Trigger_GPIO1,
-        Trigger_GPIO2
+	enum class TriggerMode {
+		Device,
+		Software,
+		GPIO1,
+		GPIO2
     };
         
 	/**
 	\brief Signal type which is classed as a trigger when working with an external hardware trigger signal.
 	*/
-    enum TriggerSignalType {
-        TriggerSignal_Default,
-        TriggerSignal_RisingEdge,
-        TriggerSignal_FallingEdge,
-        TriggerSignal_WhilstHigh,
-        TriggerSignal_WhilstLow
+	enum class TriggerSignalType {
+        Default,
+        RisingEdge,
+        FallingEdge,
+        WhilstHigh,
+        WhilstLow
     };
 
 	/**
 	\brief GPO mode of device.
 	*/
-    enum GPOMode {
-        GPOMode_On,
-        GPOMode_Off,
-        GPOMode_HighWhilstExposure,
-        GPOMode_HighWhilstFrameActive,
-        GPOMode_LowWhilstExposure,
-        GPOMode_LowWhilstFrameActive
+	enum class GPOMode {
+        On,
+        Off,
+        HighWhilstExposure,
+        HighWhilstFrameActive,
+        LowWhilstExposure,
+        LowWhilstFrameActive
     };
     
 	typedef std::pair<TriggerMode, TriggerSignalType> TriggerSettings;
@@ -84,18 +74,21 @@ namespace ofxMachineVision {
 	/**
 	\brief The current state of the capture device
 	*/
-    enum DeviceState {
+	enum class DeviceState : int {
 		//bit pattern = [reserved] [reserved] [running] [open] [exists] 
-		State_ExistsBit = 1 << 0,
-		State_OpenBit = 1 << 1,
-		State_RunningBit = 1 << 2,
+		ExistsBit = 1 << 0,
+		OpenBit = 1 << 1,
+		RunningBit = 1 << 2,
 
-		State_Empty = 0,
-		State_Deleting = 1 << 5,
-		State_Closed = State_ExistsBit,
-        State_Waiting = State_OpenBit + State_ExistsBit,
-		State_Running = State_RunningBit + State_OpenBit + State_ExistsBit
+		Empty = 0,
+		Deleting = 1 << 5,
+		Closed = ExistsBit,
+        Waiting = OpenBit + ExistsBit,
+		Running = RunningBit + OpenBit + ExistsBit
     };
+	inline bool operator&(const DeviceState & lhs, const DeviceState & rhs) {
+		return (static_cast<int>(lhs) & static_cast<int>(rhs)) != 0;
+	}
 
 	/**
 	 \brief An exception class
@@ -113,50 +106,30 @@ namespace ofxMachineVision {
 	@name Static helpers
 	*/
 	//@{
-	static string toString(const Feature & deviceFeature) {
-		switch (deviceFeature) {
-			case Feature_ROI:
-				return "ROI";
-			case Feature_Binning:
-				return "Binning";
-			case Feature_PixelClock:
-				return "Pixel clock";
-			case Feature_Triggering:
-				return "Triggering";
-			case Feature_GPO:
-				return "GPO";
-			case Feature_FreeRun:
-				return "Free run capture";
-			case Feature_OneShot:
-				return "One shot capture";
-			case Feature_Exposure:
-				return "Exposure";
-			case Feature_Gain:
-				return "Gain";
-			case Feature_Focus:
-				return "Focus";
-			case Feature_Sharpness:
-				return "Sharpness";
-			case Feature_DeviceID:
-				return "DeviceID";
-			default:
-				return "Unsupported";
+	static string toString(const CaptureSequenceType & captureSequenceType) {
+		switch (captureSequenceType) {
+		case CaptureSequenceType::Continuous:
+			return "Continuous";
+		case CaptureSequenceType::OneShot:
+			return "OneShot";
+		default:
+			return "Unsupported";
 		}
 	}
 
 	static string toString(const PixelMode & pixelMode) {
 		switch (pixelMode) {
-			case Pixel_Unallocated:
+			case PixelMode::Unallocated:
 				return "Unallocated";
-			case Pixel_L8:
+			case PixelMode::L8:
 				return "L8";
-			case Pixel_L12:
+			case PixelMode::L12:
 				return "L12";
-			case Pixel_L16:
+			case PixelMode::L16:
 				return "L16";
-			case Pixel_RGB8:
+			case PixelMode::RGB8:
 				return "RGB8";
-			case Pixel_BAYER8:
+			case PixelMode::BAYER8:
 				return "BAYER8";
 			default:
 				return "Unsupported";
@@ -165,13 +138,13 @@ namespace ofxMachineVision {
 
 	static string toString(const TriggerMode & triggerMode) {
 		switch (triggerMode) {
-			case Trigger_Device:
+			case TriggerMode::Device:
 				return "Device";
-			case Trigger_GPIO1:
+			case TriggerMode::GPIO1:
 				return "GPIO1";
-			case Trigger_GPIO2:
+			case TriggerMode::GPIO2:
 				return "GPIO2";
-			case Trigger_Software:
+			case TriggerMode::Software:
 				return "Software";
 			default:
 				return "Unsupported";
@@ -180,15 +153,15 @@ namespace ofxMachineVision {
 
 	static string toString(const TriggerSignalType & triggerSignalType) {
 		switch (triggerSignalType) {
-			case TriggerSignal_Default:
+			case TriggerSignalType::Default:
 				return "Default";
-			case TriggerSignal_FallingEdge:
+			case TriggerSignalType::FallingEdge:
 				return "Falling edge";
-			case TriggerSignal_RisingEdge:
+			case TriggerSignalType::RisingEdge:
 				return "Rising edge";
-			case TriggerSignal_WhilstHigh:
+			case TriggerSignalType::WhilstHigh:
 				return "Whilst high";
-			case TriggerSignal_WhilstLow:
+			case TriggerSignalType::WhilstLow:
 				return "Whilst low";
 			default:
 				return "Unsupported";
@@ -197,17 +170,17 @@ namespace ofxMachineVision {
 
 	static string toString(const GPOMode & gpoMode) {
 		switch (gpoMode) {
-		case GPOMode_On:
+		case GPOMode::On:
 			return "On";
-		case GPOMode_Off:
+		case GPOMode::Off:
 			return "Off";
-		case GPOMode_HighWhilstExposure:
+		case GPOMode::HighWhilstExposure:
 			return "High whilst exposure";
-		case GPOMode_HighWhilstFrameActive:
+		case GPOMode::HighWhilstFrameActive:
 			return "High whilst frame active";
-		case GPOMode_LowWhilstExposure:
+		case GPOMode::LowWhilstExposure:
 			return "Low whilst exposure";
-		case GPOMode_LowWhilstFrameActive:
+		case GPOMode::LowWhilstFrameActive:
 			return "Low whilst frame active";
 		default:
 			return "Unsupported";
@@ -216,13 +189,13 @@ namespace ofxMachineVision {
 
 	static string toString(const DeviceState & deviceState) {
 		switch (deviceState) {
-		case State_Closed:
+		case DeviceState::Closed:
 			return "Closed";
-		case State_Deleting:
+		case DeviceState::Deleting:
 			return "Deleting";
-		case State_Running:
+		case DeviceState::Running:
 			return "Running";
-		case State_Waiting:
+		case DeviceState::Waiting:
 			return "Waiting";
 		default:
 			return "Unsupported";
@@ -231,13 +204,13 @@ namespace ofxMachineVision {
     
 	static bool isColor(const PixelMode & pixelMode) {
 		switch (pixelMode) {
-			case Pixel_Unallocated:
-			case Pixel_L8:
-			case Pixel_L12:
-			case Pixel_L16:
-			case Pixel_BAYER8:
+			case PixelMode::Unallocated:
+			case PixelMode::L8:
+			case PixelMode::L12:
+			case PixelMode::L16:
+			case PixelMode::BAYER8:
 				return false;
-			case Pixel_RGB8:
+			case PixelMode::RGB8:
 				return true;
 			default:
 				return false;

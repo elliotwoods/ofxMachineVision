@@ -9,13 +9,13 @@ namespace ofxMachineVision {
 	namespace Stream {
 		class Recorder : public std::map<chrono::nanoseconds, shared_ptr<Frame>> {
 		public:
-			enum State {
-				State_NoGrabber,
-				State_GrabberNotReady,
-				State_Ready,
-				State_Recording,
-				State_Saving,
-				State_Loading
+			enum class State {
+				NoGrabber,
+				GrabberNotReady,
+				Ready,
+				Recording,
+				Saving,
+				Loading
 			};
 
 			Recorder();

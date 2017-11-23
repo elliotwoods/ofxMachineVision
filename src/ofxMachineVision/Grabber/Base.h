@@ -45,22 +45,11 @@ namespace ofxMachineVision {
 			virtual bool open(shared_ptr<Device::Base::InitialisationSettings> = nullptr) = 0;
 			virtual void close() = 0;
 
-			virtual void startCapture(const TriggerMode & = Trigger_Device, const TriggerSignalType & = TriggerSignal_Default) = 0;
+			virtual void startCapture() = 0;
 			virtual void stopCapture() = 0;
 
-			/**
-			\name Capture properties
-			*/
-			//@{
-			virtual void setExposure(chrono::microseconds exposure) = 0;
-			virtual void setGain(float percent) = 0;
-			virtual void setFocus(float percent) = 0;
-			virtual void setSharpness(float percent) = 0;
-			virtual void setBinning(int binningX = 1, int binningY = 1) = 0;
-			virtual void setROI(const ofRectangle &) = 0;
-			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) = 0;
-			virtual void setGPOMode(const GPOMode &) = 0;
-			//@}
+			virtual void syncToDevice(AbstractParameter &) = 0;
+			virtual void syncFromDevice(AbstractParameter &) = 0;
 
 			/**
 			\name Product specification
@@ -77,9 +66,9 @@ namespace ofxMachineVision {
 
 			const Device::Type & getDeviceType() const { return this->deviceType; }
 			const DeviceState & getDeviceState() const { return this->deviceState; }
-			bool getIsDeviceExists() const { return this->getDeviceState() & State_ExistsBit; }
-			bool getIsDeviceOpen() const { return this->getDeviceState() & State_OpenBit; }
-			bool getIsDeviceRunning() const { return this->getDeviceState() & State_RunningBit; }
+			bool getIsDeviceExists() const { return this->getDeviceState() & DeviceState::ExistsBit; }
+			bool getIsDeviceOpen() const { return this->getDeviceState() & DeviceState::OpenBit; }
+			bool getIsDeviceRunning() const { return this->getDeviceState() & DeviceState::RunningBit; }
 
 			ofxLiquidEvent<shared_ptr<Frame>> onNewFrameReceived;
 		protected:

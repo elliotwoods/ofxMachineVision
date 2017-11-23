@@ -12,6 +12,15 @@ namespace ofxMachineVision {
 		* Virtual functions below
 		* Virtual functions in Device::Base
 
+		Single shot
+		-----------
+
+		If your camera is a one-shot camera. Then please ignore the singleShot function and just write
+		the capture code into getFrame. We will call this whenever we want a single shot.
+
+		Examples of single shot blocking devices:
+		* StilImages
+
 		*/
 		class Blocking : public Base {
 		public:

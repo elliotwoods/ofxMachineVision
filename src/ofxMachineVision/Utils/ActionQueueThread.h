@@ -15,7 +15,10 @@ namespace ofxMachineVision {
 			virtual ~ActionQueueThread();
 
 			void setIdleFunction(ActionFunction);
-			void performInThread(ActionFunction &&, bool blocking);
+
+			// returns false if exception is thrown
+			bool performInThread(ActionFunction &&, bool blocking);
+
 			void blockUntilQueueEmpty();
 		protected:
 			std::function<void()> idleFunction;

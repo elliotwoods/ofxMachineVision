@@ -139,6 +139,7 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\Callback.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\FactoryRegister.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\NullDevice.h" />
+    <ClInclude Include="..\src\ofxMachineVision\Device\StillImages.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Types.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Updating.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\VideoInput.h" />
@@ -158,6 +159,7 @@
     <ClCompile Include="..\src\ofxMachineVision\Device\Base.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Device\StillImages.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInput.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoPlayer.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Frame.cpp" />
@@ -169,11 +171,6 @@
     <ClCompile Include="..\src\ofxMachineVision\Stream\Recorder.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Utils\ActionQueueThread.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Utils\FramePool.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\addons\ofxPlugin\ofxPluginLib\ofxPluginLib.vcxproj">
-      <Project>{68b9239b-5ae6-45c0-b1cb-6fc6b58bb6ee}</Project>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

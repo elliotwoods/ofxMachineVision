@@ -60,20 +60,7 @@ namespace ofxMachineVision {
 			virtual void stopCapture() { }
 			virtual void singleShot() { }
 			
-			/**
-			\name Optional interfaces
-			You should declare which actions your camera supports in the Specification's Features
-			*/
-			//@{
-			virtual void setExposure(chrono::microseconds exposure) { };
-			virtual void setGain(float percent) { };
-			virtual void setFocus(float percent) { };
-			virtual void setSharpness(float percent) { };
-			virtual void setBinning(int binningX = 1, int binningY = 1) { };
-			virtual void setROI(const ofRectangle &) { };
-			virtual void setTriggerMode(const TriggerMode &, const TriggerSignalType &) { };
-			virtual void setGPOMode(const GPOMode &) { };
-			//@}
+			const vector<shared_ptr<AbstractParameter>> & getParameters() const;
 		protected:
 			template<typename SettingsType>
 			/**

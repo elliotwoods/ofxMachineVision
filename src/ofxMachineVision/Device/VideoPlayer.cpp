@@ -31,12 +31,12 @@ namespace ofxMachineVision {
 			this->videoPlayer->load(typedInitialisationSettings->filename);
 			//this->videoPlayer->setSpeed(typedInitialisationSettings->playbackRate);
 
-			ofxMachineVision::Specification specification(this->videoPlayer->getWidth()
+			ofxMachineVision::Specification specification(CaptureSequenceType::Continuous
+				, this->videoPlayer->getWidth()
 				, this->videoPlayer->getHeight()
 				, "ofxMachineVision"
 				, "Video player"
 				, "ofVideoPlayer");
-			specification.addFeature(Feature_FreeRun);
 			return specification;
 		}
 

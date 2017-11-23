@@ -4,14 +4,14 @@ namespace ofxMachineVision {
 	namespace Grabber {
 		//----------
 		Base::Base() {
-			this->deviceState = State_Empty;
+			this->deviceState = DeviceState::Empty;
 		}
 
 		//----------
 		Base::~Base() {
-			this->deviceState = State_Deleting;
+			this->deviceState = DeviceState::Deleting;
 			this->baseDevice.reset();
-			this->deviceState = State_Empty;
+			this->deviceState = DeviceState::Empty;
 		}
 
 		//----------
@@ -23,7 +23,7 @@ namespace ofxMachineVision {
 
 				//open a thread for the device if required
 				switch (this->deviceType) {
-				case Device::Type_Blocking: {
+				case Device::Type::Blocking: {
 					this->thread = make_unique<Utils::ActionQueueThread>();
 					break;
 				}
@@ -34,10 +34,10 @@ namespace ofxMachineVision {
 					break;
 				}
 
-				this->deviceState = DeviceState::State_Closed;
+				this->deviceState = DeviceState::Closed;
 			}
 			else {
-				this->deviceState = DeviceState::State_Empty;
+				this->deviceState = DeviceState::Empty;
 			}
 			
 		}

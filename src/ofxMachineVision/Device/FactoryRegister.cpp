@@ -4,6 +4,7 @@
 #include "./VideoInput.h"
 #include "./OSXUVC.h"
 #include "./VideoPlayer.h"
+#include "./StillImages.h"
 
 OFXSINGLETON_DEFINE(ofxMachineVision::Device::FactoryRegister);
 
@@ -17,6 +18,7 @@ namespace ofxMachineVision {
 			this->add<Webcam>();
 
 			this->add<VideoPlayer>();
+			this->add<StillImages>();
 
 			this->loadPlugins();
 		}
