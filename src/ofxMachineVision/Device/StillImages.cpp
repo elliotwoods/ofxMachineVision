@@ -32,6 +32,7 @@ namespace ofxMachineVision {
 			, "openFrameworks"
 			, "StillImages"
 			, "ofLoadImage");
+			specification.getCaptureSequenceType();
 
 			return specification;
 		}
