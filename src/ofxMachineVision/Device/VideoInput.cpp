@@ -83,10 +83,13 @@ namespace ofxMachineVision {
 				, this->device->getHeight(this->deviceIndex)
 				, ofPixelFormat::OF_PIXELS_RGB);
 
-			this->device->getPixels(this->deviceIndex, frame->getPixels().getData(), true, true);
+			bool success = this->device->getPixels(this->deviceIndex, frame->getPixels().getData(), true, true);
 
-			frame->setTimestamp(chrono::high_resolution_clock::now() - this->timerStart);
-			frame->setFrameIndex(this->frameIndex);
+			if (success){
+				frame->setTimestamp(chrono::high_resolution_clock::now() - this->timerStart);
+				frame->setFrameIndex(this->frameIndex);
+			}
+
 			return frame;
 		}
 
