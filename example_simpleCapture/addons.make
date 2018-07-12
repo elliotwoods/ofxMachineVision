@@ -1,2 +1,4 @@
-ofxUVC
+ofxLiquidEvent
 ofxMachineVision
+ofxPlugin
+ofxSingleton

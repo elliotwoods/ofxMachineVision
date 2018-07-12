@@ -2,6 +2,7 @@
 
 #include "ofBaseTypes.h"
 #include "ofTexture.h"
+#include "ofMath.h"
 
 #include "Base.h"
 #include "ofxMachineVision/Frame.h"
@@ -162,7 +163,7 @@ namespace ofxMachineVision {
 			void setFrame(shared_ptr<Frame>);
 			void clearCachedFrame();
 
-			mutable ofMutex framePointerMutex;
+			mutable std::mutex framePointerMutex;
 			shared_ptr<Frame> frame;
 
 			ofPixels pixels; // every app frame we cache a set of pixels which we can use for simple access. if getPixels() returned from frame, then there would be locking issues.

@@ -1,5 +1,6 @@
 #include "ActionQueueThread.h"
 #include "ofAppRunner.h"
+#include "ofLog.h"
 
 #include "../Constants.h"
 

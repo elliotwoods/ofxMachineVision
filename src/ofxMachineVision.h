@@ -46,7 +46,7 @@ namespace ofxMachineVision {
 	class SimpleGrabber : public Grabber::Simple {
 	public:
 		SimpleGrabber() : Grabber::Simple() {
-			this->setDevice(make_shared<Device::Type>());
+			this->setDevice(DevicePtr());
 		}
 
 		shared_ptr<DeviceType> getDeviceTyped() const {
