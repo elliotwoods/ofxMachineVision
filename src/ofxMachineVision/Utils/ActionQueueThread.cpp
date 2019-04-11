@@ -3,6 +3,8 @@
 
 #include "../Constants.h"
 
+#include "ofLog.h"
+
 namespace ofxMachineVision {
 	namespace Utils {
 		//----------

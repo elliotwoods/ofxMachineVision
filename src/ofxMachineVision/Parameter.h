@@ -5,7 +5,7 @@
 namespace ofxMachineVision {
 	class AbstractParameter {
 	public:
-		AbstractParameter(string units) 
+		AbstractParameter(std::string units) 
 		: units(units) {
 		}
 
@@ -16,23 +16,23 @@ namespace ofxMachineVision {
 			return dynamic_cast<ofParameter<TypeName> *>(&this->getParameter());
 		}
 
-		const string & getUnits() const {
+		const std::string & getUnits() const {
 			return this->units;
 		}
 		
 		virtual void syncToDevice() const = 0;
 		virtual void syncFromDevice() = 0;
 	protected:
-		string units;
+		std::string units;
 	};
 
 	template<class TypeName>
 	class Parameter : public AbstractParameter {
 	public:
-		typedef function<TypeName()> GetDeviceValueFunction;
-		typedef function<void(const TypeName &)> SetDeviceValueFunction;
+		typedef std::function<TypeName()> GetDeviceValueFunction;
+		typedef std::function<void(const TypeName &)> SetDeviceValueFunction;
 
-		Parameter(ofParameter<TypeName> && parameter, const string & units = "")
+		Parameter(ofParameter<TypeName> && parameter, const std::string & units = "")
 			: parameter(parameter)
 			, AbstractParameter(units) {
 		}
@@ -62,11 +62,11 @@ namespace ofxMachineVision {
 	template<>
 	class Parameter<float> : public AbstractParameter {
 	public:
-		typedef function<float()> GetDeviceValueFunction;
-		typedef function<void(float &, float &)> GetDeviceValueRangeFunction;
-		typedef function<void(const float &)> SetDeviceValueFunction;
+		typedef std::function<float()> GetDeviceValueFunction;
+		typedef std::function<void(float &, float &)> GetDeviceValueRangeFunction;
+		typedef std::function<void(const float &)> SetDeviceValueFunction;
 
-		Parameter(ofParameter<float> && parameter, const string & units = "")
+		Parameter(ofParameter<float> && parameter, const std::string & units = "")
 			: parameter(parameter)
 			, AbstractParameter(units) {
 

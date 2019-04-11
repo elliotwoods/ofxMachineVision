@@ -1,5 +1,7 @@
 #include "VideoPlayer.h"
 
+#include "ofSystemUtils.h"
+
 namespace ofxMachineVision {
 	namespace Device {
 
@@ -23,7 +25,7 @@ namespace ofxMachineVision {
 				} 
 				typedInitialisationSettings->filename = result.filePath;
 			}
-			if (!ofFile::doesFileExist(typedInitialisationSettings->filename)) {
+			if (!ofFile::doesFileExist(filesystem::path(typedInitialisationSettings->filename.get()))) {
 				throw(ofxMachineVision::Exception("File does not exist"));
 			}
 
