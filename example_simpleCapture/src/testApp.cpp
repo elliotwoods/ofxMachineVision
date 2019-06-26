@@ -2,13 +2,26 @@
 
 //--------------------------------------------------------------
 void testApp::setup(){
-    
+	cout << "Listing devices..." << endl;
+	auto devices = camera.getDevice()->listDevices(); // returns empty. is this normal?
+	for (auto deviceDescription : devices) {
+		cout << deviceDescription.manufacturer << ", " << deviceDescription.model << endl;
+	}
+
+	// get default initialisation settings and update as desired
+	auto initSettings = camera.getDefaultInitialisationSettings();
+	initSettings->getInt("Device ID").set(0);
+	initSettings->getInt("Width").set(640);
+	initSettings->getInt("Height").set(480);
+	initSettings->getInt("Ideal frame rate").set(60);
+
     //open a connection to the device
-    camera.open();
-    
+    camera.open(initSettings);
+	//camera.open();
+
     //start the camera capturing using default trigger
 	camera.startCapture();
-    
+
     //print device information
     cout << camera.getDeviceSpecification().toString();
 }

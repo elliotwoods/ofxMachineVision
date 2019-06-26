@@ -34,3 +34,7 @@ Release/
 
 *~.xml
 ._build
+*.VC.db
+*.VC.opendb
+*.VC.db-shm
+*.VC.db-wal
