@@ -10,6 +10,29 @@ namespace ofxMachineVision {
 			return "VideoPlayer";
 		}
 
+		//----------
+		vector<Device::Base::ListedDevice> VideoPlayer::listDevices() const {
+			auto files = ofDirectory(".").getFiles();
+
+			vector<Device::Base::ListedDevice> results;
+			for (auto file : files) {
+				auto extension = ofToLower(file.getExtension());
+				if (extension == "mov"
+					|| extension == "avi"
+					|| extension == "mp4") {
+					auto initialisationSetttings = dynamic_pointer_cast<VideoPlayer::InitialisationSettings>(VideoPlayer::getDefaultSettings());
+					initialisationSetttings->filename.set(file.getFileName());
+
+					results.push_back(ListedDevice{
+							initialisationSetttings
+						, "VideoPlayer"
+						, file.getFileName()
+						});
+				}
+			}
+
+			return results;
+		}
 
 		//----------
 		ofxMachineVision::Specification VideoPlayer::open(shared_ptr<Base::InitialisationSettings> initialisationSettings) {
@@ -31,7 +54,7 @@ namespace ofxMachineVision {
 
 			this->videoPlayer = make_shared<ofVideoPlayer>();
 			this->videoPlayer->load(typedInitialisationSettings->filename);
-			//this->videoPlayer->setSpeed(typedInitialisationSettings->playbackRate);
+			this->videoPlayer->setSpeed(typedInitialisationSettings->playbackRate);
 
 			ofxMachineVision::Specification specification(CaptureSequenceType::Continuous
 				, this->videoPlayer->getWidth()

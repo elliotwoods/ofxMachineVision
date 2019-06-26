@@ -12,8 +12,6 @@ namespace ofxMachineVision {
 
 		//----------
 		std::vector<Device::Base::ListedDevice> VideoInput::listDevices() const {
-			return vector<ListedDevice>();
-
 			videoInput listDevicesDevice;
 			auto deviceNames = listDevicesDevice.getDeviceList();
 
@@ -39,7 +37,10 @@ namespace ofxMachineVision {
 			this->device->setComMultiThreaded(true);
 			this->device->setIdealFramerate(this->deviceIndex, (int) settings->idealFrameRate);
 			this->device->setRequestedMediaSubType(VI_MEDIASUBTYPE_MJPG);
-			this->device->setupDevice(this->deviceIndex, settings->width, settings->height);
+			if (!this->device->setupDevice(this->deviceIndex, settings->width, settings->height)) {
+				throw(ofxMachineVision::Exception("Could not open videoInput:" + ofToString(this->deviceIndex)));
+			}
+
 			this->device->setVideoSettingFilter(this->deviceIndex, this->device->propSharpness, 0);
 			this->resetTimestamp();
 
@@ -68,7 +69,6 @@ namespace ofxMachineVision {
 		
 		//---------
 		bool VideoInput::startCapture() {
-
 			return true;
 		}
 

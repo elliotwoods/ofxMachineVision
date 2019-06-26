@@ -188,8 +188,9 @@ namespace ofxMachineVision {
 			REQUIRES(CaptureSequenceType::Continuous);
 
 			this->callInRightThread([=] () {
-				this->getDevice()->startCapture();
-				this->deviceState = DeviceState::Running;
+				if (this->getDevice()->startCapture()) {
+					this->deviceState = DeviceState::Running;
+				}
 			}, true);
 		}
 

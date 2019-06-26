@@ -32,6 +32,9 @@ namespace ofxMachineVision {
 			};
 
 			virtual string getTypeName() const override;
+
+			vector<ListedDevice> listDevices() const override;
+
 			shared_ptr<Base::InitialisationSettings> getDefaultSettings() const override {
 				return make_shared<InitialisationSettings>();
 			}
