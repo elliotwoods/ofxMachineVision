@@ -97,7 +97,7 @@ namespace ofxMachineVision {
 	public:
 		Exception(std::string & message) : message(message) { }
 		Exception(const char * message) : message(string(message)) { }
-		virtual const char * what() { return this->message.c_str(); }
+		virtual const char * what() const override { return this->message.c_str(); }
 	protected:
 		const string message;
 	};
