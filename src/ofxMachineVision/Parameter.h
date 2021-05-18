@@ -33,12 +33,25 @@ namespace ofxMachineVision {
 		typedef std::function<void(const TypeName &)> SetDeviceValueFunction;
 
 		Parameter(ofParameter<TypeName> && parameter, const std::string & units = "")
+			: parameter(new ofParameter<TypeName>(parameter))
+			, AbstractParameter(units)
+			, locallyAllocated(true) {
+		}
+
+		Parameter(ofParameter<TypeName> * parameter, const std::string& units = "")
 			: parameter(parameter)
-			, AbstractParameter(units) {
+			, AbstractParameter(units)
+			, locallyAllocated(false) {
+		}
+
+		~Parameter() {
+			if (this->locallyAllocated) {
+				delete this->parameter;
+			}
 		}
 
 		ofAbstractParameter & getParameter() override {
-			return this->parameter;
+			return * this->parameter;
 		}
 
 		GetDeviceValueFunction getDeviceValueFunction;
@@ -46,17 +59,18 @@ namespace ofxMachineVision {
 
 		void syncFromDevice() override {
 			if (getDeviceValueFunction) {
-				this->parameter.set(getDeviceValueFunction());
+				this->parameter->set(getDeviceValueFunction());
 			}
 		}
 
 		void syncToDevice() const override {
 			if (setDeviceValueFunction) {
-				setDeviceValueFunction(this->parameter.get());
+				setDeviceValueFunction(this->parameter->get());
 			}
 		}
 	protected:
-		ofParameter<TypeName> parameter;
+		ofParameter<TypeName> * parameter = nullptr;
+		bool locallyAllocated = false;
 	};
 
 	template<>
@@ -67,13 +81,25 @@ namespace ofxMachineVision {
 		typedef std::function<void(const float &)> SetDeviceValueFunction;
 
 		Parameter(ofParameter<float> && parameter, const std::string & units = "")
-			: parameter(parameter)
-			, AbstractParameter(units) {
+			: parameter(new ofParameter<float>(parameter))
+			, AbstractParameter(units)
+			, locallyAllocated(true) {
+		}
 
+		Parameter(ofParameter<float>* parameter, const std::string& units = "")
+			: parameter(parameter)
+			, AbstractParameter(units)
+			, locallyAllocated(false) {
+		}
+
+		~Parameter() {
+			if (this->locallyAllocated) {
+				delete this->parameter;
+			}
 		}
 
 		ofAbstractParameter & getParameter() override {
-			return this->parameter;
+			return * this->parameter;
 		}
 
 		GetDeviceValueFunction getDeviceValueFunction;
@@ -84,21 +110,22 @@ namespace ofxMachineVision {
 			if (getDeviceValueRangeFunction) {
 				float min, max;
 				getDeviceValueRangeFunction(min, max);
-				this->parameter.setMin(min);
-				this->parameter.setMax(max);
+				this->parameter->setMin(min);
+				this->parameter->setMax(max);
 			}
 			if (getDeviceValueFunction) {
-				this->parameter.set(getDeviceValueFunction());
+				this->parameter->set(getDeviceValueFunction());
 			}
 	}
 
 		void syncToDevice() const override {
 			if (setDeviceValueFunction) {
-				setDeviceValueFunction(this->parameter.get());
+				setDeviceValueFunction(this->parameter->get());
 			}
 		}
 	protected:
 		//we don't use parameter events locally because we can't control the threading pattern from here
-		ofParameter<float> parameter;
+		ofParameter<float> * parameter;
+		bool locallyAllocated = false;
 	};
 }

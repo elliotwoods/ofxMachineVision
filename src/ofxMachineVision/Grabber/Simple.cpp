@@ -258,6 +258,10 @@ namespace ofxMachineVision {
 		shared_ptr<Frame> Simple::getFreshFrame(chrono::microseconds timeout) {
 			shared_ptr<Frame> frame;
 
+			if (!this->getIsDeviceOpen()) {
+				throw(ofxMachineVision::Exception("Camera is not open"));
+			}
+
 			auto startTime = chrono::system_clock::now();
 
 			if (this->specification.getCaptureSequenceType() == CaptureSequenceType::OneShot) {
