@@ -20,7 +20,7 @@ namespace ofxMachineVision {
 			return this->units;
 		}
 		
-		virtual void syncToDevice() const = 0;
+		virtual void syncToDevice() = 0;
 		virtual void syncFromDevice() = 0;
 	protected:
 		std::string units;
@@ -63,10 +63,19 @@ namespace ofxMachineVision {
 			}
 		}
 
-		void syncToDevice() const override {
+		void syncToDevice() override {
 			if (setDeviceValueFunction) {
-				setDeviceValueFunction(this->parameter->get());
+				try {
+					setDeviceValueFunction(this->parameter->get());
+				}
+				catch (...) {
+					this->syncFromDevice();
+				}
 			}
+		}
+
+		ofParameter<TypeName>* getParameterTypedAuto() {
+			return dynamic_cast<ofParameter<TypeName> *>(&this->getParameter());
 		}
 	protected:
 		ofParameter<TypeName> * parameter = nullptr;
@@ -102,6 +111,10 @@ namespace ofxMachineVision {
 			return * this->parameter;
 		}
 
+		ofParameter<float>* getParameterTypedAuto() {
+			return dynamic_cast<ofParameter<float> *>(&this->getParameter());
+		}
+
 		GetDeviceValueFunction getDeviceValueFunction;
 		GetDeviceValueRangeFunction getDeviceValueRangeFunction;
 		SetDeviceValueFunction setDeviceValueFunction;
@@ -118,9 +131,14 @@ namespace ofxMachineVision {
 			}
 	}
 
-		void syncToDevice() const override {
+		void syncToDevice() override {
 			if (setDeviceValueFunction) {
-				setDeviceValueFunction(this->parameter->get());
+				try {
+					setDeviceValueFunction(this->parameter->get());
+				}
+				catch (...) {
+					this->syncFromDevice();
+				}
 			}
 		}
 	protected:
