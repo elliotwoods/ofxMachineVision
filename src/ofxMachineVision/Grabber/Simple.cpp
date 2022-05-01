@@ -421,7 +421,10 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::draw(float x, float y, float w, float h) const {
-			this->texture.draw(x, y, w, h);
+			// Avoid error messages flooding the console
+			if (this->texture.isAllocated()) {
+				this->texture.draw(x, y, w, h);
+			}
 		}
 
 		//----------
