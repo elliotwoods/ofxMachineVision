@@ -53,6 +53,7 @@ namespace ofxMachineVision {
 					try {
 						action();
 						responder.send(true);
+						return;
 					}
 					OFXMV_CATCH_ALL_TO_ERROR;
 					responder.send(false);
@@ -62,7 +63,7 @@ namespace ofxMachineVision {
 				this->actionQueue.send(move(wrappedAction));
 				
 				//block until response arrives
-				bool success;
+				bool success = false;
 				responder.receive(success);
 				return success;
 			}

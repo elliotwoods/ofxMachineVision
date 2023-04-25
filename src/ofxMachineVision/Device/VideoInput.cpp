@@ -58,6 +58,7 @@ namespace ofxMachineVision {
 			this->setupFloatParameter("Sharpness", this->device->propSharpness);
 
 			this->frameIndex = 0;
+			this->monochromeFromGreen = settings->greenAsLuminance.get();
 
 			return specification;
 		}
@@ -84,6 +85,31 @@ namespace ofxMachineVision {
 				, ofPixelFormat::OF_PIXELS_RGB);
 
 			this->device->getPixels(this->deviceIndex, frame->getPixels().getData(), true, true);
+
+			if (this->monochromeFromGreen) {
+				// Extract green channel as a mono frame
+
+				// The mono frame comes from the available frames as normal
+				auto monoFrame = FramePool::X().getAvailableAllocatedFrame(frame->getPixels().getWidth()
+					, frame->getPixels().getHeight()
+					, ofPixelFormat::OF_PIXELS_GRAY);
+				
+				// iterate through to copy
+				{
+					size_t size = monoFrame->getPixels().size();
+					auto input = frame->getPixels().getData() + 1;
+					auto output = monoFrame->getPixels().getData();
+
+					for (size_t i = 0; i < size; i++) {
+						*output = *input;
+						input += 3;
+						output++;
+					}
+				}
+
+				// replace with mono frame
+				frame = monoFrame;
+			}
 
 			frame->setTimestamp(chrono::high_resolution_clock::now() - this->timerStart);
 			frame->setFrameIndex(this->frameIndex);

@@ -21,12 +21,14 @@ namespace ofxMachineVision {
 				InitialisationSettings() {
 					add(width.set("Width", 1920));
 					add(height.set("Height", 1080));
-					add(idealFrameRate.set("Ideal frame rate", 30));
+					add(greenAsLuminance.set("Green as luminance", false));
+
 				}
 
 				ofParameter<int> width;
 				ofParameter<int> height;
 				ofParameter<int> idealFrameRate;
+				ofParameter<bool> greenAsLuminance;
 			};
 
 			virtual string getTypeName() const override;
@@ -52,6 +54,8 @@ namespace ofxMachineVision {
 			chrono::high_resolution_clock::time_point timerStart;
 			int frameIndex;
 			int deviceIndex;
+			bool monochromeFromGreen;
+			
 		};
 		
 		class Webcam : public VideoInput {
