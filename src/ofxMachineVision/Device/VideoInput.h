@@ -19,16 +19,16 @@ namespace ofxMachineVision {
 			struct InitialisationSettings : Base::InitialisationSettings {
 			public:
 				InitialisationSettings() {
-					add(width.set("Width", 1920));
-					add(height.set("Height", 1080));
-					add(greenAsLuminance.set("Green as luminance", false));
-
+					add(width);
+					add(height);
+					add(greenAsLuminance);
+					add(idealFrameRate);
 				}
 
-				ofParameter<int> width;
-				ofParameter<int> height;
-				ofParameter<int> idealFrameRate;
-				ofParameter<bool> greenAsLuminance;
+				ofParameter<int> width{ "Width", 1920 };
+				ofParameter<int> height{ "Height", 1080 };
+				ofParameter<int> idealFrameRate{ 30 };
+				ofParameter<bool> greenAsLuminance{ "Green as luminance", false };
 			};
 
 			virtual string getTypeName() const override;
