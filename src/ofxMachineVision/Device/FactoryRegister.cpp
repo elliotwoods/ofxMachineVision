@@ -5,6 +5,7 @@
 #include "./OSXUVC.h"
 #include "./VideoPlayer.h"
 #include "./StillImages.h"
+#include "./FolderWatcher.h"
 
 OFXSINGLETON_DEFINE(ofxMachineVision::Device::FactoryRegister);
 
@@ -19,6 +20,7 @@ namespace ofxMachineVision {
 
 			this->add<VideoPlayer>();
 			this->add<StillImages>();
+			this->add<FolderWatcher>();
 
 			this->loadPlugins();
 		}

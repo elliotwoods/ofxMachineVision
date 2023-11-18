@@ -139,6 +139,7 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\Blocking.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Callback.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\FactoryRegister.h" />
+    <ClInclude Include="..\src\ofxMachineVision\Device\FolderWatcher.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\NullDevice.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\StillImages.h" />
     <ClInclude Include="..\src\ofxMachineVision\Device\Types.h" />
@@ -159,6 +160,7 @@
     <ClCompile Include="..\src\ofxMachineVision.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\Base.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\FactoryRegister.cpp" />
+    <ClCompile Include="..\src\ofxMachineVision\Device\FolderWatcher.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\NullDevice.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\StillImages.cpp" />
     <ClCompile Include="..\src\ofxMachineVision\Device\VideoInput.cpp" />

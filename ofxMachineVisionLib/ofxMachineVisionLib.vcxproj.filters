@@ -87,6 +87,9 @@
     <ClInclude Include="..\src\ofxMachineVision\Device\StillImages.h">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ofxMachineVision\Device\FolderWatcher.h">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ofxMachineVision\Specification.cpp">
@@ -135,6 +138,9 @@
       <Filter>src\ofxMachineVision\Utils</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ofxMachineVision\Device\StillImages.cpp">
+      <Filter>src\ofxMachineVision\Device</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ofxMachineVision\Device\FolderWatcher.cpp">
       <Filter>src\ofxMachineVision\Device</Filter>
     </ClCompile>
   </ItemGroup>
