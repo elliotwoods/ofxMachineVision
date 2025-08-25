@@ -26,6 +26,10 @@ namespace ofxMachineVision {
 
 			auto frame = this->getFrame();
 
+			if (!frame) {
+				throw(ofxMachineVision::Exception("Use didn't select an image for opening grabber"));
+			}
+
 			ofxMachineVision::Specification specification(CaptureSequenceType::OneShot
 			, frame->getPixels().getWidth()
 			, frame->getPixels().getHeight()
