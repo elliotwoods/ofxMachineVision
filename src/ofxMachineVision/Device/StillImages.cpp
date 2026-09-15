@@ -51,12 +51,14 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+#ifdef TARGET_OSX
 		void StillImages::singleShot() {
 			auto frame = this->getFrame();
 			if (frame) {
 				this->onNewFrame(frame);
 			}
 		}
+#endif
 
 		//----------
 		shared_ptr<ofxMachineVision::Frame> StillImages::getFrame() {
