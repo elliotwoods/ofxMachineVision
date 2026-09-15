@@ -1,9 +1,7 @@
 #pragma once
 
 #include "ofConstants.h"
-#ifdef TARGET_WIN32
 
-#include "../../../libs/videoInput/include/videoInput.h"
 
 #include "ofxMachineVision/Specification.h"
 #include "Updating.h"
@@ -52,5 +50,3 @@ namespace ofxMachineVision {
 		};
 	}
 }
-
-#endif

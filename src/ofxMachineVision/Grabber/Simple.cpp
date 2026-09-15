@@ -160,7 +160,9 @@ namespace ofxMachineVision {
 
 		//----------
 		void Simple::close() {
-			this->stopCapture();
+			if (this->getIsDeviceRunning()) {
+				this->stopCapture();
+			}
 
 			if (this->getIsDeviceOpen()) {
 				this->callInRightThread([this]() {
@@ -563,7 +565,8 @@ namespace ofxMachineVision {
 			this->lastTimestamp = frame->getTimestamp();
 			this->lastFrameIndex = frame->getFrameIndex();
 
-			this->onNewFrameReceived(this->getFrame());
+			auto receivedFrame = this->getFrame();
+			this->onNewFrameReceived(receivedFrame);
 		}
 
 

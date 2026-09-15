@@ -1,9 +1,9 @@
 #pragma once
-#include "Blocking.h"
+#include "Callback.h"
 
 namespace ofxMachineVision {
 	namespace Device {
-		class StillImages : public Blocking {
+		class StillImages : public Callback {
 		public:
 			struct InitialisationSettings : Device::Base::InitialisationSettings {
 				InitialisationSettings() {
@@ -15,7 +15,8 @@ namespace ofxMachineVision {
 			shared_ptr<Device::Base::InitialisationSettings> getDefaultSettings() const override;
 			Specification open(shared_ptr<Base::InitialisationSettings> = nullptr) override;
 			void close() override;
-			shared_ptr<Frame> getFrame() override;
+			shared_ptr<Frame> getFrame();
+			void singleShot() override;
 		protected:
 			shared_ptr<Frame> frame;
 			size_t frameIndex = 0;

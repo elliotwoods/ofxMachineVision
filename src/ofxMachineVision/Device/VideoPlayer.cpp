@@ -53,7 +53,7 @@ namespace ofxMachineVision {
 			}
 
 			this->videoPlayer = make_shared<ofVideoPlayer>();
-			this->videoPlayer->load(typedInitialisationSettings->filename);
+			this->videoPlayer->load(typedInitialisationSettings->filename.get());
 			this->videoPlayer->setSpeed(typedInitialisationSettings->playbackRate);
 
 			ofxMachineVision::Specification specification(CaptureSequenceType::Continuous

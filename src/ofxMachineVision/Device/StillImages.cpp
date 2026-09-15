@@ -1,6 +1,9 @@
 #include "StillImages.h"
 #include "ofSystemUtils.h"
 #include "ofImage.h"
+#ifdef TARGET_OSX
+#include <pthread.h>
+#endif
 
 namespace ofxMachineVision {
 	namespace Device {
@@ -18,6 +21,7 @@ namespace ofxMachineVision {
 		//----------
 		ofxMachineVision::Specification StillImages::open(shared_ptr<Base::InitialisationSettings> /*= nullptr*/) {
 			this->openTime = chrono::system_clock::now();
+			this->parameters.clear();
 
 			{
 				this->exposure = make_shared<Parameter<float>>(ofParameter<float>("Exposure", 1.0f, 0.0f, 16.0f));
@@ -47,7 +51,20 @@ namespace ofxMachineVision {
 		}
 
 		//----------
+		void StillImages::singleShot() {
+			auto frame = this->getFrame();
+			if (frame) {
+				this->onNewFrame(frame);
+			}
+		}
+
+		//----------
 		shared_ptr<ofxMachineVision::Frame> StillImages::getFrame() {
+#ifdef TARGET_OSX
+			if (!pthread_main_np()) {
+				throw Exception("StillImages must select images on the main thread");
+			}
+#endif
 			auto result = ofSystemLoadDialog("Select image file");
 			if (result.bSuccess) {
 				auto frame = ofxMachineVision::FramePool::X().getAvailableFrame();
